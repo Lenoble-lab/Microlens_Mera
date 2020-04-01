@@ -1,0 +1,86 @@
+Nom de la simu
+
+
+parametres non physiques :
+--------------------------
+
+vlimit       =  prog principal
+n            =  prog principal
+nbsimul      =  prog principal
+nbMAX        =  prog principal
+
+distances mini et maxi :
+------------------------
+
+dsup = prog principal
+dinf = prog principal
+
+soleil :
+--------
+
+R = prog principal
+vrot = vperp (vy)
+elevation = prog principal     
+
+direction d'observation :
+-------------------------
+
+l =  prog principal
+b =  prog principal
+
+fonctions de masse :
+--------------------
+
+minf = prog principal
+msup = prog principal
+
+disque mince : fmdm
+disque epais : fmde
+bulbe        : fmbu 
+halo         : fmh
+
+disque mince :
+--------------
+
+rhodm
+
+disque epais :
+--------------
+
+rhode
+
+bulbe :
+-------
+
+rhobu
+
+halo :
+------
+
+rhoh
+
+ATTENTION, VERIFIER DANS DENSSOURCE, RHOLENS, NSOURCE QU'AUCUNE DENSITE N'EST MISE A 0
+
+dispersions de vitesse :
+------------------------
+
+sig**.m
+
+dans les trois direction teta, phi et r, pour les 4 composantes
+
+vitesses de rotation :
+----------------------
+
+vrot*.m
+
+pour les 4 composantes
+
+luminosite des sources :
+------------------------
+
+nsource  (parametre bet) 
+
+choix des populations des sources et lenses :
+---------------------------------------------
+
+prog principal
