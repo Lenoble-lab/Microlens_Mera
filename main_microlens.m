@@ -19,7 +19,7 @@ kpc=pc*1e3;  	Msol=1.989e30;
 c=299792458;	GMsol=1.32712497e20;
 
 %-------------------------------------------------
-% Paramètres vlimit (vitesse perpendiculaire maxi)
+% Paramï¿½tres vlimit (vitesse perpendiculaire maxi)
 %-------------------------------------------------
 
 global vlimit
@@ -36,7 +36,7 @@ nbsimul=500; %a augmenter pour meilleure stat
 nbMAX=500;
 
 %----------------------------------------------------------------------
-% Paramètres de la fonction de distribution de la distance de la source
+% Paramï¿½tres de la fonction de distribution de la distance de la source
 %----------------------------------------------------------------------
 
 global dsup dinf 
@@ -63,7 +63,7 @@ Rcoro = 3500;
 
 
 %---------------------------------------       
-% paramètres du calcul de microlentilles
+% paramï¿½tres du calcul de microlentilles
 %---------------------------------------
 global l b
 
@@ -77,12 +77,12 @@ b = -4 *pi/180;
 %l = 4 *pi/180;    % direction d'observation en radian
 %b = -1 *pi/180;
 
-uT = 1;		   % Seuil de détection en paramètre d'impact
-AT = 3/sqrt(5);    % Seuil de détection en amplification
+uT = 1;		   % Seuil de dï¿½tection en paramï¿½tre d'impact
+AT = 3/sqrt(5);    % Seuil de dï¿½tection en amplification
 
 
 %-----------------------------------
-% Paramètres de la fonction de masse
+% Paramï¿½tres de la fonction de masse
 %-----------------------------------
 global minfbu msupbu minfdm msupdm minfde msupde minfh msuph 
 global minf msup
@@ -123,7 +123,7 @@ msuptot=max([msupdm msupde msupbu msuph]);
 minftot=max([minfdm minfde minfbu minfh]);
 
 %-------------------------------------------------
-% Calcul préalable du cosinus pour aller plus vite
+% Calcul prï¿½alable du cosinus pour aller plus vite
 %-------------------------------------------------
 global sinb cosb  cosbl sinl cosl
 sinb = abs(sin(b));		cosb = cos(b);		cosl = cos(l);
@@ -140,10 +140,10 @@ cosbl=cos(b)*cos(l);		sinl = sin(l);
 
 global normfmdm mmeandm
 
-normfmdm=quad8('fmdm',minfdm,msupdm);
+normfmdm=quadl('fmdm',minfdm,msupdm);
 disp(['integrale de la fonction de masse du disque mince = ' num2str(normfmdm)]);
 
-mmeandm=quad8('mPmdm',minfdm,msupdm);
+mmeandm=quadl('mPmdm',minfdm,msupdm);
 
     %--------------------
     % cas du disque epais
@@ -151,10 +151,10 @@ mmeandm=quad8('mPmdm',minfdm,msupdm);
 
 global normfmde mmeande
 
-normfmde=quad8('fmde',minfde,msupde);
+normfmde=quadl('fmde',minfde,msupde);
 disp(['integrale de la fonction de masse du disque epais = ' num2str(normfmde)]);
 
-mmeande=quad8('mPmde',minfde,msupde);
+mmeande=quadl('mPmde',minfde,msupde);
 
 
     %-------------
@@ -163,10 +163,10 @@ mmeande=quad8('mPmde',minfde,msupde);
 
 global normfmbu mmeanbu
 
-normfmbu=quad8('fmbu',minfbu,msupbu);
+normfmbu=quadl('fmbu',minfbu,msupbu);
 disp(['integrale de la fonction de masse du bulbe = ' num2str(normfmbu)]);
 
-mmeanbu=quad8('mPmbu',minfbu,msupbu);
+mmeanbu=quadl('mPmbu',minfbu,msupbu);
 
     %------------
     % cas du halo
@@ -174,10 +174,10 @@ mmeanbu=quad8('mPmbu',minfbu,msupbu);
 
 global normfmh mmeanh
 
-normfmh=quad8('fmh',minfh,msuph);
+normfmh=quadl('fmh',minfh,msuph);
 disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
 
-mmeanh=quad8('mPmh',minfh,msuph);
+mmeanh=quadl('mPmh',minfh,msuph);
 
 %----------------------------------
 % comparaison avec KP
@@ -200,9 +200,9 @@ disp(['masse moyenne du halo = ' num2str(mmeanh)]);
 %calcul de la profondeur optique
 %-------------------------------
 
-normnu=quad8('nsource',dinf,dsup);
+normnu=quadl('nsource',dinf,dsup);
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-tau  = Ctau*dblquad('dtau',0,1,dinf,dsup,1e-2,'quad8') /normnu;
+tau  = Ctau*dblquad('dtau',0,1,dinf,dsup,1e-2,'quadl') /normnu;
 taucx=tau;
 tau=real(taucx);
 disp(['tau = ' num2str(taucx)]);
@@ -684,7 +684,7 @@ disp(['nb d''evt  = ' num2str(N)]);
 %------------------------------------
 
 %------------------------
-% Efficacités MACHO bulbe
+% Efficacitï¿½s MACHO bulbe
 %------------------------
 
 
