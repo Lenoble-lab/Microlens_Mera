@@ -3,5 +3,5 @@
 function pm = probadm(m)
 
 global normfmdm
-
+ 
 pm=fmdm(m)./normfmdm;
