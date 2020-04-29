@@ -87,6 +87,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 global minfbu msupbu minfdm msupdm minfde msupde minfh msuph 
 global minf msup
 
+
 minf=0.01;
 msup=100;
 
@@ -199,7 +200,6 @@ disp(['masse moyenne du halo = ' num2str(mmeanh)]);
 %-------------------------------
 %calcul de la profondeur optique
 %-------------------------------
-
 normnu=integral(@nsource,dinf,dsup);
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
 tau  = Ctau*integral2(@dtau,0,1,dinf,dsup) /normnu;
@@ -670,6 +670,9 @@ disp(['nombre d''evenements 2 = ' num2str(N)]);
 gam=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
+tau_MC = gamma*uT*pi/2*mean(te)/1e6/365.25;
+disp(['tau (integre par MC) = ' num2str(tau_MC)]);
+
 
 
 ttobs=tau/(gam/1e6/365.25);
@@ -910,7 +913,7 @@ gamobs = gam/length(te)*length(teobs)*max(eff);
 disp(['gamma (integre par MC) = ' num2str(gamobs)]);
 
 tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
-disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
+disp([' (calcule par le te moyen) = ' num2str(tauobs)]);
 
 
 %------------------------

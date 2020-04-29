@@ -3,7 +3,7 @@
 % Parametres : coordonnees cylindriques galactiques en pc R et z, et theta
 % retourne la densite de masse en Msol/pc^3
 
-function res = rhotd(R,z,th)
+function res = rhode(R,z,th)
 global Ro 
 
 % ------------
@@ -18,7 +18,7 @@ global Ro
 
 htd = 760;	        % Echelle de hauteur en pc
 Ltd = 3000; 	        % Echelle de longueur en pc
-rhtd = 0.05/10;        % densite au voisinage solaire, en Msol/pc^3
+rhtd = 0.05/20;        % densite au voisinage solaire, en Msol/pc^3
 
 res = rhtd.*exp(-R./Ltd-abs(z)./htd+Ro./Ltd);
 
