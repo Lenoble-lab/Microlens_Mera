@@ -28,7 +28,7 @@ function rh = rhodwek(R,z,th)
     
 
     %%-----------------------%%
-    %%Modèle de Iocco, 2018
+    %%Modèle de Iocco (G2), 2018
     %%-----------------------%%
     alpha=pi*24.9/180;
     beta=0;
@@ -41,20 +41,20 @@ function rh = rhodwek(R,z,th)
     %%-----------------------%%
     %%Modèle de Han&Gould, Calchi Novatti 2008, à l'origine le modèle G2 de Dwek 1995
     %%-----------------------%%
-    alpha=pi*20/180;
-    beta=0;
-    x0=1580; %en parsec
-    y0=620;
-    z0=430;
+    % alpha=pi*20/180;
+    % beta=0;
+    % x0=1580; %en parsec
+    % y0=620;
+    % z0=430;
 
     %%-----------------------%%
     %%Valeures présentes dans le code à l'origine
     %%-----------------------%%
-    alpha=pi*20/180;
-    beta=0;
-    x0=1490; %en parsec
-    y0=580;
-    z0=400;
+    % alpha=pi*20/180;
+    % beta=0;
+    % x0=1490; %en parsec
+    % y0=580;
+    % z0=400;
 
     
     %------------------------

@@ -26,26 +26,27 @@ x = (0:1e-5:1).*(dsup-dinf)+dinf+Rcoro+5000;
 [R, z, th] = toGC(x);
 
 dens_zhao = rhozhao(R, z, th);
-dens_dm = rhodm(R, z, th);
-dens_de = rhode(R, z, th);
+dens_G2 = rhodwek(R, z, th)
+dens_E2 = rhostanek(R, z, th)
+dens_HetG = rhobuHetG(R, z, th)
 
-% figure(1)
-% hold on;
-% plot(x, dens_zhao);
-% plot(x, dens_dm);
-% plot(x, dens_de);
-% % plot(x, R./dsup)
-% % plot(x, z/350)
-% 
-% legend('bulbe (Zhao)', 'disque mince', 'disque épais');
-% xlabel('distance au soleil (en pc))');
-% ylabel('densité de masse en M_{sol}/pc^{3}');
-% 
+
+
+% dens_dm = rhodm(R, z, th);
+% dens_de = rhode(R, z, th);
+
+figure(1)
+hold on;
+plot(x, dens_zhao);
+plot(x, dens_E2);
+plot(x, dens_G2);
+plot(x, dens_HetG)
+% plot(x, z/350)
+
+legend('bulbe (Zhao)', 'E2 (Stanek)', 'G2 (dwek)', 'H&G');
+xlabel('distance au soleil (en pc))');
+ylabel('densité de masse en M_{sol}/pc^{3}');
+
 % format long
 % m_bu = integral3(@rhozhao,-1000, 1000,-1000, 1000, 0, pi/4, 'method','iterated');
 % disp(['masse bulbe ', num2str(m_bu*8)])
-
-disp = sigtdm(R, z, th);
-
-figure(2)
-plot(R, disp);
