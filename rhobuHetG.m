@@ -13,15 +13,15 @@ function res = rhobuHetG(R,z,th)
 
     global Ro 
 
-    s = (R.^4 + (z./610).^4).^(1/4);
+    s = (R.^4 + (z./0.610).^4).^(1/4);
 
     i0 = find(s<938);
     i1 = find(s>=938 & R<700);
     i2 = find(R>=700);
 
 
-    res(i0) = 1.04e-3.*(s(i0)./482).^(-1.85);
-    res(i1) = 3.53e-9 * besseli(0, s(i1)/670);
+    res(i0) = 1.04e6.*(s(i0)./0.482).^(-1.85);
+    res(i1) = 3.53 * besseli(0, s(i1)/667);
 
     rho0 = 3.66e-2; %en M_sol/pc^3
     
