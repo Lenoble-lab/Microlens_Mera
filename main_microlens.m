@@ -1028,7 +1028,7 @@ hold off;
 % TRACAGE des trois graphiques precedents separement avec la distribution experimentale correspondante
 
 figure(19);
-j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes (valeur de l'observation)
+j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes
 hist(teff(j),bords1);% essayer aussi hi1=hist(teff(i),bords1)*gamobs*exposure/length(teff(i));
 teff(j)
 %bar(centre1,hi1,'r');
