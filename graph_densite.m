@@ -21,14 +21,14 @@ sinb = abs(sin(b));		cosb = cos(b);		cosl = cos(l);
 cosbl=cos(b)*cos(l);		sinl = sin(l);
 
 
-x = (0:1e-5:1).*(dsup-dinf)+dinf+Rcoro+5000;
+x = (0:1e-5:1).*(dsup-dinf)+dinf;
 
 [R, z, th] = toGC(x);
 
 dens_zhao = rhozhao(R, z, th);
-dens_G2 = rhodwek(R, z, th)
-dens_E2 = rhostanek(R, z, th)
-dens_HetG = rhobuHetG(R, z, th)
+dens_G2 = rhodwek(R, z, th);
+dens_E2 = rhostanek(R, z, th);
+dens_HetG = rhobuHetG(R, z, th);
 
 
 

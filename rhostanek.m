@@ -43,7 +43,7 @@ z=R.*cth*sa*sb-R.*sth*ca*sb+z*cb;
 
 
 
-a=sqrt((x/x0).^2+(y/y0).^2+(z/z0).^2);
+a=sqrt((x(i1)/x0).^2+(y(i1)/y0).^2+(z(i1)/z0).^2);
 
-r(i0) = zeros(size(i0))
-r(i1) = rho0*exp(-a);
+r(i0) = zeros(size(i0));
+r(i1) = rho0.*exp(-a);

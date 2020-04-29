@@ -20,10 +20,10 @@ function res = rhobuHetG(R,z,th)
     i2 = find(R>=700);
 
 
-    res(i0) = 1.04e6.*(s./482)^(-1.85);
-    res(i1) = 3.53 * besseli(s/670);
+    res(i0) = 1.04e-3.*(s(i0)./482).^(-1.85);
+    res(i1) = 3.53e-9 * besseli(0, s(i1)/670);
 
-    rho0 = 3.66e7; %en M_sol/pc^3
+    rho0 = 3.66e-2; %en M_sol/pc^3
     
     
     
@@ -54,7 +54,7 @@ function res = rhobuHetG(R,z,th)
     Y=-R.*cth*sa*cb+R.*sth*ca*cb+z*sb;
     Z=R.*cth*sa*sb-R.*sth*ca*sb+z*cb;
     
-    sb2=sqrt(((X/x0).^2+(Y/y0).^2).^2+(Z/z0).^4);
+    sb2=sqrt(((X(i2)/x0).^2+(Y(i2)/y0).^2).^2+(Z(i2)/z0).^4);
     %sa=sqrt((qa*qa*(X.^2+Y.^2)+Z.^2)/(z0^2));
     
     %-----------------

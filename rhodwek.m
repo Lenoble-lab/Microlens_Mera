@@ -18,13 +18,7 @@ function rh = rhodwek(R,z,th)
     % a modifier eventuellement
     %--------------------------
     
-    %rho0=1.1968;         % essai
-    
-    rho0=1.8469;         % masse du bulbe = 1.5e10 
-    %rho0=2.71;         % masse du bulbe = 2.2e10 
-    % rho0=1.2313;       % masse du bulbe = 1.0e10
-    %rho0=2.4625;         % masse du bulbe = 2.e10
-    %rho0=4;
+    rho0 = 1;
     
 
     %%-----------------------%%
