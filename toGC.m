@@ -14,3 +14,4 @@ z = d.*sinb+elev;
 theta = asin(d./R.*sinl*cosb);
 i = find(d*cosbl>=Ro); % cas des points situes au dela du centre galactique
 if (length(i)>=1), theta(i) = pi-theta(i); end
+    

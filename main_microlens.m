@@ -140,10 +140,10 @@ cosbl=cos(b)*cos(l);		sinl = sin(l);
 
 global normfmdm mmeandm
 
-normfmdm=integral(@fmdm,minfdm,msupdm);
-disp(['quadle de la fonction de masse du disque mince = ' num2str(normfmdm)]);
+normfmdm=quadl('fmdm',minfdm,msupdm);
+disp(['integrale de la fonction de masse du disque mince = ' num2str(normfmdm)]);
 
-mmeandm=integral(@mPmdm,minfdm,msupdm);
+mmeandm=quadl('mPmdm',minfdm,msupdm);
 
     %--------------------
     % cas du disque epais
@@ -151,10 +151,10 @@ mmeandm=integral(@mPmdm,minfdm,msupdm);
 
 global normfmde mmeande
 
-normfmde=integral(@fmde,minfde,msupde); %#ok<*Dquadl>
-disp(['quadle de la fonction de masse du disque epais = ' num2str(normfmde)]);
+normfmde=quadl('fmde',minfde,msupde);
+disp(['integrale de la fonction de masse du disque epais = ' num2str(normfmde)]);
 
-mmeande=integral(@mPmde,minfde,msupde);
+mmeande=quadl('mPmde',minfde,msupde);
 
 
     %-------------
@@ -163,10 +163,10 @@ mmeande=integral(@mPmde,minfde,msupde);
 
 global normfmbu mmeanbu
 
-normfmbu=integral(@fmbu,minfbu,msupbu);
-disp(['quadle de la fonction de masse du bulbe = ' num2str(normfmbu)]);
+normfmbu=quadl('fmbu',minfbu,msupbu);
+disp(['integrale de la fonction de masse du bulbe = ' num2str(normfmbu)]);
 
-mmeanbu=integral(@mPmbu,minfbu,msupbu);
+mmeanbu=quadl('mPmbu',minfbu,msupbu);
 
     %------------
     % cas du halo
@@ -174,10 +174,10 @@ mmeanbu=integral(@mPmbu,minfbu,msupbu);
 
 global normfmh mmeanh
 
-normfmh=integral(@fmh,minfh,msuph);
-disp(['quadle de la fonction de masse du halo = ' num2str(normfmh)]);
+normfmh=quadl('fmh',minfh,msuph);
+disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
 
-mmeanh=integral(@mPmh,minfh,msuph);
+mmeanh=quadl('mPmh',minfh,msuph);
 
 %----------------------------------
 % comparaison avec KP
@@ -200,9 +200,9 @@ disp(['masse moyenne du halo = ' num2str(mmeanh)]);
 %calcul de la profondeur optique
 %-------------------------------
 
-normnu=integral(@nsource,dinf,dsup);
+normnu=quadl('nsource',dinf,dsup);
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-tau  = Ctau*integral2(@dtau,0,1,dinf,dsup) /normnu;
+tau  = Ctau*dblquad('dtau',0,1,dinf,dsup,1e-2,'quadl') /normnu;
 taucx=tau;
 tau=real(taucx);
 disp(['tau = ' num2str(taucx)]);
@@ -274,9 +274,8 @@ ifds = ifds./ifds(end);	% on fait en sorte que la primitive varie de 0 a 1
 %-------------------------------------------
 % calcul du maximum de Gamma par monte carlo
 %-------------------------------------------
-gmax = zeros(1, nbMAX);
 
-for compteur = 1:nbMAX
+for compteur = 1:nbMAX,
     
     if ( rem(compteur,100) == 0 )
     
@@ -284,8 +283,7 @@ disp(['compteur = ' num2str(compteur)]);
 
     end
 
-rng('default');  %initialisation de l'aléatoire
-
+randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
 x=rand(1,n);
 ds=rand(1,n)*(dsup-dinf)+dinf;
 m=rand(1,n)*(msuptot-minftot)+minftot;
@@ -320,7 +318,7 @@ dgamma=[];
 dgammaccepte=[];        % initialisation pour les traitement ulterieur des donnees
 tecorrespondant=[];
 
-for compteur = 1:nbsimul
+for compteur = 1:nbsimul,
 
   if ( rem(compteur,100) == 0 )  
     
@@ -333,7 +331,7 @@ disp(['compteur = ' num2str(compteur)]);
 % Initialisation aleatoire des generateurs aleatoire
 %---------------------------------------------------
 
-rng('default')
+randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
 
 %----------------------------------
 %tirage de la distance de la source
@@ -353,24 +351,24 @@ x=rand(1,n);
 %------------------------------------------
 
 %ra=rand(1,n);
-%[R,z,theta]= toGC(ds);
-%rhotot = rhodm(R,z,theta) + rhode(R,z,theta) + rhobulbe(R,z,theta) + rhohalo(R,z,theta);
-%idms=find(ra<=(rhodm(R,z,theta)./rhotot));
-%ides=find(rhodm(R,z,theta)./rhotot<ra & ra <= (rhodm(R,z,theta)+rhode(R,z,theta))./rhotot);
-%ibus=find((rhodm(R,z,theta)+rhode(R,z,theta))./rhotot<ra & ra <= (rhodm(R,z,theta)+rhode(R,z,theta)+rhobulbe(R,z,theta))./rhotot);
-%ihs=find(ra >= (rhodm(R,z,theta)+rhode(R,z,theta)+rhobulbe(R,z,theta))./rhotot);
+%[R,z,th]= toGC(ds);
+%rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
+%idms=find(ra<=(rhodm(R,z,th)./rhotot));
+%ides=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
+%ibus=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+%ihs=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
 %--------------------------------------------
 %a quelle population appartient la lentille ?
 %--------------------------------------------
 
 %ra=rand(1,n);
-%[R,z,theta]= toGC(x.*ds);
-%rhotot = rhodm(R,z,theta) + rhode(R,z,theta) + rhobulbe(R,z,theta) + rhohalo(R,z,theta);
-%idml=find(ra<=(rhodm(R,z,theta)./rhotot));
-%idel=find(rhodm(R,z,theta)./rhotot<ra & ra <= (rhodm(R,z,theta)+rhode(R,z,theta))./rhotot);
-%ibul=find((rhodm(R,z,theta)+rhode(R,z,theta))./rhotot<ra & ra <= (rhodm(R,z,theta)+rhode(R,z,theta)+rhobulbe(R,z,theta))./rhotot);
-%ihl=find(ra >= (rhodm(R,z,theta)+rhode(R,z,theta)+rhobulbe(R,z,theta))./rhotot);
+%[R,z,th]= toGC(x.*ds);
+%rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
+%idml=find(ra<=(rhodm(R,z,th)./rhotot));
+%idel=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
+%ibul=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+%ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
 
 %-----------------------------------------------------------------
@@ -378,13 +376,13 @@ x=rand(1,n);
 % du disque si R>Rcoro, et du bulbe sinon
 %-----------------------------------------------------------------
 
-[R,z,theta]= toGC(x.*ds);
+[R,z,th]= toGC(x.*ds);
 ibul=find(R<=Rcoro);
 idml=find(R>Rcoro);
 idel=find(R<0.);
 ihl=find(R<0.);
 
-[R,z,theta]= toGC(ds);
+[R,z,th]= toGC(ds);
 ibus=find(R<=Rcoro);
 idms=find(R>Rcoro);
 ides=find(R<0.);
@@ -443,46 +441,46 @@ end;
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
 %----------------------------------------------
-[R,z,theta]= toGC(x.*ds);  % Attention  car il faut recalculer R qui a ete change pour le calcul toGC pour la source
+[R,z,th]= toGC(x.*ds);  % Attention  car il faut recalculer R qui a ete change pour le calcul toGC pour la source
 
-sigrl(idml)=sigrdm(R(idml),z(idml),theta(idml));
-sigtl(idml)=sigtdm(R(idml),z(idml),theta(idml));
-sigpl(idml)=sigpdm(R(idml),z(idml),theta(idml));
-sigrl(idel)=sigrde(R(idel),z(idel),theta(idel));
-sigtl(idel)=sigtde(R(idel),z(idel),theta(idel));
-sigpl(idel)=sigpde(R(idel),z(idel),theta(idel));
-sigrl(ibul)=sigrb(R(ibul),z(ibul),theta(ibul));
-sigtl(ibul)=sigtb(R(ibul),z(ibul),theta(ibul));
-sigpl(ibul)=sigpb(R(ibul),z(ibul),theta(ibul));
-sigrl(ihl)=sigrh(R(ihl),z(ihl),theta(ihl));
-sigtl(ihl)=sigth(R(ihl),z(ihl),theta(ihl));
-sigpl(ihl)=sigph(R(ihl),z(ihl),theta(ihl));
-vrotl(idml)=vrotdm(R(idml),z(idml),theta(idml));
-vrotl(idel)=vrotde(R(idel),z(idel),theta(idel));
-vrotl(ibul)=vrotb(R(ibul),z(ibul),theta(ibul));
-vrotl(ihl)=vroth(R(ihl),z(ihl),theta(ihl));
+sigrl(idml)=sigrdm(R(idml),z(idml),th(idml));
+sigtl(idml)=sigtdm(R(idml),z(idml),th(idml));
+sigpl(idml)=sigpdm(R(idml),z(idml),th(idml));
+sigrl(idel)=sigrde(R(idel),z(idel),th(idel));
+sigtl(idel)=sigtde(R(idel),z(idel),th(idel));
+sigpl(idel)=sigpde(R(idel),z(idel),th(idel));
+sigrl(ibul)=sigrb(R(ibul),z(ibul),th(ibul));
+sigtl(ibul)=sigtb(R(ibul),z(ibul),th(ibul));
+sigpl(ibul)=sigpb(R(ibul),z(ibul),th(ibul));
+sigrl(ihl)=sigrh(R(ihl),z(ihl),th(ihl));
+sigtl(ihl)=sigth(R(ihl),z(ihl),th(ihl));
+sigpl(ihl)=sigph(R(ihl),z(ihl),th(ihl));
+vrotl(idml)=vrotdm(R(idml),z(idml),th(idml));
+vrotl(idel)=vrotde(R(idel),z(idel),th(idel));
+vrotl(ibul)=vrotb(R(ibul),z(ibul),th(ibul));
+vrotl(ihl)=vroth(R(ihl),z(ihl),th(ihl));
 
 %--------------------------------------------
 %calcul des sigmas et v rotation de la source
 %--------------------------------------------
-[R,z,theta]= toGC(ds);  % Attention  car il faut recalculer R
+[R,z,th]= toGC(ds);  % Attention  car il faut recalculer R
 
-sigrs(idms)=sigrdm(R(idms),z(idms),theta(idms));
-sigts(idms)=sigtdm(R(idms),z(idms),theta(idms));
-sigps(idms)=sigpdm(R(idms),z(idms),theta(idms));
-sigrs(ides)=sigrde(R(ides),z(ides),theta(ides));
-sigts(ides)=sigtde(R(ides),z(ides),theta(ides));
-sigps(ides)=sigpde(R(ides),z(ides),theta(ides));
-sigrs(ibus)=sigrb(R(ibus),z(ibus),theta(ibus));
-sigts(ibus)=sigtb(R(ibus),z(ibus),theta(ibus));
-sigps(ibus)=sigpb(R(ibus),z(ibus),theta(ibus));
-sigrs(ihs)=sigrh(R(ihs),z(ihs),theta(ihs));
-sigts(ihs)=sigth(R(ihs),z(ihs),theta(ihs));
-sigps(ihs)=sigph(R(ihs),z(ihs),theta(ihs));
-vrots(idms)=vrotdm(R(idms),z(idms),theta(idms));
-vrots(ides)=vrotde(R(ides),z(ides),theta(ides));
-vrots(ibus)=vrotb(R(ibus),z(ibus),theta(ibus));
-vrots(ihs)=vroth(R(ihs),z(ihs),theta(ihs));
+sigrs(idms)=sigrdm(R(idms),z(idms),th(idms));
+sigts(idms)=sigtdm(R(idms),z(idms),th(idms));
+sigps(idms)=sigpdm(R(idms),z(idms),th(idms));
+sigrs(ides)=sigrde(R(ides),z(ides),th(ides));
+sigts(ides)=sigtde(R(ides),z(ides),th(ides));
+sigps(ides)=sigpde(R(ides),z(ides),th(ides));
+sigrs(ibus)=sigrb(R(ibus),z(ibus),th(ibus));
+sigts(ibus)=sigtb(R(ibus),z(ibus),th(ibus));
+sigps(ibus)=sigpb(R(ibus),z(ibus),th(ibus));
+sigrs(ihs)=sigrh(R(ihs),z(ihs),th(ihs));
+sigts(ihs)=sigth(R(ihs),z(ihs),th(ihs));
+sigps(ihs)=sigph(R(ihs),z(ihs),th(ihs));
+vrots(idms)=vrotdm(R(idms),z(idms),th(idms));
+vrots(ides)=vrotde(R(ides),z(ides),th(ides));
+vrots(ibus)=vrotb(R(ibus),z(ibus),th(ibus));
+vrots(ihs)=vroth(R(ihs),z(ihs),th(ihs));
 
 %cas particulier pour comparer avec Peale, la vitesse de rotation de la source est nulle
 
@@ -588,7 +586,7 @@ end;
 
 
 clear x glr glt glp sigrl sigtl sigpl vrotl ds gsr gst gsp sigrs sigts sigps vrots 
-clear v m ibul idel idml ihl ibus ides idms ihs ra R z theta rhotot evnts te strange
+clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strange
 
 end
 
@@ -704,7 +702,7 @@ tmachob = [ 0, 0.56, 0.7049, 0.8872, 1.116, 1.405, 1.769, 2.227, 2.803, 3.540, 4
 tmachob = tmachob/2.; %ATTENTION, lequel est le bon?????
 stdeffmachob = [ 0, 0, 0, 0.00091407, 0.016453, 0.0338, 0.05758, 0.08135, 0.11791, 0.14899, 0.1718, 0.2065, 0.2404, 0.2815, 0.3071, 0.3436, 0.3839, 0.4076, 0.4095, 0.4369, 0.4716, 0.4561, 0.4570, 0.4360, 0.4140, 0.3884];
 clpeffmachob = [ 0, 0.0054844, 0.001828, 0.01005, 0.08866, 0.1809, 0.2568, 0.3171, 0.4085, 0.4515, 0.5018, 0.5237, 0.5840, 0.6087, 0.6590, 0.6636, 0.7129, 0.7248, 0.8089, 0.7385, 0.7888, 0.7641, 0.6974, 0.6663, 0.6069, 0.5475];
-% ces quatres dernier tableaux sont tires des figures 1 et 12 de l'article The Macho Project : microlensing detection efficiency de Alcock et al, date du 21 march 2001.
+% ces quatres dernier tableaux sont tires des figures 1 et 12 de l'article The Macho Project :  
 sampleffmachobA = [0,0,0,0,0,0.002,0.0052,0.0103,0.0188,0.0284,0.0403,0.0589,0.0646,0.0896,0.1240,0.1563,0.1808,0.2041,0.2299,0.2609,0.2893,0.3182,0.3317,0.3616,0.3823,0.3961];
 sampleffmachobB = [0,0,0,0,0,0.001,0.0013,0.0026,0.0065,0.0129,0.0222,0.0413,0.0788,0.0992,0.1214,0.1679,0.2015,0.2392,0.2712,0.3100,0.3435,0.3771,0.3926,0.4197,0.4365,0.4435];
 photomeffmachobA = [0,0,0,0,0,0.0008,0.002,0.0057,0.0103,0.0181,0.0315,0.0459,0.0671,0.0916,0.1151,0.1471,0.1755,0.2104,0.2452,0.2757,0.3004,0.3317,0.3614,0.3872,0.4027,0.4181];
@@ -968,7 +966,7 @@ hold off;
 
 
 temaxgraphe=100;  % pour le trace des graphe
-temax=5000;       % pour le calcul quadl
+temax=5000;       % pour le calcul integral
 
 % Definition des differents nombres de bin pour les graphiques
 nbbin1=temaxgraphe;
@@ -1030,7 +1028,7 @@ hold off;
 % TRACAGE des trois graphiques precedents separement avec la distribution experimentale correspondante
 
 figure(19);
-j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes
+j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes (valeur de l'observation)
 hist(teff(j),bords1);% essayer aussi hi1=hist(teff(i),bords1)*gamobs*exposure/length(teff(i));
 teff(j)
 %bar(centre1,hi1,'r');
