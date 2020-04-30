@@ -23,7 +23,7 @@ function res = rhobuHetG(R,z,th)
     res(i0) = 1.04e6.*(s(i0)./0.482).^(-1.85);
     res(i1) = 3.53 * besseli(0, s(i1)/667);
 
-    rho0 = 3.66e-2; %en M_sol/pc^3
+    rho0 = 12; %en M_sol/pc^3
     
     
     

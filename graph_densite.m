@@ -30,23 +30,27 @@ dens_G2 = rhodwek(R, z, th);
 dens_E2 = rhostanek(R, z, th);
 dens_HetG = rhobuHetG(R, z, th);
 
-
+dens_d = rhobHetG(R, z, th);
 
 % dens_dm = rhodm(R, z, th);
 % dens_de = rhode(R, z, th);
 
 figure(1)
 hold on;
-plot(x, dens_zhao);
-plot(x, dens_E2);
-plot(x, dens_G2);
-plot(x, dens_HetG)
+% plot(x, dens_zhao);
+% plot(x, dens_E2);
+% plot(x, dens_G2);
+plot(x, dens_d)
 % plot(x, z/350)
 
-legend('bulbe (Zhao)', 'E2 (Stanek)', 'G2 (dwek)', 'H&G');
+
+% legend('bulbe (Zhao)', 'E2 (Stanek)', 'G2 (dwek)', 'H&G');
 xlabel('distance au soleil (en pc))');
 ylabel('densité de masse en M_{sol}/pc^{3}');
 
+
+
+
 % format long
-% m_bu = integral3(@rhozhao,-1000, 1000,-1000, 1000, 0, pi/4, 'method','iterated');
+% m_bu = integral3(@rhozhao,-1000, 1000,-1000, 1000, 0, pi/4);
 % disp(['masse bulbe ', num2str(m_bu*8)])
