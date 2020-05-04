@@ -19,7 +19,7 @@ function rh = rhodwek(R,z,th)
     %--------------------------
     
     rho0 = 1;
-    
+    rho0 = 2.4; %Masse du bulbe 1.410^10M_sol (Calchi Novatti)
 
     %%-----------------------%%
     %%Modèle de Iocco (G2), 2018

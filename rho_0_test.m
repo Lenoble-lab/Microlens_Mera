@@ -5,7 +5,7 @@
 
 
 %----------------------------------
-% Constantes physiques (unites SI)
+%% Constantes physiques (unites SI)
 %----------------------------------
 G=6.672e-11;	pc=3.08567802e16;
 kpc=pc*1e3;  	Msol=1.989e30;
@@ -13,13 +13,13 @@ c=299792458;	GMsol=1.32712497e20;
 
 
 %----------------------------------------------------------------------
-% Param�tres de la fonction de distribution de la distance de la source
+%% Param�tres de la fonction de distribution de la distance de la source
 %----------------------------------------------------------------------
 
 global dsup dinf 
 
-dsup = 10000.;
-dinf = 800.; %distance en parsec
+dsup = 30000.;
+dinf = 0.; %distance en parsec
 
 %-------
 % soleil 
@@ -31,7 +31,7 @@ Lkpc=Ro/1000;  % distance Sun-GC en kpc
 
 
 %----------------------------
-%rayon de corotation (en pc)
+%%rayon de corotation (en pc)
 %----------------------------
 
 global Rcoro
@@ -39,7 +39,7 @@ Rcoro = 3500;
 
 
 %---------------------------------------       
-% param�tres du calcul de microlentilles
+%% param�tres du calcul de microlentilles
 %---------------------------------------
 global l b
 
@@ -50,50 +50,58 @@ b = -2.68 *pi/180;
 uT = 1;	% donnée ogle	   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 
+
+
 %-------------------------------------------------
 % Calcul pr�alable du cosinus pour aller plus vite
 %-------------------------------------------------
 global sinb cosb  cosbl sinl cosl
 sinb = abs(sin(b));		cosb = cos(b);		cosl = cos(l);
-cosbl=cos(b)*cos(l);		sinl = sin(l);
-
-
-
-
-
-
-
+cosbl=cos(b)*cos(l);	sinl = sin(l);
 
 %-------------------------------
-%calcul de la profondeur optique
+%% calcul de la profondeur optique
 %-------------------------------
 
-normnu=quadl('nsource',dinf,dsup);
+x = (0:1e-3:1).*(dsup-dinf)+dinf;
+
+tau = zeros(size(x));
+y_2 = zeros(size(x));
+
+% for k = 1:numel(x)
+%     y(k) = integral(@nsource_1,0,x(k));
+%     y_2(k) = quadl(@nsource_1,0,x(k));
+% end
+
+
+dsup = 20000;
+dinf = 0;
+
+normnu=integral(@nsource_1,dinf,dsup);
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-tau  = Ctau*dblquad('dtau',0,1,dinf,dsup,1e-2,'quadl') /normnu;
+tau  = Ctau*integral2(@dtau_1,0,1,dinf,dsup) /normnu;
 taucx=tau;
 tau=real(taucx);
-disp(['tau = ' num2str(taucx)]);
-
+disp(['nsource = ' num2str(normnu*1e-11)]);
+disp(['tau = ' num2str(tau)]);
 
 
 % Fonction a integrer pour le calcul de profondeur optique 
 
-function res = dtau(x,L)
-    global Ro cosb cosbl sinb bet
+function res = dtau_1(x,L)
     
-    res = rho_tot(x.*L).*x.*(1-x).*nsource(L).*L.^2;
+    res = rho_tot(x.*L).*x.*(1-x).*nsource_1(L).*L.^2;
 end
 
 %% Nombre de source 
 %%Prend en compte la fonction de luminosité
-function res = nsource (x)
+function res = nsource_1 (x)
 
     global dsup dinf 
     
     res = zeros(size(x));
     
-    bet=-1;
+    bet=0;
     
     
     i1 = find(x>=dinf & x<=dsup);
@@ -112,8 +120,8 @@ function res = rho_tot(x)
     %---------------
     % source : bulbe
     %---------------
-    
-    res = res + rhostanek(R,z,th);
+    res = res + rhostanek(R, z, th);
+%     res = res + rhodwek(R, z, th);
     
     %----------------------
     % source : disque 
