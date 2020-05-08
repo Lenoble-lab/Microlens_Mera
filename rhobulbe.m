@@ -13,16 +13,22 @@ function res = rhobulbe(R,z,th)
 %res = rhobk(R,z,th);
 
 %-----------------
+% modele de Dweck
+%-----------------
+
+% res = rhodwek(R,z,th);
+
+%-----------------
 % modele de Stanek
 %-----------------
 
-%res = rhostanek(R,z,th);
+res = rhostanek(R,z,th);
 
 %---------------
 % modele de Zhao
 %---------------
 
-res = rhozhao(R,z,th);
+% res = rhozhao(R,z,th);
 
 %-----------------------
 % modele de Zhao tronque

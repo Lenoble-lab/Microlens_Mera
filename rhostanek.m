@@ -10,7 +10,9 @@ global Rcoro
 %Dans l'article, Rcoro = 3.5 kpc
 
 rho0 =  1.0;       % valeur test
-rho0 = 9.6;      %Masse du bulbe = 1.5 10^10 M_sol
+rho0 = 9.6;      %Masse du bulbe = 1.5 10^10 M_sol (Calchi novatti)
+
+rho0 = 9.6*0.826;
 
 
 i0 = find(R>Rcoro);
@@ -44,7 +46,10 @@ z=R.*cth*sa*sb-R.*sth*ca*sb+z.*cb;
 
 a = sqrt((x./x0).^2+(y./y0).^2+(z./z0).^2);
 
-% a = sqrt((x(i1)./x0).^2+(y(i1)./y0).^2+(z(i1)./z0).^2);
 r = rho0.*exp(-a);
+
+%Iocco (avec une coupure exponentielle
+% r(i0) = r(i0).*exp(-(R(i0)-Rcoro).^2/(2*500^2));
+
+%Calchi Novatti (arrêt brusque)
 r(i0) = zeros(size(i0));
-% r(i1) = rho0.*exp(-a);

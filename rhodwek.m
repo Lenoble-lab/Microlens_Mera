@@ -12,15 +12,28 @@
 
 function rh = rhodwek(R,z,th)
 
-    global Ro 
+    global Ro Rcoro
     %--------------------------
     % donnees du modele
     % a modifier eventuellement
     %--------------------------
     
-    rho0 = 1;
-    rho0 = 2.4; %Masse du bulbe 1.410^10M_sol (Calchi Novatti)
+%     rho0 = 1;
+   %-------------------------
+   %Donnee de calchi novatti
+   %------------------------
+%     rho0 = 2.4 ; %Masse du bulbe 1.410^10M_sol (Calchi Novatti)
 
+   %-------------------------
+   %Donnee de Iocco
+   %------------------------
+%     rho0 = 2.4 * 0.73; %Iocco, modèle 2
+
+    rho0 = 2.4 *0.94;
+
+    i0 = find(R>Rcoro);
+    i1 = find(R<=Rcoro);
+    
     %%-----------------------%%
     %%Modèle de Iocco (G2), 2018
     %%-----------------------%%
@@ -76,3 +89,6 @@ function rh = rhodwek(R,z,th)
     %-----------------
     
     rh=rho0*(exp(-sb2/2));  
+
+    %coupure exponentielle (Iocco)
+    rh(i0) = rh(i0).*exp(-(R(i0)-Rcoro).^2/(2*500^2));

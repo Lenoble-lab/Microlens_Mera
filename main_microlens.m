@@ -41,8 +41,8 @@ nbMAX=500;
 
 global dsup dinf 
 
-dsup = 10000.;
-dinf = 800.;
+dsup = 20000.;
+dinf = 0.;
 %distance en parsec
 
 %-------

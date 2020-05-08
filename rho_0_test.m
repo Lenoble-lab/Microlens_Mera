@@ -3,7 +3,7 @@
 
 %% Principe : on part de rho_0 = 1 et ensuite comme \tau en dépend, on le trouve pour que la valeur calculée correspondent à la valeur observée
 
-
+clear *
 %----------------------------------
 %% Constantes physiques (unites SI)
 %----------------------------------
@@ -17,9 +17,6 @@ c=299792458;	GMsol=1.32712497e20;
 %----------------------------------------------------------------------
 
 global dsup dinf 
-
-dsup = 30000.;
-dinf = 0.; %distance en parsec
 
 %-------
 % soleil 
@@ -44,13 +41,14 @@ Rcoro = 3500;
 global l b
 
 % definition de la fenetre de Baade :  l = 1 et b = -4
-l = 1.5 *pi/180;    % direction d'observation en radian
+l =1.5 *pi/180;    % direction d'observation en radian
 b = -2.68 *pi/180;
 
 uT = 1;	% donnée ogle	   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 
-
+L = [1.5, 1.16, -4.5, -1.5];
+B = [-2.68, -2.75, 2.4, 2.42];
 
 %-------------------------------------------------
 % Calcul pr�alable du cosinus pour aller plus vite
@@ -63,25 +61,14 @@ cosbl=cos(b)*cos(l);	sinl = sin(l);
 %% calcul de la profondeur optique
 %-------------------------------
 
-x = (0:1e-3:1).*(dsup-dinf)+dinf;
-
-tau = zeros(size(x));
-y_2 = zeros(size(x));
-
-% for k = 1:numel(x)
-%     y(k) = integral(@nsource_1,0,x(k));
-%     y_2(k) = quadl(@nsource_1,0,x(k));
-% end
-
 
 dsup = 20000;
 dinf = 0;
 
-normnu=integral(@nsource_1,dinf,dsup);
+normnu=real(integral(@nsource_1,dinf,dsup));
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-tau  = Ctau*integral2(@dtau_1,0,1,dinf,dsup) /normnu;
-taucx=tau;
-tau=real(taucx);
+tau  = Ctau*integral2(@dtau_1,0,1,dinf,dsup, 'Method', 'iterated') /normnu;
+tau=real(tau);
 disp(['nsource = ' num2str(normnu*1e-11)]);
 disp(['tau = ' num2str(tau)]);
 
@@ -90,7 +77,7 @@ disp(['tau = ' num2str(tau)]);
 
 function res = dtau_1(x,L)
     
-    res = rho_tot(x.*L).*x.*(1-x).*nsource_1(L).*L.^2;
+     res = rho_lens_1(x.*L).*x.*(1-x).*nsource_1(L).*L.^2;
 end
 
 %% Nombre de source 
@@ -102,18 +89,39 @@ function res = nsource_1 (x)
     res = zeros(size(x));
     
     bet=0;
-    
-    
+       
     i1 = find(x>=dinf & x<=dsup);
     if (length(i1)>=1)
-      res (i1) = rho_tot(x(i1)).*x(i1).^(2.*bet+2);
+      res (i1) = rho_source(x(i1)).*x(i1).^(2.*bet+2);
     end
 end
 
 %%densité totale bulbe+disque
-function res = rho_tot(x)
+function res = rho_lens_1(x)
 
     [R, z, th] = toGC(x);
+%     R = x; z=x ;  th = x;
+    
+    res=zeros(size(R));
+    
+    %---------------
+    % source : bulbe
+    %---------------
+    res = res + rhostanek(R, z, th);
+%     res = res + 0.885*rhodwek(R, z, th);
+    
+    %----------------------
+    % source : disque 
+    %----------------------
+    
+    res = res + rhodHetG(R,z,th);
+%     res = res + rhodm(R,z,th);
+    
+end
+function res = rho_source(x)
+
+    [R, z, th] = toGC(x);
+%     R = x; z=x ;  th = x;
     
     res=zeros(size(R));
     
@@ -128,5 +136,6 @@ function res = rho_tot(x)
     %----------------------
     
     res = res + rhodHetG(R,z,th);
-    
+%     res = res + rhodm(R,z,th);
 end
+    
