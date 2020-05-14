@@ -71,14 +71,14 @@ vly = vly - (1-x).*vysol + x.*vsy;
 vlz = vlz - (1-x).*vzsol + x.*vsz;
 
 %----------------------------------------------
-% Vitesse projetée le long de la ligne de visée
+% Vitesse projetï¿½e le long de la ligne de visï¿½e
 %----------------------------------------------
 
 vr = cosbl.*vlx + cosb.*sinl.*vly +sinb.*vlz;
 v  = vlx.*vlx + vly.*vly + vlz.*vlz;
 
 %------------------------------------------------------------
-% Norme de la vitesse perpendiculairement à la ligne de visée
+% Norme de la vitesse perpendiculairement ï¿½ la ligne de visï¿½e
 %------------------------------------------------------------
 
 vt = sqrt(v-vr.*vr);
