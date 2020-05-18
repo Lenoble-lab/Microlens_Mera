@@ -22,14 +22,14 @@ res = res + rhobulbe(R,z,th);
 %----------------------
 
 % res = res + rhodm(R,z,th)*mmeandm;
-% res = res + rhodm(R,z,th);
+res = res + rhodm(R,z,th);
 
 %----------------------
 % source : disque epais
 %----------------------
 
 % res = res + rhode(R,z,th)*mmeande;
-% res = res + rhode(R,z,th);
+res = res + rhode(R,z,th);
 
 %--------------
 % source : halo

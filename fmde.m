@@ -140,4 +140,5 @@ m0=0.095;
 %fonctions de masse externes
 %---------------------------
 
-pm=fmrecente(m);
+% pm=fmrecente(m);
+pm = fm2(m);

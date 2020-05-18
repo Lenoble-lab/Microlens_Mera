@@ -16,8 +16,8 @@ c=299792458;	GMsol=1.32712497e20;
 
 global dsup dinf 
 
-dsup = 30000.;
-dinf = 0.; %distance en parsec
+dsup = 12000.;
+dinf = 800.; %distance en parsec
 
 %-------
 % soleil 
@@ -44,19 +44,9 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 L = (0:1e-2:1).*20-10;
 B = (0:1e-2:1).*20-10;
 
-
-% L = [1.5, 1.16, -4.5, -1.5, 1.5, 4.5, 306.56, 331.09, 18.51, 26.6];
-% B = [-2.68, -2.75, 2.4, 2.42, 2.22, 2.53, -1.46, -2.42, -2.09, -2.15];
-
-
-% L = [1.5, 6, 8.5, 4];
-% B = [-2.68, 0, 0, 4];
-
-
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
 
 tau_table = zeros(size(L,2), size(B,2));
-% tau_table = zeros(size(L,2));
 
 for k = 1:numel(L)
         
@@ -64,10 +54,7 @@ for k = 1:numel(L)
     
 disp(['compteur = ' num2str(k)]);
 
-    end
-%     tau_table(k) = Ctau * tau(L(k), B(k));
-%     disp(['l = ' num2str(L(k)) '  b = ' num2str(B(k)) '  tau = ' num2str(tau_table(k))])
-    
+    end   
     for i = 1:numel(B)
         tau_table(k, i) = Ctau * tau(L(i), B(k));
         
@@ -106,11 +93,14 @@ tau_load = load('graph_iso.mat');
 
 figure(1)
 hold on
+% open_table7_1
 % contour(tau_load.B, tau_load.L, transpose(tau_load.tau_table), 'ShowText', 'on')
-contour(tau_load.B, tau_load.L, transpose(tau_load.tau_table), [0.3e-6, 1e-6, 1.5e-6, 2.3e-6, 3.5e-6], 'ShowText', 'on')
+contour(tau_load.B, tau_load.L, tau_load.tau_table.*1e6, [0.3, 1, 1.5, 2.17, 3], 'ShowText', 'on')
 % contour(tau_load.B, tau_load.L, transpose(tau_load.tau_table), [3.5e-6, 4e-6, 1.5e-6, 2.17e-6, 3e-6], 'ShowText', 'on')
 % contour(tau_load.B, tau_load.L, fliplr(transpose(tau_load.tau_table)),[3.5e-6, 6e-6, 1.5e-6, 2.17e-6, 3e-6], 'ShowText', 'on')
 
+xlabel('longitude galactique (en degrès)')
+ylabel('latitude galactique (en degrés)')
 
 %-------------------------------
 %calcul de la profondeur optique, let b en degré

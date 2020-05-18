@@ -22,19 +22,19 @@ res = res + rhobulbe(R,z,th);
 % lentille : disque H et G
 %----------------------
 
-res = res + rhodHetG(R, z, th);
+% res = res + rhodHetG(R, z, th);
 
 %----------------------
 % lentille : disque mince
 %----------------------
 
-% res = res + rhodm(R,z,th);
+res = res + rhodm(R,z,th);
 
 %----------------------
 % lentille : disque epais
 %----------------------
 
-% res = res + rhode(R,z,th);
+res = res + rhode(R,z,th);
 
 %--------------
 % lentille : halo

@@ -1,15 +1,21 @@
-% Dispersion de vitesse des etoiles du disque dans la direction phi
+% Dispersion de vitesse des etoiles du disque dans la direction z
+% orthogonale au plan
 %
 % Parametres : coordonnees Galactiques en pc
 % Sortie: dispersion de vitesse en m/s
 
-function res = siglp(R,z,t)
-%res = ones(size(R)).*20e3*sqrt(2);
-%res = ones(size(R)).*20e3;
+function res = sigzdm(R,z,t)
+
+
 
 global Rcoro Ro
 
-res = ones(size(R)) * 20.8e3;
+
+% donnée de Pasetto, S. et al 
+%"Thin disk kinematics from RAVE and the solar motion", Astronomy and Astrophysics 547 (2012), pp. A71.
+
+% res = ones(size(R)) * 16.3e3;
+res = zeros(size(R));
 
 % i0 = find( R <= Rcoro );   
 % i1 = find( R > Rcoro & R <= (Rcoro+Ro)/2 );

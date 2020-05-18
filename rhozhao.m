@@ -21,30 +21,33 @@ function rh = rhozhao(R,z,th)
 rho0=1.8469;         % masse du bulbe = 1.5e10 
 %rho0=2.71;         % masse du bulbe = 2.2e10   
 % rho0=1.2313;       % masse du bulbe = 1.0e10
-%rho0=2.4625;         % masse du bulbe = 2.e10
+% rho0=2.4625;         % masse du bulbe = 2.e10
 %rho0=4;
 
 %--------------
 %Modèle M4 de Iocco
 %-------------
-rho0 = 2.3 ;
-
-alpha=pi*25/180;
-beta=0;
-x0=900;
-y0=900;
-z0=399;
-qa=0.6;
-
-
-
-
-% alpha=pi*20/180;
+% rho0 = 2.3 ;
+% 
+% alpha=pi*25/180;
 % beta=0;
-% x0=1490; %en parsec
-% y0=580;
-% z0=400;
+% x0=900;
+% y0=900;
+% z0=399;
 % qa=0.6;
+
+
+
+%----------------
+% Modèle de Alibert
+%-----------------
+
+alpha=pi*20/180;
+beta=0;
+x0=1490; %en parsec
+y0=580;
+z0=400;
+qa=0.6;
 
 %------------------------
 %intermediaires de calcul

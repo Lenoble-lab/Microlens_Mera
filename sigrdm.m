@@ -3,7 +3,7 @@
 % Parametres : coordonnees Galactiques en pc
 % Sortie: dispersion de vitesse en m/s
 
-function res = siglp(R,z,t)
+function res = sigrdm(R,z,t)
 %res = ones(size(R)).*20e3*sqrt(2);
 %res = ones(size(R)).*20e3;
 
@@ -13,12 +13,7 @@ global Rcoro Ro
 % donnée de Pasetto, S. et al 
 %"Thin disk kinematics from RAVE and the solar motion", Astronomy and Astrophysics 547 (2012), pp. A71.
 
-res = ones(size(R)) * 27.4
-
-
-\sigma_{r}^{thin}=27.4\pm1.1\ km/s\quad	\sigma_{r}^{thick}=56.1\pm3.8\ km/s
-\sigma_{\theta}^{thin}=20.8\pm1.2\ km/s\quad	\sigma_{\theta}^{thick}=46.1\pm6.7\ km/s
-\sigma_{z}^{thin}=16.3\pm2.2\ km/s\quad	\sigma_{z}^{thick}=35.1\pm3.4\ km/s
+res = ones(size(R)) * 27.4e3;
 
 
 % i0 = find( R <= Rcoro );   

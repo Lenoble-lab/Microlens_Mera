@@ -30,8 +30,8 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-%n=20000;
-n = 10000;
+n = 20000;
+% n = 10000;
 nbsimul=500; %a augmenter pour meilleure stat
 nbMAX=500;
 
@@ -41,8 +41,8 @@ nbMAX=500;
 
 global dsup dinf 
 
-dsup = 20000.;
-dinf = 0.;
+dsup = 15000.;
+dinf = 800.;
 %distance en parsec
 
 %-------
@@ -69,13 +69,13 @@ global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-l = 1 *pi/180;    % direction d'observation en radian
-b = -4 *pi/180;
+% l = 1 *pi/180;    % direction d'observation en radian
+% b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-%l = 4 *pi/180;    % direction d'observation en radian
-%b = -1 *pi/180;
+l = 4 *pi/180;    % direction d'observation en radian
+b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -140,10 +140,10 @@ cosbl=cos(b)*cos(l);		sinl = sin(l);
 
 global normfmdm mmeandm
 
-normfmdm=quadl('fmdm',minfdm,msupdm);
+normfmdm=integral(@fmdm,minfdm,msupdm);
 disp(['integrale de la fonction de masse du disque mince = ' num2str(normfmdm)]);
 
-mmeandm=quadl('mPmdm',minfdm,msupdm);
+mmeandm=integral(@mPmdm,minfdm,msupdm);
 
     %--------------------
     % cas du disque epais
@@ -151,10 +151,10 @@ mmeandm=quadl('mPmdm',minfdm,msupdm);
 
 global normfmde mmeande
 
-normfmde=quadl('fmde',minfde,msupde);
+normfmde=integral(@fmde,minfde,msupde);
 disp(['integrale de la fonction de masse du disque epais = ' num2str(normfmde)]);
 
-mmeande=quadl('mPmde',minfde,msupde);
+mmeande=integral(@mPmde,minfde,msupde);
 
 
     %-------------
@@ -163,10 +163,10 @@ mmeande=quadl('mPmde',minfde,msupde);
 
 global normfmbu mmeanbu
 
-normfmbu=quadl('fmbu',minfbu,msupbu);
+normfmbu=integral(@fmbu,minfbu,msupbu);
 disp(['integrale de la fonction de masse du bulbe = ' num2str(normfmbu)]);
 
-mmeanbu=quadl('mPmbu',minfbu,msupbu);
+mmeanbu=integral(@mPmbu,minfbu,msupbu);
 
     %------------
     % cas du halo
@@ -174,10 +174,10 @@ mmeanbu=quadl('mPmbu',minfbu,msupbu);
 
 global normfmh mmeanh
 
-normfmh=quadl('fmh',minfh,msuph);
+normfmh=integral(@fmh,minfh,msuph);
 disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
 
-mmeanh=quadl('mPmh',minfh,msuph);
+mmeanh=integral(@mPmh,minfh,msuph);
 
 %----------------------------------
 % comparaison avec KP
@@ -200,9 +200,9 @@ disp(['masse moyenne du halo = ' num2str(mmeanh)]);
 %calcul de la profondeur optique
 %-------------------------------
 
-normnu=quadl('nsource',dinf,dsup);
+normnu=integral(@nsource,dinf,dsup);
 Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-tau  = Ctau*dblquad('dtau',0,1,dinf,dsup,1e-2,'quadl') /normnu;
+tau = Ctau * integral2(@dtau,0,1,dinf,dsup, 'Method', 'iterated') /normnu;
 taucx=tau;
 tau=real(taucx);
 disp(['tau = ' num2str(taucx)]);
@@ -265,11 +265,19 @@ ifmmh = ifmmh./ifmmh(end);	% on fait en sorte que la primitive varie de 0 a 1
 % Preparation de la table pour le tirage aleatoire de la distance de la source
 %-----------------------------------------------------------------------------
 
+% dd = (0:1e-5:1).*(dsup-dinf)+dinf;
+% fds = nsource (dd);
+% ifds = real(cumsum(fds));	% primitive 
+% ifds = ifds-ifds(1);
+% ifds = ifds./ifds(end);	% on fait en sorte que la primitive varie de 0 a 1
+
 dd = (0:1e-5:1).*(dsup-dinf)+dinf;
+disp(dd(500));
 fds = nsource (dd);
 ifds = cumsum(fds);	% primitive 
 ifds = ifds-ifds(1);
-ifds = ifds./ifds(end);	% on fait en sorte que la primitive varie de 0 a 1
+ifds = real(ifds./ifds(end));	% on fait en sorte que la primitive varie de 0 a 1
+
 
 %-------------------------------------------
 % calcul du maximum de Gamma par monte carlo
@@ -283,7 +291,8 @@ disp(['compteur = ' num2str(compteur)]);
 
     end
 
-randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
+% randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
+
 x=rand(1,n);
 ds=rand(1,n)*(dsup-dinf)+dinf;
 m=rand(1,n)*(msuptot-minftot)+minftot;
@@ -331,14 +340,16 @@ disp(['compteur = ' num2str(compteur)]);
 % Initialisation aleatoire des generateurs aleatoire
 %---------------------------------------------------
 
-randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
+% randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
 
 %----------------------------------
 %tirage de la distance de la source
 %----------------------------------
 
 ra = rand(1,n);
-ds = interp1(ifds,dd,ra);
+[ifds, index] = unique(ifds); 
+
+ds = interp1(ifds,dd(index),ra);
 
 %------------
 % Tirage de x
@@ -350,25 +361,25 @@ x=rand(1,n);
 %a quelle population appartient la source ?
 %------------------------------------------
 
-%ra=rand(1,n);
-%[R,z,th]= toGC(ds);
-%rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
-%idms=find(ra<=(rhodm(R,z,th)./rhotot));
-%ides=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
-%ibus=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
-%ihs=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+% ra=rand(1,n);
+% [R,z,th]= toGC(ds);
+% rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
+% idms=find(ra<=(rhodm(R,z,th)./rhotot));
+% ides=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
+% ibus=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+% ihs=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
 %--------------------------------------------
 %a quelle population appartient la lentille ?
 %--------------------------------------------
 
-%ra=rand(1,n);
-%[R,z,th]= toGC(x.*ds);
-%rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
-%idml=find(ra<=(rhodm(R,z,th)./rhotot));
-%idel=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
-%ibul=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
-%ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+% ra=rand(1,n);
+% [R,z,th]= toGC(x.*ds);
+% rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
+% idml=find(ra<=(rhodm(R,z,th)./rhotot));
+% idel=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
+% ibul=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+% ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
 
 %-----------------------------------------------------------------
@@ -443,18 +454,39 @@ end;
 %----------------------------------------------
 [R,z,th]= toGC(x.*ds);  % Attention  car il faut recalculer R qui a ete change pour le calcul toGC pour la source
 
+
+%direction u_r et u_theta
+
+%Disque mince
 sigrl(idml)=sigrdm(R(idml),z(idml),th(idml));
 sigtl(idml)=sigtdm(R(idml),z(idml),th(idml));
-sigpl(idml)=sigpdm(R(idml),z(idml),th(idml));
-sigrl(idel)=sigrde(R(idel),z(idel),th(idel));
-sigtl(idel)=sigtde(R(idel),z(idel),th(idel));
-sigpl(idel)=sigpde(R(idel),z(idel),th(idel));
+
+%Disque épais
+% sigrl(idel)=sigrde(R(idel),z(idel),th(idel));
+% sigtl(idel)=sigtde(R(idel),z(idel),th(idel));
+
+%Bulbe
 sigrl(ibul)=sigrb(R(ibul),z(ibul),th(ibul));
 sigtl(ibul)=sigtb(R(ibul),z(ibul),th(ibul));
+
+%Halo
+% sigrl(ihl)=sigrh(R(ihl),z(ihl),th(ihl));
+% sigtl(ihl)=sigth(R(ihl),z(ihl),th(ihl));
+
+
+%Coordonnée cylindrique u_z
+% sigzl(idml)=sigzdm(R(idml),z(idml),th(idml));
+% sigzl(ibul)=sigzb(R(ibul),z(ibul),th(ibul));
+% % sigzl(idel)=sigzde(R(idel),z(idel),th(idel));
+% sigzl(ihl)=sigzh(R(ihl),z(ihl),th(ihl));
+
+%Coordonnée sphérique u_phi
+sigpl(idml)=sigpdm(R(idml),z(idml),th(idml));
+sigpl(idel)=sigpde(R(idel),z(idel),th(idel));
 sigpl(ibul)=sigpb(R(ibul),z(ibul),th(ibul));
-sigrl(ihl)=sigrh(R(ihl),z(ihl),th(ihl));
-sigtl(ihl)=sigth(R(ihl),z(ihl),th(ihl));
 sigpl(ihl)=sigph(R(ihl),z(ihl),th(ihl));
+
+
 vrotl(idml)=vrotdm(R(idml),z(idml),th(idml));
 vrotl(idel)=vrotde(R(idel),z(idel),th(idel));
 vrotl(ibul)=vrotb(R(ibul),z(ibul),th(ibul));
@@ -463,20 +495,40 @@ vrotl(ihl)=vroth(R(ihl),z(ihl),th(ihl));
 %--------------------------------------------
 %calcul des sigmas et v rotation de la source
 %--------------------------------------------
+
 [R,z,th]= toGC(ds);  % Attention  car il faut recalculer R
 
+%disque mince
 sigrs(idms)=sigrdm(R(idms),z(idms),th(idms));
 sigts(idms)=sigtdm(R(idms),z(idms),th(idms));
-sigps(idms)=sigpdm(R(idms),z(idms),th(idms));
-sigrs(ides)=sigrde(R(ides),z(ides),th(ides));
-sigts(ides)=sigtde(R(ides),z(ides),th(ides));
-sigps(ides)=sigpde(R(ides),z(ides),th(ides));
+
+%disque épais
+% sigrs(ides)=sigrde(R(ides),z(ides),th(ides));
+% sigts(ides)=sigtde(R(ides),z(ides),th(ides));
+
+%Bulbe
 sigrs(ibus)=sigrb(R(ibus),z(ibus),th(ibus));
 sigts(ibus)=sigtb(R(ibus),z(ibus),th(ibus));
+
+%Halo
+% sigrs(ihs)=sigrh(R(ihs),z(ihs),th(ihs));
+% sigts(ihs)=sigth(R(ihs),z(ihs),th(ihs));
+
+%Coordonnée cylindrique u_z
+% sigzs(idms)=sigzdm(R(idms),z(idms),th(idms));
+% sigzs(ides)=sigzde(R(ides),z(ides),th(ides));
+% sigzs(ibus)=sigzb(R(ibus),z(ibus),th(ibus));
+% sigzs(ihs)=sigzh(R(ihs),z(ihs),th(ihs));
+
+
+%Coordonnée sphérique u_phi
+sigps(idms)=sigpdm(R(idms),z(idms),th(idms));
+sigps(ides)=sigpde(R(ides),z(ides),th(ides));
 sigps(ibus)=sigpb(R(ibus),z(ibus),th(ibus));
-sigrs(ihs)=sigrh(R(ihs),z(ihs),th(ihs));
-sigts(ihs)=sigth(R(ihs),z(ihs),th(ihs));
 sigps(ihs)=sigph(R(ihs),z(ihs),th(ihs));
+
+
+
 vrots(idms)=vrotdm(R(idms),z(idms),th(idms));
 vrots(ides)=vrotde(R(ides),z(ides),th(ides));
 vrots(ibus)=vrotb(R(ibus),z(ibus),th(ibus));
@@ -505,7 +557,12 @@ glr = rand(1,n);	gsr = rand(1,n);
 glt = rand(1,n);	gst = rand(1,n);
 glp = rand(1,n);	gsp = rand(1,n);
 
+%cooronnées phériques
 v = vperp(x,glr,glt,glp,sigrl,sigtl,sigpl,vrotl,ds,gsr,gst,gsp,sigrs,sigts,sigps,vrots);
+
+
+%coordonées cylindriques
+% v_cyl = vperp_cyl(x,glr,glp,glt,sigrl,sigtl,sigzl,vrotl,ds,gsr,gsp,gst,sigrs,sigts,sigzs,vrots);
 
 vlim=vlimit*ones(size(v));
 
@@ -595,6 +652,12 @@ end
 fclose(fid);
 fclose(fids);
 
+
+%---------------------
+%% Analyse des résultats
+%---------------------
+
+close all;
 fid=fopen(fichres,'w');
 
 fprintf(fid,'%15.11f  \n',tau);
@@ -676,7 +739,6 @@ N=gam*expos;
 disp(['nb d''evt  = ' num2str(N)]);
 
 
-
 %------------------------------------
 %------------------------------------
 % application du facteur d'efficacite
@@ -733,42 +795,42 @@ photomeffmachoB= [0,0.0012,0.0023,0.0045,0.0103,0.0258,0.0542,0.0955,0.1523,0.21
 
 %TRACE DES EFFICACITES EN FONCTION DU TEMPS (ECHELLE LOG) 
 
-lt=log10(tmachob);
-figure(5);
-title('graphe des differentes efficacites pour les donnees machob');
-hold on;
-plot(lt,stdeffmachob,'g--');
-plot(lt,clpeffmachob,'c--');
-plot(lt,sampleffmachobA,'b-');
-plot(lt,sampleffmachobB,'r-');
-plot(lt,photomeffmachobA,'b-.');
-plot(lt,photomeffmachobB,'r-.');
-legend('stdeff','clpeff','sampleffA','sampleffB','photomeffA','photomeffB');
-hold off;
-
-lt=log10(tebulbe);
-figure(51);
-title('graphe des differentes efficacites pour les donnees tebulbe');
-hold on;
-plot(lt,sampleffA,'b-');
-plot(lt,sampleffB,'r-');
-plot(lt,photomeffA,'b-.');
-plot(lt,photomeffB,'r-.');
-legend('sampleffA','sampleffB','photomeffA','photomeffB');
-hold off;
-
-lt=log10(tmachoNEW);
-figure(6);
-title('graphe des differentes efficacites pour les donnees machoNEW');
-hold on;
-plot(lt,effmachoA,'g--');
-plot(lt,effmachoB,'c--');
-plot(lt,sampleffmachoA,'b-');
-plot(lt,sampleffmachoB,'r-');
-plot(lt,photomeffmachoA,'b-.');
-plot(lt,photomeffmachoB,'r-.');
-legend('effA','effB','sampleffA','sampleffB','photomeffA','photomeffB');
-hold off;
+% lt=log14(tmachob);
+% figure(5);
+% title('graphe des differentes efficacites pour les donnees machob');
+% hold on;
+% plot(lt,stdeffmachob,'g--');
+% plot(lt,clpeffmachob,'c--');
+% plot(lt,sampleffmachobA,'b-');
+% plot(lt,sampleffmachobB,'r-');
+% plot(lt,photomeffmachobA,'b-.');
+% plot(lt,photomeffmachobB,'r-.');
+% legend('stdeff','clpeff','sampleffA','sampleffB','photomeffA','photomeffB');
+% hold off;
+% 
+% lt=log10(tebulbe);
+% figure(51);
+% title('graphe des differentes efficacites pour les donnees tebulbe');
+% hold on;
+% plot(lt,sampleffA,'b-');
+% plot(lt,sampleffB,'r-');
+% plot(lt,photomeffA,'b-.');
+% plot(lt,photomeffB,'r-.');
+% legend('sampleffA','sampleffB','photomeffA','photomeffB');
+% hold off;
+% 
+% lt=log10(tmachoNEW);
+% figure(6);
+% title('graphe des differentes efficacites pour les donnees machoNEW');
+% hold on;
+% plot(lt,effmachoA,'g--');
+% plot(lt,effmachoB,'c--');
+% plot(lt,sampleffmachoA,'b-');
+% plot(lt,sampleffmachoB,'r-');
+% plot(lt,photomeffmachoA,'b-.');
+% plot(lt,photomeffmachoB,'r-.');
+% legend('effA','effB','sampleffA','sampleffB','photomeffA','photomeffB');
+% hold off;
 
 
 %----------------------
@@ -828,11 +890,11 @@ ra = rand(1,length(te))*max(effinterp);
 % Trace dgamma accepte en fonction de tecorrespondant
 
 size(tecorrespondant);   % verification de leurs tailles pour le tracage
-size(dgammaccepte);
-figure(7);
-plot(tecorrespondant,dgammaccepte,'b.');
-title('dgammaccepte en fonction de tecorrespondant (resultat du Monte-Carlo)');
-hold off;
+% size(dgammaccepte);
+% figure(7);
+% plot(tecorrespondant,dgammaccepte,'b.');
+% title('dgammaccepte en fonction de tecorrespondant (resultat du Monte-Carlo)');
+% hold off;
 
 
 ecar=0.5;
@@ -844,37 +906,37 @@ for i = ecar:ecar:max(tecorrespondant);
     dg(k)=max(d);
 end;
 i = ecar:ecar:max(tecorrespondant);
-figure(8);
-plot(i,dg,'r-');
-axis([0,100,0,1]);
-title('dgammaccepte en fonction de tecorrespondant ( envelope ou fonction reelle )');
-hold off;
+% figure(8);
+% plot(i,dg,'r-');
+% axis([0,100,0,1]);
+% title('dgammaccepte en fonction de tecorrespondant ( envelope ou fonction reelle )');
+% hold off;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure(9);
-ep=interp1(tinterp,effinterp,i);
-des=ep.*dg;
-plot(i,des,'g-');
-axis([0,100,0,0.05]);
-title('taux d''evt en fonction de te (a un facteur pres  ( epsilon*dgamma) )');
-hold off;
+% figure(9);
+% ep=interp1(tinterp,effinterp,i);
+% des=ep.*dg;
+% plot(i,des,'g-');
+% axis([0,100,0,0.05]);
+% title('taux d''evt en fonction de te (a un facteur pres  ( epsilon*dgamma) )');
+% hold off;
 
 
 
-% Trace de la distrib de te (simulation)
-figure(10);
-hist(te,1000);
-title('Distribution de te obtenu a partir de la simulation');
-hold off;
-
-%Trace de la fonction d'efficacite
-figure(11);
-lt = log(te);
-plot(lt,effsim,'.');
-title('efficacite de la simulation en fonction des durees d''evenements (echelle log)');
-hold off;
-
-
+% % Trace de la distrib de te (simulation)
+% figure(10);
+% hist(te,1000);
+% title('Distribution de te obtenu a partir de la simulation');
+% hold off;
+% 
+% %Trace de la fonction d'efficacite
+% figure(11);
+% lt = log(te);
+% plot(lt,effsim,'.');
+% title('efficacite de la simulation en fonction des durees d''evenements (echelle log)');
+% hold off;
+% 
+% 
 
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
@@ -882,16 +944,17 @@ hold off;
 
 i1 = find(ra-effsim<=0);
 teobs=te(i1);
-
-lt=log10(teobs);
-figure(81); %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-plot(lt,ra(i1),'.');
-title('resultat du Monte-Carlo sur l''efficacite');
-hold off;
+% 
+% lt=log10(teobs);
+% figure(81); %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% plot(lt,ra(i1),'.');
+% title('resultat du Monte-Carlo sur l''efficacite');
+% hold off;
 
 %teobs=te;  c'est faux puisqu'il faut faire
 %l'integration qui se fait soit par le monte carlo soit en essayant de
 %faire le veritable calcul (un des autres essai que j'ai fait).
+
 
 %---------------
 %calcul de gamma
@@ -950,12 +1013,24 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Trace la distrib de te en zoomant
-figure(16);
-hist(te,1000);
-axis([0,80,0,3500]);
+
+
+
+
+%Trace la distribde te en zoomant
+[hist, edges] = histcounts(te, 3'0, 'BinLimits',[0,30], 'Normalization', 'probability');
+centre = zeros(size(edges)-[0,1]);
+
+for j =1:length(centre);
+centre(j)=(edges(j)+edges(j+1))/2;
+end
+
+figure(18);
+% histogram(te, 30, 'BinLimits',[1,30]);
+plot(centre, hist);
 title('Distribution de te (en zoomant)');
 hold off;
+
 %trace la distrib de teobs
 figure(17);
 hist(teobs,1000);
@@ -973,8 +1048,12 @@ nbbin1=temaxgraphe;
 nbbin2=temaxgraphe/2;     
 nbbin5=temaxgraphe/5;
 
-exposure=6.5244;
+bords1 = zeros(1, nbbin1) ; centre1 = zeros(1, nbbin1-1);
+bords2 = zeros(1, nbbin2) ; centre2 = zeros(1, nbbin2-1);
+bords5 = zeros(1, nbbin5) ; centre5 = zeros(1, nbbin5-1);
 
+exposure=6.5244;
+teobs = te;
 %Definition des tableaux bords et centre pour une largeur de 1 jour
 for j =1:nbbin1;
 bords1(j)=temaxgraphe/nbbin1*(j-1);
@@ -1018,6 +1097,7 @@ hold on;
 plot(centre1,h1,'b-');
 plot(centre2,h2,'r-');
 plot(centre5,h5,'g-');
+axis([0,30,0,20]);
 title('Diagramme des evenements obtenu par simulation pour des largeurs de representation differentes');
 legend('largeur de 1 jour','largeur de 2 jours','largeur de 5 jours');
 xlabel('durees d''evenements');
@@ -1030,7 +1110,7 @@ hold off;
 figure(19);
 j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes
 hist(teff(j),bords1);% essayer aussi hi1=hist(teff(i),bords1)*gamobs*exposure/length(teff(i));
-teff(j)
+teff(j);
 %bar(centre1,hi1,'r');
 hold on;
 plot(centre1,h1,'r');
@@ -1112,15 +1192,15 @@ disp(['nb d''evt par l''experience :' num2str(nombre6) ]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Trace dgamma (c'est le dgamma global et non pas celui apres le Monte-Carlo)
 % Pour avoir quelque chose de coherent, trace plutot dgammaccepte
-figure(22);
-mgam=max(dgamma);
-y=0:mgam/100000:mgam;
-h4=histc(dgamma,y);
-h4=h4+1;
-h4=log(h4);
-bar(y,h4);
-title('distrib de dgamma');
-hold off;
+% figure(22);
+% mgam=max(dgamma);
+% y=0:mgam/100000:mgam;
+% h4=histc(dgamma,y);
+% h4=h4+1;
+% h4=log(h4);
+% bar(y,h4);
+% title('distrib de dgamma');
+% hold off;
 %trace dgamma avec une echelle log pour la lisibilite
 %figure(23);
 %%dgamma=dgamma*1000+1;

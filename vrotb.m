@@ -1,4 +1,4 @@
-% Courbe de rotation pour les etoiles du bulbe
+    % Courbe de rotation pour les etoiles du bulbe
 %
 % Parametre : les coordonnees galactiques
 % retourne la vitesse vphi en m/s

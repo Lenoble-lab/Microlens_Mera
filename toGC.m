@@ -10,7 +10,7 @@ function [R, z, theta] = toGC(d)
 global Ro sinl cosl cosbl cosb sinb elev
 R = sqrt(Ro.*Ro+d.*d.*cosb.*cosb-2.*Ro.*d.*cosbl);
 z = d.*sinb+elev;
-theta = asin(d./R.*sinl);
+theta = asin(d./R.*sinl.*cosb);
 i = find(d*cosbl>=Ro); % cas des points situes au dela du centre galactique
 if (length(i)>=1), theta(i) = pi-theta(i); end
     

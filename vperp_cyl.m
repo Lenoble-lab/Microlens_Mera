@@ -1,4 +1,4 @@
-function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigrs,sigts,sigps,vrots)
+function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigrs,sigts,sigzs,vrots)
 
     global cosb cosbl sinb L0 sinl vsp vsr vst vlr vlp vlt Ro
     
@@ -29,14 +29,17 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     % calcul des angles pour conversion en cartesien
     %-----------------------------------------------
     
-    sth = x.*L*cosb.*sinl./R;
-    cth = -(Ro-x.*L.*cosbl)./R;
+%     sth = x.*L*cosb.*sinl./R;
+%     cth = -(Ro-x.*L.*cosbl)./R;
+
+    cth = -cos(th);
+    sth = sin(th);
     
     %----------------------------------
     % calcul de la vitesse en cartesien
     %----------------------------------
     
-    vlx = -vlr.*cth + vlt.*sth;
+    vlx = vlr.*cth - vlt.*sth;
     vly = vlr.*sth + vlt.*cth;
     
     %-----------------------------------------------------------------------------
@@ -52,16 +55,18 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     
     vsr = sigrs.*erfinv(2.*gsr-1);
     vst = sigts.*erfinv(2.*gst-1)+vrots;
-    vsz = sigps.*erfinv(2.*gsp-1);
+    vsz = sigzs.*erfinv(2.*gsz-1);
     
-    sth = x.*L*cosb.*sinl./R;
-    cth = -(Ro-x.*L.*cosbl)./R;
-    
+%     sth = x.*L*cosb.*sinl./R;
+%     cth = -(Ro-x.*L.*cosbl)./R;
+
+    cth = -cos(th);
+    sth = sin(th);
     %----------------------------------
     % calcul de la vitesse en cartesien
     %----------------------------------
     
-    vsx = -vsr.*cth + vst.*sth;
+    vsx = vsr.*cth - vst.*sth;
     vsy = vsr.*sth + vst.*cth;
     
     
