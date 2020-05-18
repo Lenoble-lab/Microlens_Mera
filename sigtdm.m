@@ -14,8 +14,8 @@ global Rcoro Ro
 % donnée de Pasetto, S. et al 
 %"Thin disk kinematics from RAVE and the solar motion", Astronomy and Astrophysics 547 (2012), pp. A71.
 
-% res = ones(size(R)) * 20.8e3;
-res = zeros(size(R));
+res = ones(size(R)) * 20.8e3;
+% res = zeros(size(R));
 
 % i0 = find( R <= Rcoro );   
 % i1 = find( R > Rcoro & R <= (Rcoro+Ro)/2 );

@@ -50,7 +50,7 @@ dinf = 800.;
 %-------
 global Ro elev
 Ro = 8000;	   % distance Sun-GC en pc
-elev = 0 ;      % elevation au dessus du plan du disque
+elev = 26 ;      % elevation au dessus du plan du disque
 Lkpc=Ro/1000;  % distance Sun-GC en kpc
 
 
@@ -361,25 +361,25 @@ x=rand(1,n);
 %a quelle population appartient la source ?
 %------------------------------------------
 
-% ra=rand(1,n);
-% [R,z,th]= toGC(ds);
-% rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
-% idms=find(ra<=(rhodm(R,z,th)./rhotot));
-% ides=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
-% ibus=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
-% ihs=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+ra=rand(1,n);
+[R,z,th]= toGC(ds);
+rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
+idms=find(ra<=(rhodm(R,z,th)./rhotot));
+ides=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
+ibus=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+ihs=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
 %--------------------------------------------
 %a quelle population appartient la lentille ?
 %--------------------------------------------
 
-% ra=rand(1,n);
-% [R,z,th]= toGC(x.*ds);
-% rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
-% idml=find(ra<=(rhodm(R,z,th)./rhotot));
-% idel=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
-% ibul=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
-% ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+ra=rand(1,n);
+[R,z,th]= toGC(x.*ds);
+rhotot = rhodm(R,z,th) + rhode(R,z,th) + rhobulbe(R,z,th) + rhohalo(R,z,th);
+idml=find(ra<=(rhodm(R,z,th)./rhotot));
+idel=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot);
+ibul=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
+ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
 
 %-----------------------------------------------------------------
@@ -387,17 +387,17 @@ x=rand(1,n);
 % du disque si R>Rcoro, et du bulbe sinon
 %-----------------------------------------------------------------
 
-[R,z,th]= toGC(x.*ds);
-ibul=find(R<=Rcoro);
-idml=find(R>Rcoro);
-idel=find(R<0.);
-ihl=find(R<0.);
+% [R,z,th]= toGC(x.*ds);
+% ibul=find(R<=Rcoro);
+% idml=find(R>Rcoro);
+% idel=find(R<0.);
+% ihl=find(R<0.);
 
-[R,z,th]= toGC(ds);
-ibus=find(R<=Rcoro);
-idms=find(R>Rcoro);
-ides=find(R<0.);
-ihs=find(R<0.);
+% [R,z,th]= toGC(ds);
+% ibus=find(R<=Rcoro);
+% idms=find(R>Rcoro);
+% ides=find(R<0.);
+% ihs=find(R<0.);
 
 
 %---------------------------------
@@ -475,16 +475,16 @@ sigtl(ibul)=sigtb(R(ibul),z(ibul),th(ibul));
 
 
 %Coordonnée cylindrique u_z
-% sigzl(idml)=sigzdm(R(idml),z(idml),th(idml));
-% sigzl(ibul)=sigzb(R(ibul),z(ibul),th(ibul));
-% % sigzl(idel)=sigzde(R(idel),z(idel),th(idel));
+sigzl(idml)=sigzdm(R(idml),z(idml),th(idml));
+sigzl(ibul)=sigzb(R(ibul),z(ibul),th(ibul));
+sigzl(idel)=sigzde(R(idel),z(idel),th(idel));
 % sigzl(ihl)=sigzh(R(ihl),z(ihl),th(ihl));
 
 %Coordonnée sphérique u_phi
-sigpl(idml)=sigpdm(R(idml),z(idml),th(idml));
-sigpl(idel)=sigpde(R(idel),z(idel),th(idel));
-sigpl(ibul)=sigpb(R(ibul),z(ibul),th(ibul));
-sigpl(ihl)=sigph(R(ihl),z(ihl),th(ihl));
+% sigpl(idml)=sigpdm(R(idml),z(idml),th(idml));
+% sigpl(idel)=sigpde(R(idel),z(idel),th(idel));
+% sigpl(ibul)=sigpb(R(ibul),z(ibul),th(ibul));
+% sigpl(ihl)=sigph(R(ihl),z(ihl),th(ihl));
 
 
 vrotl(idml)=vrotdm(R(idml),z(idml),th(idml));
@@ -515,17 +515,17 @@ sigts(ibus)=sigtb(R(ibus),z(ibus),th(ibus));
 % sigts(ihs)=sigth(R(ihs),z(ihs),th(ihs));
 
 %Coordonnée cylindrique u_z
-% sigzs(idms)=sigzdm(R(idms),z(idms),th(idms));
-% sigzs(ides)=sigzde(R(ides),z(ides),th(ides));
-% sigzs(ibus)=sigzb(R(ibus),z(ibus),th(ibus));
+sigzs(idms)=sigzdm(R(idms),z(idms),th(idms));
+sigzs(ides)=sigzde(R(ides),z(ides),th(ides));
+sigzs(ibus)=sigzb(R(ibus),z(ibus),th(ibus));
 % sigzs(ihs)=sigzh(R(ihs),z(ihs),th(ihs));
 
 
 %Coordonnée sphérique u_phi
-sigps(idms)=sigpdm(R(idms),z(idms),th(idms));
-sigps(ides)=sigpde(R(ides),z(ides),th(ides));
-sigps(ibus)=sigpb(R(ibus),z(ibus),th(ibus));
-sigps(ihs)=sigph(R(ihs),z(ihs),th(ihs));
+% sigps(idms)=sigpdm(R(idms),z(idms),th(idms));
+% sigps(ides)=sigpde(R(ides),z(ides),th(ides));
+% sigps(ibus)=sigpb(R(ibus),z(ibus),th(ibus));
+% sigps(ihs)=sigph(R(ihs),z(ihs),th(ihs));
 
 
 

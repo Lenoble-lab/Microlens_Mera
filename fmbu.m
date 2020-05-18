@@ -138,5 +138,4 @@ fraction=0;
 %fonctions de masse externes
 %---------------------------
 
-% pm=fmrecente(m);
-pm = fm2(m);
+pm=fmrecente(m);

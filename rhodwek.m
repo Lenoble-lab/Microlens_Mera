@@ -18,7 +18,7 @@ function rh = rhodwek(R,z,th)
     % a modifier eventuellement
     %--------------------------
     
-%     rho0 = 1;
+rho0 = 1;
    %-------------------------
    %Donnee de calchi novatti
    %------------------------
@@ -37,22 +37,22 @@ function rh = rhodwek(R,z,th)
     %%-----------------------%%
     %%Modèle de Iocco (G2), 2018
     %%-----------------------%%
-    alpha=pi*24.9/180;
-    beta=0;
-    x0=1239 * Ro/8000;; %en parsec
-    y0=609 * Ro/8000;;
-    z0=438 * Ro/8000;;
-    qa=0.6 * Ro/8000;;
+    % alpha=pi*24.9/180;
+    % beta=0;
+    % x0=1239 * Ro/8000;; %en parsec
+    % y0=609 * Ro/8000;;
+    % z0=438 * Ro/8000;;
+    % qa=0.6 * Ro/8000;;
     
     
     %%-----------------------%%
     %%Modèle de Han&Gould, Calchi Novatti 2008, à l'origine le modèle G2 de Dwek 1995
     %%-----------------------%%
-    % alpha=pi*20/180;
-    % beta=0;
-    % x0=1580; %en parsec
-    % y0=620;
-    % z0=430;
+    alpha=pi*20/180;
+    beta=0;
+    x0=1580; %en parsec
+    y0=620;
+    z0=430;
 
     %%-----------------------%%
     %%Valeures présentes dans le code à l'origine
