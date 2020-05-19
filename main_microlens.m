@@ -1013,28 +1013,49 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%telechargement de la courbe modèle
+
+load ../graph/evenements_1.txt
+te_model = evenements_1(:,5);
+
+%exposure OGLE
+exposure = 1084267/10^(6)*1330/365.25;
+
+%Paramètre graph
+nbre_bin = 30;
+bin_max = 30;
 
 
-
-
-%Trace la distribde te en zoomant
+%Trace la distribde te normalisée
 [hist, edges] = histcounts(te, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
+[hist_model, edges] = histcounts(te_model, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
+
+%tracé de la distribution avec l'exposition 
+[hist_ogle, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
+[hist_ogle_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max]);
+
 centre = zeros(size(edges)-[0,1]);
 
 for j =1:length(centre);
 centre(j)=(edges(j)+edges(j+1))/2;
 end
 
-openfig('../graph/hist_te_1.fig')
 figure(16)
 hold on;
-% histogram(te, 30, 'BinLimits',[1,30]);
 plot(centre, hist, 'black');
-title('Distribution de te');
+plot(centre, hist_model, 'red');
+title('Distribution de te normalisée');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
-hold off;
+figure(17)
+hold on;
+plot(centre, hist_ogle.*(gam*exposure/length(te)), 'black');
+plot(centre, hist_ogle_model.*(28.3855*exposure/length(te_model)), 'red');
+title('Distribution de te vu par ogle');
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
+
 
 %trace la distrib de teobs
 figure(17);
