@@ -5,5 +5,5 @@
 
 function res = sigtb(R,z,t)
 res = ones(size(R)).*110e3;
-%res = ones(size(R)).*140e3;
+% res = ones(size(R)).*120e3;
 % res = zeros(size(R));

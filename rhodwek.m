@@ -50,7 +50,7 @@ function rh = rhodwek(R,z,th)
     %%-----------------------%%
     %%Modèle de Han&Gould, Calchi Novatti 2008, à l'origine le modèle G2 de Dwek 1995
     %%-----------------------%%
-    alpha=pi*15/180;
+    alpha=pi*28/180;
     beta=0;
     x0=1580; %en parsec
     y0=620;
