@@ -69,13 +69,13 @@ global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-% l = 1 *pi/180;    % direction d'observation en radian
-% b = -4 *pi/180;
+l = 1 *pi/180;    % direction d'observation en radian
+b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-l = 4 *pi/180;    % direction d'observation en radian
-b = -1 *pi/180;
+% l = 4 *pi/180;    % direction d'observation en radian
+% b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -218,7 +218,7 @@ disp(['tau = ' num2str(taucx)]);
 
 
 %-------------------------------------------------------------
-% Preparation de la table pour le tirage aleatoire de la masse
+%% Preparation de la table pour le tirage aleatoire de la masse
 %-------------------------------------------------------------
 
     %--------------------
@@ -462,8 +462,8 @@ sigrl(idml)=sigrdm(R(idml),z(idml),th(idml));
 sigtl(idml)=sigtdm(R(idml),z(idml),th(idml));
 
 %Disque épais
-% sigrl(idel)=sigrde(R(idel),z(idel),th(idel));
-% sigtl(idel)=sigtde(R(idel),z(idel),th(idel));
+sigrl(idel)=sigrde(R(idel),z(idel),th(idel));
+sigtl(idel)=sigtde(R(idel),z(idel),th(idel));
 
 %Bulbe
 sigrl(ibul)=sigrb(R(ibul),z(ibul),th(ibul));
@@ -503,8 +503,8 @@ sigrs(idms)=sigrdm(R(idms),z(idms),th(idms));
 sigts(idms)=sigtdm(R(idms),z(idms),th(idms));
 
 %disque épais
-% sigrs(ides)=sigrde(R(ides),z(ides),th(ides));
-% sigts(ides)=sigtde(R(ides),z(ides),th(ides));
+sigrs(ides)=sigrde(R(ides),z(ides),th(ides));
+sigts(ides)=sigtde(R(ides),z(ides),th(ides));
 
 %Bulbe
 sigrs(ibus)=sigrb(R(ibus),z(ibus),th(ibus));
@@ -558,11 +558,11 @@ glt = rand(1,n);	gst = rand(1,n);
 glp = rand(1,n);	gsp = rand(1,n);
 
 %cooronnées phériques
-v = vperp(x,glr,glt,glp,sigrl,sigtl,sigpl,vrotl,ds,gsr,gst,gsp,sigrs,sigts,sigps,vrots);
+% v = vperp(x,glr,glt,glp,sigrl,sigtl,sigpl,vrotl,ds,gsr,gst,gsp,sigrs,sigts,sigps,vrots);
 
 
 %coordonées cylindriques
-% v_cyl = vperp_cyl(x,glr,glp,glt,sigrl,sigtl,sigzl,vrotl,ds,gsr,gsp,gst,sigrs,sigts,sigzs,vrots);
+v = vperp_cyl(x,glr,glp,glt,sigrl,sigtl,sigzl,vrotl,ds,gsr,gsp,gst,sigrs,sigts,sigzs,vrots);
 
 vlim=vlimit*ones(size(v));
 
@@ -1018,17 +1018,22 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 
 
 %Trace la distribde te en zoomant
-[hist, edges] = histcounts(te, 3'0, 'BinLimits',[0,30], 'Normalization', 'probability');
+[hist, edges] = histcounts(te, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
 centre = zeros(size(edges)-[0,1]);
 
 for j =1:length(centre);
 centre(j)=(edges(j)+edges(j+1))/2;
 end
 
-figure(18);
+openfig('../graph/hist_te_1.fig')
+figure(16)
+hold on;
 % histogram(te, 30, 'BinLimits',[1,30]);
-plot(centre, hist);
-title('Distribution de te (en zoomant)');
+plot(centre, hist, 'black');
+title('Distribution de te');
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
+
 hold off;
 
 %trace la distrib de teobs
@@ -1209,6 +1214,9 @@ disp(['nb d''evt par l''experience :' num2str(nombre6) ]);
 %title('distrib de dgamma echelle log1000');
 %hold off;
 %n'a pas trop d'interet
+
+
+
 
 
 

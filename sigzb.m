@@ -6,4 +6,4 @@
 function res = sigzb(R,z,t)
 res = ones(size(R)).*110e3;
 
-res = zeros(size(R));
+% res = zeros(size(R));

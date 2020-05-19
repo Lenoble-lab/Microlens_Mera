@@ -5,8 +5,8 @@ global dsup dinf Ro elev Rcoro
 Rcoro = 3500;
 elev = 0;
 Ro = 8000;
-dsup = 10000.;
-dinf = 0.; %distance en parsec
+dsup = 8500.;
+dinf = 100.; %distance en parsec
 
 global l b
 
@@ -30,36 +30,59 @@ x = (0:1e-5:1).*(dsup-dinf)+dinf;
 % dens_E2 = rhostanek(R, z, th);
 % dens_HetG = rhobuHetG(R, z, th);
 
+% dens_d = rhodHetG(R, z, th);
+% dens_dm = rhodm(R, z, th);
+% dens_de = rhode(R, z, th);
 
-dens_d = rhodHetG(R, z, th);
+i0 = find( R <= Rcoro );   
+i1 = find( R > Rcoro);
 
-dens_dm = rhodm(R, z, th);
-dens_de = rhode(R, z, th);
-
-
+vrot(i1) = vrotdm(R(i1),z(i1),th(i1));
+vrot(i0) = vrotb(R(i0),z(i0),th(i0));
 
 figure(1)
 hold on;
+plot(x,vrotdm(x,z,th).*1e-3);
+title('Vitesse de rotation en fonction de R');
+xlabel('distance au centre galactique')
+ylabel('vitesse en km/s')
+% plot(x, vrotb(R,z,th).*1e-2);
 % plot(x, dens_zhao);
 % plot(x, dens_E2);
 % plot(x, dens_G2);
 % legend('bulbe (Zhao)', 'E2 (Stanek)', 'G2 (dwek)', 'H&G');
 
 
-plot(x, dens_d)
-plot(x, dens_dm)
-plot(x, dens_de)
-legend('H et G', 'dm', 'de')
-
-xlabel('distance au soleil (en pc))');
-ylabel('densité de masse en M_{sol}/pc^{3}');
+% plot(x, dens_d)
+% plot(x, dens_dm)
+% plot(x, dens_de)  
+% legend('H et G', 'dm', 'de')
+% 
+% xlabel('distance au soleil (en pc))');
+% ylabel('densité de masse en M_{sol}/pc^{3}');
 
 %% Integration pour le calcul de la masse
-maxx = 1e6;
+maxx = 1e7;
 format long
-m_bu = integral3(@rho_zhao_simple,0, maxx, 0, maxx, 0, maxx);
-disp(['masse bulbe ', num2str(m_bu*8e-10)])
+m_bu = integral3(@rho_dweck_simple,0, maxx, 0, maxx, 0, maxx);
+disp(['masse bulbe ', num2str(m_bu)])
 
+function rh = rho_dweck_simple(X,Y,Z)
+    
+    x0=1; %en parsec
+    y0=1;
+    z0=1;
+    
+    rho0 = 1/(6.57*pi*x0*y0*z0);
+    rho0 = 1/(2*pi*2^(3/2)*2*0.675*x0*y0*z0);
+    sb2=sqrt(((X/x0).^2+(Y/y0).^2).^2+(Z/z0).^4);
+    
+    %-----------------
+    % densite de masse
+    %-----------------
+    
+    rh=rho0*(exp(-sb2/2));  
+end
 function rh = rho_zhao_simple(X,Y,Z)
     
     x0=1490; %en parsec

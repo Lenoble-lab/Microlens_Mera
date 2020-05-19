@@ -16,7 +16,7 @@ c=299792458;	GMsol=1.32712497e20;
 
 global dsup dinf 
 
-dsup = 12000.;
+dsup = 15000.;
 dinf = 800.; %distance en parsec
 
 %-------
@@ -63,7 +63,7 @@ end
 
 disp([' '])
 
-save('graph_iso.mat', 'tau_table', 'B', 'L')
+save('graph_iso_model.mat', 'tau_table', 'B', 'L')
 
 %% test densité
 R = (0:1e-3:1).*4000;
@@ -89,7 +89,7 @@ contour(X, Y, rho, '--black', 'ShowText', 'on');
 
 
 clear
-tau_load = load('graph_iso.mat');
+tau_load = load('graph_iso_model.mat');
 
 figure(1)
 hold on
@@ -99,6 +99,8 @@ contour(tau_load.B, tau_load.L, tau_load.tau_table.*1e6, [0.3, 1, 1.5, 2.17, 3],
 % contour(tau_load.B, tau_load.L, transpose(tau_load.tau_table), [3.5e-6, 4e-6, 1.5e-6, 2.17e-6, 3e-6], 'ShowText', 'on')
 % contour(tau_load.B, tau_load.L, fliplr(transpose(tau_load.tau_table)),[3.5e-6, 6e-6, 1.5e-6, 2.17e-6, 3e-6], 'ShowText', 'on')
 
+grid on;
+grid minor
 xlabel('longitude galactique (en degrès)')
 ylabel('latitude galactique (en degrés)')
 

@@ -13,13 +13,15 @@
 function rh = rhodwek(R,z,th)
 
     global Ro Rcoro
-    %--------------------------
-    % donnees du modele
-    % a modifier eventuellement
-    %--------------------------
     
-rho0 = 1;
-   %-------------------------
+%--------------------------
+%Moniez et al (eros)
+%--------------------------
+
+%rho0 = M_b/(6.57*pi*a*b*c
+  
+
+    %-------------------------
    %Donnee de calchi novatti
    %------------------------
 %     rho0 = 2.4 ; %Masse du bulbe 1.410^10M_sol (Calchi Novatti)
@@ -29,10 +31,10 @@ rho0 = 1;
    %------------------------
 %     rho0 = 2.4 * 0.73; %Iocco, modèle 2
 
-    rho0 = 2.4 *0.94;
-
-    i0 = find(R>Rcoro);
-    i1 = find(R<=Rcoro);
+%     rho0 = 2.4 *0.94;
+% 
+%     i0 = find(R>Rcoro);
+%     i1 = find(R<=Rcoro);
     
     %%-----------------------%%
     %%Modèle de Iocco (G2), 2018
@@ -48,12 +50,16 @@ rho0 = 1;
     %%-----------------------%%
     %%Modèle de Han&Gould, Calchi Novatti 2008, à l'origine le modèle G2 de Dwek 1995
     %%-----------------------%%
-    alpha=pi*20/180;
+    alpha=pi*15/180;
     beta=0;
     x0=1580; %en parsec
     y0=620;
     z0=430;
 
+    M_b= 1.8*1e10; 
+    rho0 = M_b/(6.57*pi*x0*y0*z0);
+    
+    
     %%-----------------------%%
     %%Valeures présentes dans le code à l'origine
     %%-----------------------%%
@@ -82,7 +88,6 @@ rho0 = 1;
     Z=R.*cth*sa*sb-R.*sth*ca*sb+z*cb;
     
     sb2=sqrt(((X/x0).^2+(Y/y0).^2).^2+(Z/z0).^4);
-    %sa=sqrt((qa*qa*(X.^2+Y.^2)+Z.^2)/(z0^2));
     
     %-----------------
     % densite de masse
@@ -91,4 +96,4 @@ rho0 = 1;
     rh=rho0*(exp(-sb2/2));  
 
     %coupure exponentielle (Iocco)
-    rh(i0) = rh(i0).*exp(-(R(i0)-Rcoro).^2/(2*500^2));
+%     rh(i0) = rh(i0).*exp(-(R(i0)-Rcoro).^2/(2*500^2));
