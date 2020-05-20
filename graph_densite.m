@@ -62,34 +62,52 @@ ylabel('vitesse en km/s')
 % ylabel('densité de masse en M_{sol}/pc^{3}');
 
 %% Integration pour le calcul de la masse
-maxx = 1e7;
+clear *
+maxx = 1e5;
 format long
-m_bu = integral3(@rho_dweck_simple,0, maxx, 0, maxx, 0, maxx);
-disp(['masse bulbe ', num2str(m_bu)])
+m_bu = integral3(@rho_stanek_simple,0, maxx, 0, maxx, 0, maxx);
+disp(['masse bulbe ', num2str(m_bu*8*1e-10)])
+
+function rh = rho_stanek_simple(x,y,z)
+
+x0=890;
+y0=x0.*4.3/10;
+z0=x0.*2.8/10;
+
+M_b = 2e10;
+rho0 = M_b/(x0*y0*z0*8*pi);
+
+a = sqrt((x./x0).^2+(y./y0).^2+(z./z0).^2);
+
+rh = rho0.*exp(-a);
+end
 
 function rh = rho_dweck_simple(X,Y,Z)
     
-    x0=1; %en parsec
-    y0=1;
-    z0=1;
+x0=890;
+y0=x0.*4.3/10;
+z0=x0.*2.8/10;
     
-    rho0 = 1/(6.57*pi*x0*y0*z0);
-    rho0 = 1/(2*pi*2^(3/2)*2*0.675*x0*y0*z0);
+M_b = 1e10;
+    rho0 = M_b/(6.57*pi*x0*y0*z0);
+%     rho0 = 1/(2*pi*2^(3/2)*2*0.675*x0*y0*z0);
     sb2=sqrt(((X/x0).^2+(Y/y0).^2).^2+(Z/z0).^4);
     
     %-----------------
     % densite de masse
     %-----------------
     
-    rh=rho0*(exp(-sb2/2));  
+    rh=rho0*(exp(-sb2/2)); 
 end
 function rh = rho_zhao_simple(X,Y,Z)
     
-    x0=1490; %en parsec
+    x0=1490; 
     y0=580;
     z0=400;
     qa=0.6;
-    rho0 = 1;
+    
+    M_b = 2;
+    rho0 = M_b/0.9221;
 
     sb2=sqrt(((X/x0).^2+(Y/y0).^2).^2+(Z/z0).^4);
     sa=sqrt((qa*qa*(X.^2+Y.^2)+Z.^2)/(z0^2));
@@ -97,8 +115,6 @@ function rh = rho_zhao_simple(X,Y,Z)
     %-------------  ----
     % densite de masse
     %-----------------
-
-    %rh=rho0*(exp(-sb2/2));   % modele de Dwek (ref du modele G2)
 
     rh=rho0*(exp(-sb2/2)+sa.^(-1.85).*exp(-sa));
 end

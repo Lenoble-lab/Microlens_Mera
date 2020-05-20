@@ -9,10 +9,6 @@ global Rcoro
 %la densité est tronquée pour r>Rcoro
 %Dans l'article, Rcoro = 3.5 kpc
 
-rho0 =  1.0;       % valeur test
-rho0 = 9.6;      %Masse du bulbe = 1.5 10^10 M_sol (Calchi novatti)
-
-rho0 = 9.6*0.826;
 
 
 i0 = find(R>Rcoro);
@@ -28,6 +24,9 @@ x0=890;
 y0=x0.*4.3/10;
 z0=x0.*2.8/10;
 
+
+M_b = 1.8e10;
+rho0 = M_b/(x0*y0*z0*8*pi);
 
 % calcul des coordonnees dans le repere principal du bulbe
 
@@ -52,4 +51,4 @@ r = rho0.*exp(-a);
 % r(i0) = r(i0).*exp(-(R(i0)-Rcoro).^2/(2*500^2));
 
 %Calchi Novatti (arrêt brusque)
-r(i0) = zeros(size(i0));
+% r(i0) = zeros(size(i0));
