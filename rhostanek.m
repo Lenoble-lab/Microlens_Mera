@@ -17,7 +17,7 @@ i1 = find(R<=Rcoro);
 %%-----------------------%%
 %% Modèle de Calchi Novatti 2008, Stanek et al 1997
 %%-----------------------%%
-phi=23.8; %angle de la barre avec l'axe soleil-GC
+phi=28; %angle de la barre avec l'axe soleil-GC
 alpha=pi*phi/180;
 beta=0;
 x0=890;
