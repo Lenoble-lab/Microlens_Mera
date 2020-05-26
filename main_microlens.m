@@ -59,7 +59,7 @@ Lkpc=Ro/1000;  % distance Sun-GC en kpc
 %----------------------------
 
 global Rcoro
-Rcoro = 4500;
+Rcoro = 3500;
 
 
 %---------------------------------------       
@@ -130,70 +130,28 @@ sinb = abs(sin(b));		cosb = cos(b);		cosl = cos(l);
 cosbl=cos(b)*cos(l);		sinl = sin(l);
 
 
-%-------------------------------------------------------
-%calcul de la masse moyenne et de la normalisation de fm
-%-------------------------------------------------------
+%----------------------------------------
+% Param�tres de la fonction de luminosité pour le blending (Alibert et al.)
+%----------------------------------------
 
-    %--------------------
-    % cas du disque mince
-    %--------------------
+global Vinf Vsup normfl
 
-global normfmdm mmeandm
+Vinf = 22; % magnitudes limites des étoiles observées.
+Vsup = 16;
 
-normfmdm=integral(@fmdm,minfdm,msupdm);
-disp(['integrale de la fonction de masse du disque mince = ' num2str(normfmdm)]);
+Linf=lum(Vinf);
+Lsup=lum(Vsup);
 
-mmeandm=integral(@mPmdm,minfdm,msupdm);
+% Norme de la fonction de luminosité :
 
-    %--------------------
-    % cas du disque epais
-    %--------------------
+normfl = integral(@fl, Linf, Lsup);
 
-global normfmde mmeande
+%----------------------------
+% Param�tre pour le blending 
+%---------------------------
 
-normfmde=integral(@fmde,minfde,msupde);
-disp(['integrale de la fonction de masse du disque epais = ' num2str(normfmde)]);
-
-mmeande=integral(@mPmde,minfde,msupde);
-
-
-    %-------------
-    % cas du bulbe
-    %-------------
-
-global normfmbu mmeanbu
-
-normfmbu=integral(@fmbu,minfbu,msupbu);
-disp(['integrale de la fonction de masse du bulbe = ' num2str(normfmbu)]);
-
-mmeanbu=integral(@mPmbu,minfbu,msupbu);
-
-    %------------
-    % cas du halo
-    %------------
-
-global normfmh mmeanh
-
-normfmh=integral(@fmh,minfh,msuph);
-disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
-
-mmeanh=integral(@mPmh,minfh,msuph);
-
-%----------------------------------
-% comparaison avec KP
-% toutes les masses sont egales a 0.6
-%----------------------------------
-
-%mmeanh=0.6;
-%mmeanbu=0.6;
-%mmeande=0.6;
-%mmeandm=0.6;
-
-
-disp(['masse moyenne du disque mince = ' num2str(mmeandm)]);
-disp(['masse moyenne du disque epais = ' num2str(mmeande)]);
-disp(['masse moyenne du bulbe = ' num2str(mmeanbu)]);
-disp(['masse moyenne du halo = ' num2str(mmeanh)]);
+f = 0.5; % fraction des évenements concernés par le blending
+nbar = 1.257; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
 
 %-------------------------------
@@ -738,6 +696,68 @@ disp(['<tobs> (en jours) = ' num2str(ttobs)]);
 N=gam*expos;
 disp(['nb d''evt  = ' num2str(N)]);
 
+%------------------------
+% Application du blending
+%------------------------
+
+% Preparation de la table pour le tirage aleatoire des luminosités
+
+
+ll = (0:1e-5:1).*(Lsup-Linf)+Linf;
+fll = probal(ll);
+ifll = cumsum(fll);	% primitive 
+ifll = ifll-ifll(1);
+ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
+
+% Tirage est évenements concernés
+
+ra = rand(size(te)); 
+out = find(ra-f> 0);
+in = find(ra-f<= 0);
+
+% Tirage des luminosités (donc des flux)
+
+ra1 = rand(size(te(in)));
+ra2 = rand(size(te(in)));
+
+flux1 = interp1(ifll,ll,ra1);
+flux2 = interp1(ifll,ll,ra2);
+
+B = flux1 ./ (flux1 + flux2);
+
+% Blending
+
+%opération pour pouvoir récupérer les infos plus tard : on conserve les indices et le résultats du blending par rapport à te
+
+blend = zeros(size(in));
+
+At=ampli(uT); %on utilse le seuil défini par l'expérience
+Umin = rand(size(in));
+Uobs= zeros(size(in));
+
+%Calcul de Uobs
+Uobs=maxampli(B.*ampli(Umin)+1-B);
+
+%Calcul du facteur d'amplification
+fact = sqrt((maxampli((At - 1)./B +1)).^2-Umin.^2)./(sqrt(1-Uobs.^2));
+il=find(fact~=real(fact)); 
+fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplification infinie, on pose donc une amplification = 1
+	    % On simule te et on observe te,obs, donc nous voulons tracer te,obs
+
+gmean = mean(fact);
+
+%Récupération des résultats
+teblend = te;
+teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
+
+
+taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
+taurblend=real(taurblend);
+disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
+
+tauobscblend=tauobsc * gmean * (nbar/(1-exp(-nbar)));
+tauobsblend=real(tauobscblend);
+disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
 
 %------------------------------------
 %------------------------------------
@@ -1019,6 +1039,11 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 
 %Trace la distribde te en zoomant
 [hist, edges] = histcounts(te, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
+[histb, edges] = histcounts(teblend, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
+
+i=find(te<30);
+[hist_1, edges] = histcounts(te(i), 30, 'BinLimits',[0,30], 'Normalization', 'probability');
+
 centre = zeros(size(edges)-[0,1]);
 
 for j =1:length(centre);
@@ -1029,7 +1054,7 @@ openfig('../graph/hist_te_1.fig')
 figure(16)
 hold on;
 % histogram(te, 30, 'BinLimits',[1,30]);
-plot(centre, hist, 'black');
+plot(centre, hist_1, 'black');
 title('Distribution de te');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -1038,8 +1063,9 @@ hold off;
 
 %trace la distrib de teobs
 figure(17);
-hist(teobs,1000);
-title('Distribution de teobs (evenements garde apres le dernier Monte-Carlo)');
+plot(centre, hist, 'red')
+plot(centre, histb, 'black')
+title('Blending black et sans blending rouge)');
 hold off;
 
 
