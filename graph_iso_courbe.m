@@ -65,25 +65,6 @@ disp([' '])
 
 save('graph_iso_model.mat', 'tau_table', 'B', 'L')
 
-%% test densité
-R = (0:1e-3:1).*4000;
-th = (0:1e-3:1).*2*pi;
-
-[R, th] = meshgrid(R, th);
-rho_bu = rhostanek(R, zeros(size(R)), th);
-rho_disk = rhodHetG(R, zeros(size(R)), th);
-[X,Y] = pol2cart(th, R);
-
-rho = rho_disk  ;
-
-figure(1)
-pcolor(X, Y, rho); 
-shading interp;
-hold on
-colorbar;
-
-
-contour(X, Y, rho, '--black', 'ShowText', 'on');
 
 %% analyse the results
 

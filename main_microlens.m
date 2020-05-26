@@ -59,7 +59,7 @@ Lkpc=Ro/1000;  % distance Sun-GC en kpc
 %----------------------------
 
 global Rcoro
-Rcoro = 4500;
+Rcoro = 3500;
 
 
 %---------------------------------------       
@@ -130,6 +130,49 @@ sinb = abs(sin(b));		cosb = cos(b);		cosl = cos(l);
 cosbl=cos(b)*cos(l);		sinl = sin(l);
 
 
+%----------------------------------------
+% Param�tres de la fonction de luminosité pour le blending (Alibert et al.)
+%----------------------------------------
+
+global Vinf Vsup normfl
+
+Vinf = 22; % magnitudes limites des étoiles observées.
+Vsup = 16;
+
+Linf=lum(Vinf);
+Lsup=lum(Vsup);
+
+% Norme de la fonction de luminosité :
+
+normfl = integral(@fl, Linf, Lsup);
+
+%----------------------------
+% Param�tre pour le blending 
+%---------------------------
+
+f = 0.5; % fraction des évenements concernés par le blending
+nbar = 1.257; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
+
+
+%-------------------------------
+%calcul de la profondeur optique
+%-------------------------------
+
+normnu=integral(@nsource,dinf,dsup);
+Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
+tau = Ctau * integral2(@dtau,0,1,dinf,dsup, 'Method', 'iterated') /normnu;
+taucx=tau;
+tau=real(taucx);
+disp(['tau = ' num2str(taucx)]);
+
+%-----------------------------------------------------------------------------
+%calcul de la profondeur optique dans le cas d'une source a distance constante
+%-----------------------------------------------------------------------------
+
+%Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
+%tau  = Ctau*quad('dtaud',0,1,1e-2);
+%disp(['tau = ' num2str(tau)]);
+
 %-------------------------------------------------------
 %calcul de la masse moyenne et de la normalisation de fm
 %-------------------------------------------------------
@@ -172,50 +215,12 @@ mmeanbu=integral(@mPmbu,minfbu,msupbu);
     % cas du halo
     %------------
 
-global normfmh mmeanh
+    global normfmh mmeanh
 
 normfmh=integral(@fmh,minfh,msuph);
 disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
 
 mmeanh=integral(@mPmh,minfh,msuph);
-
-%----------------------------------
-% comparaison avec KP
-% toutes les masses sont egales a 0.6
-%----------------------------------
-
-%mmeanh=0.6;
-%mmeanbu=0.6;
-%mmeande=0.6;
-%mmeandm=0.6;
-
-
-disp(['masse moyenne du disque mince = ' num2str(mmeandm)]);
-disp(['masse moyenne du disque epais = ' num2str(mmeande)]);
-disp(['masse moyenne du bulbe = ' num2str(mmeanbu)]);
-disp(['masse moyenne du halo = ' num2str(mmeanh)]);
-
-
-%-------------------------------
-%calcul de la profondeur optique
-%-------------------------------
-
-normnu=integral(@nsource,dinf,dsup);
-Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-tau = Ctau * integral2(@dtau,0,1,dinf,dsup, 'Method', 'iterated') /normnu;
-taucx=tau;
-tau=real(taucx);
-disp(['tau = ' num2str(taucx)]);
-
-%-----------------------------------------------------------------------------
-%calcul de la profondeur optique dans le cas d'une source a distance constante
-%-----------------------------------------------------------------------------
-
-%Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
-%tau  = Ctau*quad('dtaud',0,1,1e-2);
-%disp(['tau = ' num2str(tau)]);
-
-
 
 %-------------------------------------------------------------
 %% Preparation de la table pour le tirage aleatoire de la masse
@@ -701,7 +706,6 @@ m=m';
 te=te';
 
 
-
 %---------------
 %calcul de gamma
 %---------------
@@ -709,34 +713,106 @@ te=te';
 gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 disp(['gamma (calcule par le te moyen) = ' num2str(gamma)]);
 
-
-% Juste un ou deux tests
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ttobs=tau/(gamma/1e6/365.25);
-disp(['<tobs1> (en jours) = ' num2str(ttobs)]);
-t=pi/2*te;
-l=length(t);
-l;
-disp(['nombre d''evenements 1 = ' num2str(l)]);
-ttobs2=sum(t)/l;
-disp(['<tobs2> (en jours) = ' num2str(ttobs2)]);
-%c'est le meme resultat par definition de mean()
-expos=(sum(t)/tau)/(1e6*365.25);
-disp(['Exposure (en 10^6 an-etoile) = ' num2str(expos)]);
-N=(gamma)*expos;
-disp(['nombre d''evenements 2 = ' num2str(N)]);
+% gammawd=tau/uT*2/pi/mean(teWD)*1e6*365.25;
+% disp(['gamma (calcule par le te moyen) avec WD= ' num2str(gammawd)]);
 
 
-
-gam=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6*Gammax;
+gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
+gam=gam1*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
+% gam1WD=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(teWD)/(n*nbsimul)*86400*365.25*1e6;
+% gamWD=gam1WD*Gammax;
+% disp(['gamma (integre par MC) avec WD= ' num2str(gamWD)]);
 
+% gam1WDuniq=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(listeWD)/(n*nbsimul)*86400*365.25*1e6;
+% gamWDuniq=gam1WDuniq*Gammax;
+% disp(['dont (integre par MC) avec WD uniquement= ' num2str(gamWDuniq)]);
+
+%exposure=6.5244;
+
+% Differentes exposures
+% Exposure Macho 2005
+%exposure = 2530/365.25 * 1260000/10^6;
+
+% Exposure Eros 2006
+%exposure = 18.1246 ; % page 8, formule 11
+
+%Exposure  OGLE II 2006 p 249
+% exposure = 1084267/10^(6)*1330/365.25;
+
+%Exposure  Alcock
+% exposure = 12.6*190/365.25;
 
 ttobs=tau/(gam/1e6/365.25);
 disp(['<tobs> (en jours) = ' num2str(ttobs)]);
-N=gam*expos;
+N=gam*exposure;
 disp(['nb d''evt  = ' num2str(N)]);
+
+taur=gam*pi/2*uT*mean(te)/365.25/1e6;
+taur=real(taur);
+disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
+
+
+
+%------------------------
+% Application du blending
+%------------------------
+
+% Preparation de la table pour le tirage aleatoire des luminosités
+
+
+ll = (0:1e-5:1).*(Lsup-Linf)+Linf;
+fll = probal(ll);
+ifll = cumsum(fll);	% primitive 
+ifll = ifll-ifll(1);
+ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
+
+% Tirage est évenements concernés
+
+ra = rand(size(te)); 
+out = find(ra-f> 0);
+in = find(ra-f<= 0);
+
+% Tirage des luminosités (donc des flux)
+
+ra1 = rand(size(te(in)));
+ra2 = rand(size(te(in)));
+
+flux1 = interp1(ifll,ll,ra1);
+flux2 = interp1(ifll,ll,ra2);
+
+B = flux1 ./ (flux1 + flux2);
+
+% Blending
+
+%opération pour pouvoir récupérer les infos plus tard : on conserve les indices et le résultats du blending par rapport à te
+
+blend = zeros(size(in));
+
+At=ampli(uT); %on utilse le seuil défini par l'expérience
+Umin = rand(size(in));
+Uobs= zeros(size(in));
+
+%Calcul de Uobs
+Uobs=maxampli(B.*ampli(Umin)+1-B);
+
+%Calcul du facteur d'amplification
+fact = sqrt((maxampli((At - 1)./B +1)).^2-Umin.^2)./(sqrt(1-Uobs.^2));
+il=find(fact~=real(fact)); 
+fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplification infinie, on pose donc une amplification = 1
+	    % On simule te et on observe te,obs, donc nous voulons tracer te,obs
+
+gmean = mean(fact);
+
+%Récupération des résultats
+teblend = te;
+teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
+
+
+taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
+taurblend=real(taurblend);
+disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
 
 
 %------------------------------------
@@ -1018,21 +1094,24 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
 
-%exposure OGLE
-exposure = 1084267/10^(6)*1330/365.25;
-
 %Paramètre graph
 nbre_bin = 30;
 bin_max = 30;
 
 
 %Trace la distribde te normalisée
-[hist, edges] = histcounts(te, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
-[hist_model, edges] = histcounts(te_model, 30, 'BinLimits',[0,30], 'Normalization', 'probability');
+[hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %tracé de la distribution avec l'exposition 
 [hist_ogle, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
 [hist_ogle_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max]);
+
+[histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+i=find(te<30);
+i_model = find(te_model<30);
+[hist_1, edges] = histcounts(te(i), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 centre = zeros(size(edges)-[0,1]);
 
@@ -1042,25 +1121,29 @@ end
 
 figure(16)
 hold on;
-plot(centre, hist, 'black');
+plot(centre, hist_1, 'black');
 plot(centre, hist_model, 'red');
+plot(centre, hist_ogle/length(te(i)), 'b')
 title('Distribution de te normalisée');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 figure(17)
 hold on;
-plot(centre, hist_ogle.*(gam*exposure/length(te)), 'black');
-plot(centre, hist_ogle_model.*(28.3855*exposure/length(te_model)), 'red');
+plot(centre, hist_ogle.*(gam*exposure/length(te(i))), 'black');
+plot(centre, hist_ogle_model.*(28.3855*exposure/length(te_model(i_model))), 'red');
 title('Distribution de te vu par ogle');
+title('Distribution de te');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 
 %trace la distrib de teobs
-figure(17);
-hist(teobs,1000);
-title('Distribution de teobs (evenements garde apres le dernier Monte-Carlo)');
+figure(1);
+hold on;
+plot(centre, hist, 'red')
+plot(centre, histb, 'black')
+title('Blending black et sans blending rouge)');
 hold off;
 
 
