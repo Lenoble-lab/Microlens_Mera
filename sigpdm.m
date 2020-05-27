@@ -5,11 +5,11 @@
 
 function res = siglp(R,z,t)
 %res = ones(size(R)).*20e3*sqrt(2);
-res = ones(size(R)).*20e3;
+%res = ones(size(R)).*20e3;
 
 global Rcoro Ro
 
-% res = ones(size(R)) * 20.8e3;
+res = ones(size(R)) * 20.8e3;
 
 % i0 = find( R <= Rcoro );   
 % i1 = find( R > Rcoro & R <= (Rcoro+Ro)/2 );

@@ -6,7 +6,7 @@
 
 function res = sigzdm(R,z,t)
 
-res = ones(size(R)) * 20e3;
+
 
 global Rcoro Ro
 
@@ -14,7 +14,7 @@ global Rcoro Ro
 % donnée de Pasetto, S. et al 
 %"Thin disk kinematics from RAVE and the solar motion", Astronomy and Astrophysics 547 (2012), pp. A71.
 
-% res = ones(size(R)) * 16.3e3;
+res = ones(size(R)) * 16.3e3;
 % res = zeros(size(R));
 
 % i0 = find( R <= Rcoro );   

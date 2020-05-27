@@ -50,7 +50,7 @@ dinf = 800.;
 %-------
 global Ro elev
 Ro = 8000;	   % distance Sun-GC en pc
-elev = 0 ;      % elevation au dessus du plan du disque
+elev = 26 ;      % elevation au dessus du plan du disque
 Lkpc=Ro/1000;  % distance Sun-GC en kpc
 
 
@@ -69,13 +69,13 @@ global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-% l = 1 *pi/180;    % direction d'observation en radian
-% b = -4 *pi/180;
+l = 1 *pi/180;    % direction d'observation en radian
+b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-l = 4 *pi/180;    % direction d'observation en radian
-b = -1 *pi/180;
+% l = 4 *pi/180;    % direction d'observation en radian
+% b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -739,10 +739,10 @@ disp(['gamma (integre par MC) = ' num2str(gam)]);
 %exposure = 18.1246 ; % page 8, formule 11
 
 %Exposure  OGLE II 2006 p 249
-% exposure = 1084267/10^(6)*1330/365.25;
+exposure = 1084267/10^(6)*1330/365.25;
 
 %Exposure  Alcock
-exposure = 12.6*190/365.25;
+% exposure = 12.6*190/365.25;
 
 ttobs=tau/(gam/1e6/365.25);
 disp(['<tobs> (en jours) = ' num2str(ttobs)]);

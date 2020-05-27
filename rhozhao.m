@@ -18,7 +18,7 @@ function rh = rhozhao(R,z,th)
 
 %rho0=1.1968;         % essai
 
-rho0=1.8469;         % masse du bulbe = 1.5e10 
+% rho0=1.8469;         % masse du bulbe = 1.5e10 
 %rho0=2.71;         % masse du bulbe = 2.2e10   
 % rho0=1.2313;       % masse du bulbe = 1.0e10
 % rho0=2.4625;         % masse du bulbe = 2.e10
@@ -44,9 +44,9 @@ rho0=1.8469;         % masse du bulbe = 1.5e10
 
 M_b = 1.8;
 
-% rho0 = M_b/0.9221;
+rho0 = M_b/0.9221;
 
-alpha=pi*20/180;
+alpha=pi*28/180;
 beta=0;
 x0=1490; %en parsec
 y0=580;

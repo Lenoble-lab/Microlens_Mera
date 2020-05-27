@@ -4,13 +4,13 @@
 % Sortie: dispersion de vitesse en m/s
 
 function res = sigtde(R,z,t)
-res = ones(size(R)).*20e3;
+%res = ones(size(R)).*20e3;
 
 %-----------
 %Pasetto et al
 %-----------
 
-% res = ones(size(R)).*46.1;
+res = ones(size(R)).*46.1;
 
 %-----------
 %Robin et al
