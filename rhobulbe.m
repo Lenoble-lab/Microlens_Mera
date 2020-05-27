@@ -16,7 +16,7 @@ function res = rhobulbe(R,z,th)
 % modele de Dweck
 %-----------------
 
-res = rhodwek(R,z,th);
+% res = rhodwek(R,z,th);
 
 %-----------------
 % modele de Stanek
@@ -28,7 +28,7 @@ res = rhodwek(R,z,th);
 % modele de Zhao
 %---------------
 
-% res = rhozhao(R,z,th);
+res = rhozhao(R,z,th);
 
 %-----------------------
 % modele de Zhao tronque
