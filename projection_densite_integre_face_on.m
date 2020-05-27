@@ -23,18 +23,20 @@ for i = 1:numel(xx)
 
 end
 
+xx_1 = [fliplr(xx)*-1 xx];
+dens_minor = [fliplr(dens_minor) dens_minor];
+dens_major = [fliplr(dens_major) dens_major];
 
 
-
-figure(1)
-semilogy(yy*1e-3, dens_minor)
+figure(2)
+semilogy(xx_1*1e-3, dens_minor)
 hold on
-semilogy(xx*1e-3, dens_major)
+semilogy(xx_1*1e-3, dens_major)
 legend('Axe mineur', 'Axe majeur')
 xlabel('X,Y (kpc)')
 ylabel('\Sigma_{*} (M_{sun}.kpc^{-2})')
 
-%%
+
 % [R, th] = meshgrid(R, th);
 % % rho_bu = integral(@denssource(R, , th);
 % % rho_disk = rhodHetG(R, zeros(size(R)), th);
@@ -69,8 +71,8 @@ pcolor(x_y, y_x, log10(dens_surf));
 shading interp;
 hold on
 colorbar;
-caxis([7 9.5])
-contour(x_y, y_x, log10(dens_surf), 'black', 'ShowText', 'on');
+caxis([7 10])
+contour(x_y, y_x, log10(dens_surf), 'black', 'ShowText', 'on')
 xlabel('X (kpc)')
 ylabel('Y (kpc)')
 

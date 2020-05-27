@@ -1,7 +1,7 @@
 %% test densité
-clear; close all;
+clear; 
+close all;
 global X Z
-
 X = 8500; Z = 0;
 xx = (0:1e-2:1).*1e4;
 zz = (0:1e-2:1).*3e3;
@@ -22,7 +22,7 @@ disp(['compteur = ' num2str(k)]);
 
     end   
     for i = 1:numel(zz)
-        Y = zz(i);
+        Z = zz(i);
         dens_surf(k, i) = 2e6 * integral(@densite, 0, 1e5); %1e6 pour être en kpc
         
     end
@@ -34,15 +34,16 @@ dens_surf = quadrant(dens_surf);
 
 x_y = x_y * 1e-3; z_x = z_x * 1e-3;
 
-figure(1)
+figure(2)
 % colormap(hot)
 pcolor(x_y, z_x, log10(dens_surf)); 
 shading interp;
 hold on
 colorbar;
-caxis([6 10])
+caxis([7 10])
 contour(x_y, z_x, log10(dens_surf), 'black', 'ShowText', 'on');
-
+xlabel('X (kpc)')
+ylabel('Z (kpc)')
 
 function res = quadrant(matrix)
 %Construit une image symétrique à partir d'un unique quart d'image (éviter
@@ -57,7 +58,7 @@ function rh = densite(Y)
     
     global X Z Ro
     
-    R = sqrt(X^2+Z^2);
+    R = sqrt(X^2+Y.^2);
     rh = zeros(size(R));
     %-------------
     %Bulbe
@@ -70,7 +71,9 @@ function rh = densite(Y)
     M_b= 1.8*1e10; 
     rho0 = M_b/(6.57*pi*x0*y0*z0);
     sb2=sqrt(((X/x0).^2+(Y/y0).^2).^2+(Z/z0).^4);
-     
+%     c_para = 1.434 ; c_perp = 3.797;
+%     sb2=(((X/x0).^c_perp+(Y/y0).^c_perp).^(c_para/c_perp)+(Z/z0).^c_para).^(1/c_para);
+
     rh = rh + rho0*(exp(-sb2/2)); 
     
     
