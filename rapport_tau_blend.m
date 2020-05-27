@@ -25,6 +25,8 @@ ifll = ifll-ifll(1);
 ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 
 n = 1e5;
+f_li = (0:1e-3:1);
+rapport = zeros(size(f_li));
 
 for k = 1:length(f_li)
 
@@ -35,7 +37,7 @@ in = find(ra-f<= 0);
 
 % Tirage des luminosités (donc des flux)
 
-ra1 = rand(size(out));
+ra1 = rand(size(in));
 ra2 = rand(size(in));
 
 flux1 = interp1(ifll,ll,ra1);
@@ -45,11 +47,7 @@ B = flux1 ./ (flux1 + flux2);
 
 % Blending
 
-%opération pour pouvoir récupérer les infos plus tard : on conserve les indices et le résultats du blending par rapport à te
-
-blend = zeros(size(in));
-
-At=ampli(uT); %on utilse le seuil défini par l'expérience
+At=1.34; %on utilse le seuil défini par l'expérience
 Umin = rand(size(in));
 Uobs= zeros(size(in));
 
@@ -64,8 +62,10 @@ fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplificat
 
 gmean = mean(fact);
 
-taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
-taurblend=real(taurblend);
-disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
-
+rapport(k) = (gmean * (nbar/(1-exp(-nbar))))^-1;
 end
+
+figure(1)
+plot(f_li, rapport)
+ylabel('\tau / \tau_{obs}')
+xlabel('fraction de sources sans biais de confusion')
