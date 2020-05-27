@@ -770,7 +770,13 @@ ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 
 % Tirage est évenements concernés
 
+f_li = [0.4, 0.5, 0.6];
+teblend = zeros(length(f_li),size(te,2));
+
+for k = 1:length(f_li)
+
 ra = rand(size(te)); 
+f = f_li(k);
 out = find(ra-f> 0);
 in = find(ra-f<= 0);
 
@@ -806,14 +812,15 @@ fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplificat
 gmean = mean(fact);
 
 %Récupération des résultats
-teblend = te;
-teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
+teblend(k,:) = te;
+teblend(k,in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
 
 taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
 taurblend=real(taurblend);
 disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
 
+end
 
 %------------------------------------
 %------------------------------------
@@ -1107,7 +1114,10 @@ bin_max = 30;
 [hist_ogle, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
 [hist_ogle_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max]);
 
-[histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+for i = 1:numel(f_li)
+[histb(i,:), edges] = histcounts(teblend(i,:), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+end
 
 i=find(te<30);
 i_model = find(te_model<30);
@@ -1141,11 +1151,13 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 %trace la distrib de teobs
 figure(1);
 hold on;
-plot(centre, hist, 'red')
-plot(centre, histb, 'black')
-title('Blending black et sans blending rouge)');
-hold off;
-
+plot(centre, hist)
+plot(centre, histb(1,:))
+plot(centre, histb(2,:))
+plot(centre, histb(3,:))
+legend('model', 'f = 0.4', 'f = 0.5', 'f = 0.6');
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
 
 
 
