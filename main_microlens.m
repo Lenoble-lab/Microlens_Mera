@@ -69,13 +69,13 @@ global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-l = 1 *pi/180;    % direction d'observation en radian
-b = -4 *pi/180;
+% l = 1 *pi/180;    % direction d'observation en radian
+% b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-% l = 4 *pi/180;    % direction d'observation en radian
-% b = -1 *pi/180;
+l = 4 *pi/180;    % direction d'observation en radian
+b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -713,41 +713,16 @@ te=te';
 gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 disp(['gamma (calcule par le te moyen) = ' num2str(gamma)]);
 
-% gammawd=tau/uT*2/pi/mean(teWD)*1e6*365.25;
-% disp(['gamma (calcule par le te moyen) avec WD= ' num2str(gammawd)]);
-
 
 gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
 gam=gam1*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
-% gam1WD=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(teWD)/(n*nbsimul)*86400*365.25*1e6;
-% gamWD=gam1WD*Gammax;
-% disp(['gamma (integre par MC) avec WD= ' num2str(gamWD)]);
-
-% gam1WDuniq=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(listeWD)/(n*nbsimul)*86400*365.25*1e6;
-% gamWDuniq=gam1WDuniq*Gammax;
-% disp(['dont (integre par MC) avec WD uniquement= ' num2str(gamWDuniq)]);
-
-%exposure=6.5244;
-
-% Differentes exposures
-% Exposure Macho 2005
-%exposure = 2530/365.25 * 1260000/10^6;
-
-% Exposure Eros 2006
-%exposure = 18.1246 ; % page 8, formule 11
-
-%Exposure  OGLE II 2006 p 249
-exposure = 1084267/10^(6)*1330/365.25;
-
-%Exposure  Alcock
-% exposure = 12.6*190/365.25;
 
 ttobs=tau/(gam/1e6/365.25);
 disp(['<tobs> (en jours) = ' num2str(ttobs)]);
-N=gam*exposure;
-disp(['nb d''evt  = ' num2str(N)]);
+% N=gam*exposure;
+% disp(['nb d''evt  = ' num2str(N)]);
 
 taur=gam*pi/2*uT*mean(te)/365.25/1e6;
 taur=real(taur);
@@ -770,13 +745,7 @@ ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 
 % Tirage est évenements concernés
 
-f_li = [0.4, 0.5, 0.6];
-teblend = zeros(length(f_li),size(te,2));
-
-for k = 1:length(f_li)
-
 ra = rand(size(te)); 
-f = f_li(k);
 out = find(ra-f> 0);
 in = find(ra-f<= 0);
 
@@ -812,232 +781,19 @@ fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplificat
 gmean = mean(fact);
 
 %Récupération des résultats
-teblend(k,:) = te;
-teblend(k,in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
+teblend = te;
+teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
 
 taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
 taurblend=real(taurblend);
 disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
 
-end
+%-----------
+%Choix de l'expérience à analyser
+%------------
 
-%------------------------------------
-%------------------------------------
-% application du facteur d'efficacite
-%------------------------------------
-%------------------------------------
-
-%------------------------
-% Efficacit�s MACHO bulbe
-%------------------------
-
-
-
-% Durees observees en direction du bulbe, incluant les 4 evts longs
-tebulbe = [4.4000,5.5000,5.5500,6.2000,6.3500,6.7000,7.2000,7.4000,7.5000,7.9000,8.2000,8.2000,8.2500,10.9500,10.9500,10.9500,10.9500,11.7500,11.8500,12.3000,14.7500,14.8000,14.9500,15.3500,16.0500,16.2000,16.4500,16.9500,18.1000,20.5000,21.3000,22.2500,24.2500,24.7000,26.9500,27.2000,27.7500,33.3500,75.8500,75.9000,97.8500,112.2500];
-% Pour ce tebulbe les donnees sont deja des rayons d'einstein
-sampleffA=[0.0982,0.1240,0.1266,0.1395,0.1434,0.1498,0.16015,0.1643,0.1653,0.1689,0.1741,0.1741,0.1746,0.2015,0.2015,0.2015,0.2015,0.2113,0.2144,0.2170,0.2390,0.2392,0.2402,0.2449,0.2526,0.2537,0.2547,0.2583,0.2645,0.2790,0.2841,0.2893,0.3017,0.3048,0.3141,0.3159,0.3177,0.3286,0.4001,0.4006,0.4102,0.4164];
-sampleffB=[0.0891,0.1214,0.1240,0.14465,0.1498,0.1576,0.1710,0.1782,0.1818,0.1834,0.1932,0.1932,0.1937,0.2376,0.2376,0.2376,0.2376,0.2475,0.2531,0.2557,0.2819,0.2821,0.2854,0.2908,0.2991,0.3007,0.3022,0.3058,0.3125,0.3306,0.3384,0.3430,0.3565,0.3601,0.3694,0.3720,0.3745,0.3880,0.4450,0.4456,0.4489,0.4494];
-photomeffA=[0.0917,0.1111,0.1147,0.1276,0.1307,0.1343,0.1472,0.1498,0.1500,0.1576,0.1632,0.1632,0.1640,0.2066,0.2066,0.2066,0.2066,0.2170,0.2221,0.2273,0.2542,0.2547,0.2552,0.2609,0.2645,0.2666,0.2686,0.2717,0.2769,0.2919,0.2965,0.3007,0.3100,0.3151,0.3220,0.3255,0.3280,0.3523,0.4190,0.4196,0.4262,0.4288];
-photomeffB=[0.0826,0.1111,0.1147,0.1317,0.1421,0.1493,0.1679,0.1756,0.1780,0.1860,0.1937,0.1937,0.1950,0.2635,0.2635,0.2635,0.2635,0.2790,0.2841,0.2945,0.3332,0.3345,0.3358,0.3410,0.3461,0.3490,0.3513,0.3580,0.3668,0.3875,0.3968,0.40295,0.4185,0.4288,0.4350,0.4443,0.4520,0.4644,0.5364,0.5370,0.5321,0.5350];
-
-
-tmachob = [ 0, 0.56, 0.7049, 0.8872, 1.116, 1.405, 1.769, 2.227, 2.803, 3.540, 4.456, 5.609, 7.060, 8.887, 11.18, 14.08, 17.72, 22.3, 28.08, 35.34, 44.49, 56, 70.49, 89.02, 112.05, 141.04];
-tmachob = tmachob/2.; %ATTENTION, lequel est le bon?????
-stdeffmachob = [ 0, 0, 0, 0.00091407, 0.016453, 0.0338, 0.05758, 0.08135, 0.11791, 0.14899, 0.1718, 0.2065, 0.2404, 0.2815, 0.3071, 0.3436, 0.3839, 0.4076, 0.4095, 0.4369, 0.4716, 0.4561, 0.4570, 0.4360, 0.4140, 0.3884];
-clpeffmachob = [ 0, 0.0054844, 0.001828, 0.01005, 0.08866, 0.1809, 0.2568, 0.3171, 0.4085, 0.4515, 0.5018, 0.5237, 0.5840, 0.6087, 0.6590, 0.6636, 0.7129, 0.7248, 0.8089, 0.7385, 0.7888, 0.7641, 0.6974, 0.6663, 0.6069, 0.5475];
-% ces quatres dernier tableaux sont tires des figures 1 et 12 de l'article The Macho Project :  
-sampleffmachobA = [0,0,0,0,0,0.002,0.0052,0.0103,0.0188,0.0284,0.0403,0.0589,0.0646,0.0896,0.1240,0.1563,0.1808,0.2041,0.2299,0.2609,0.2893,0.3182,0.3317,0.3616,0.3823,0.3961];
-sampleffmachobB = [0,0,0,0,0,0.001,0.0013,0.0026,0.0065,0.0129,0.0222,0.0413,0.0788,0.0992,0.1214,0.1679,0.2015,0.2392,0.2712,0.3100,0.3435,0.3771,0.3926,0.4197,0.4365,0.4435];
-photomeffmachobA = [0,0,0,0,0,0.0008,0.002,0.0057,0.0103,0.0181,0.0315,0.0459,0.0671,0.0916,0.1151,0.1471,0.1755,0.2104,0.2452,0.2757,0.3004,0.3317,0.3614,0.3872,0.4027,0.4181];
-photomeffmachobB = [0,0,0,0,0,0,0.001,0.0021,0.0044,0.0090,0.0155,0.0399,0.0542,0.0839,0.1151,0.1673,0.2117,0.2684,0.3175,0.3614,0.3985,0.4517,0.4698,0.5033,0.5255,0.5384];
-
-
-
-%-------------------------------
-% Efficacites MACHO 24 Mars 2000
-% Criteres A ou B
-%-------------------------------
-
-
-%attention, les machos prennent le diametre d'einstein --> diviser les tmacho par 2 !
-
-
-tmachoNEW = [ 1, 1.46, 2, 2.7, 3.8, 5.2, 7.1, 9.7, 13.3, 18.2, 24.9, 34.2, 46.8, 64.2, 88.0, 121.0, 165.0, 227.0, 311.0, 426.0, 584.0, 800.0, 1096.0, 1502.0 ];
-tmachoNEW = tmachoNEW/2.;
-effmachoA = [8.7e-4, 2.1e-3, 6.5e-3, 1.3e-2, 3.2e-2, 5.2e-2, 8.7e-2, 1.1e-1, 1.5e-1, 1.9e-1, 2.5e-1, 2.8e-1, 3.2e-1, 3.6e-1, 3.9e-1, 4.1e-1, 4.2e-1, 4.3e-1, 4.1e-1, 3.2e-1, 1.0e-1, 4.7e-2, 3.3e-2, 3.0e-2 ];
-effmachoB = [1.9e-4, 5.4e-4, 2.2e-3, 5.7e-3, 1.5e-2, 3.7e-2, 7.8e-2, 1.1e-1, 1.8e-1, 2.5e-1, 3.2e-1, 3.8e-1, 4.4e-1, 4.7e-1, 5.1e-1, 5.4e-1, 5.3e-1, 5.3e-1, 4.9e-1, 4.1e-1, 1.7e-1, 9.1e-2, 6.8e-2, 6.1e-2 ]; 
-
-% ces quatres dernier tableaux sont tires des figures 1 et 12 de l'article The Macho Project : microlensing detection efficiency de Alcock et al, date du 21 march 2001.
-sampleffmachoA = [0,0.0025,0.0077,0.0176,0.032,0.0532,0.0801,0.1100,0.1472,0.1834,0.2185,0.2561,0.2970,0.3270,0.3565,0.3875,0.4035,0.4174,0.4236,0.3802,0.1756,0.0093,0,0];
-sampleffmachoB = [0,0.001,0.002,0.0057,0.0155,0.0362,0.0646,0.1007,0.1550,0.2072,0.2562,0.3027,0.3487,0.3875,0.4159,0.4391,0.4469,0.4494,0.4391,0.3934,0.1808,0.0093,0,0];
-photomeffmachoA = [0,0,0.004,0.0095,0.0222,0.0426,0.0681,0.0991,0.1353,0.1760,0.2277,0.2710,0.3072,0.3485,0.3820,0.4078,0.4220,0.4300,0.4187,0.3655,0.2117,0.0718,0.0390,0.0315];
-photomeffmachoB= [0,0.0012,0.0023,0.0045,0.0103,0.0258,0.0542,0.0955,0.1523,0.2168,0.2937,0.3562,0.4130,0.4620,0.4945,0.5291,0.5356,0.5322,0.4976,0.4228,0.2839,0.1208,0.0779,0.0645];
-
-
-%TRACE DES EFFICACITES EN FONCTION DU TEMPS (ECHELLE LOG) 
-
-% lt=log14(tmachob);
-% figure(5);
-% title('graphe des differentes efficacites pour les donnees machob');
-% hold on;
-% plot(lt,stdeffmachob,'g--');
-% plot(lt,clpeffmachob,'c--');
-% plot(lt,sampleffmachobA,'b-');
-% plot(lt,sampleffmachobB,'r-');
-% plot(lt,photomeffmachobA,'b-.');
-% plot(lt,photomeffmachobB,'r-.');
-% legend('stdeff','clpeff','sampleffA','sampleffB','photomeffA','photomeffB');
-% hold off;
-% 
-% lt=log10(tebulbe);
-% figure(51);
-% title('graphe des differentes efficacites pour les donnees tebulbe');
-% hold on;
-% plot(lt,sampleffA,'b-');
-% plot(lt,sampleffB,'r-');
-% plot(lt,photomeffA,'b-.');
-% plot(lt,photomeffB,'r-.');
-% legend('sampleffA','sampleffB','photomeffA','photomeffB');
-% hold off;
-% 
-% lt=log10(tmachoNEW);
-% figure(6);
-% title('graphe des differentes efficacites pour les donnees machoNEW');
-% hold on;
-% plot(lt,effmachoA,'g--');
-% plot(lt,effmachoB,'c--');
-% plot(lt,sampleffmachoA,'b-');
-% plot(lt,sampleffmachoB,'r-');
-% plot(lt,photomeffmachoA,'b-.');
-% plot(lt,photomeffmachoB,'r-.');
-% legend('effA','effB','sampleffA','sampleffB','photomeffA','photomeffB');
-% hold off;
-
-
-%----------------------
-% Choix de l'efficacite
-%----------------------
-
-eff = sampleffA; 
-
-teff = tebulbe;
-
-
-%----------------------
-% essai, efficacite = 1
-%----------------------
-
-%eff=ones(size(teff));
-
-
-%-----------------------------------------------------------------------------------------------
-% Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
-%-----------------------------------------------------------------------------------------------
-
-%if ((eff==stdeffmachob)|(eff==clpeffmachob)|(eff==effmachoA)|(eff==effmachoB)|(eff==ones(size(teff))))
-%    tinterp=teff;
-%    effinterp=eff;
-%else
-%    tinterp=tmachoNEW; 
-%    if ((eff==sampleffA)|(eff==sampleffmachobA)|(eff==sampleffmachoA))
-%        effinterp=sampleffmachoA;
-%    elseif ((eff==sampleffB)|(eff==sampleffmachobB)|(eff==sampleffmachoB))
-%        effinterp=sampleffmachoB;
-%    elseif ((eff==photomeffA)|(eff==photomeffmachobA)|(eff==photomeffmachoA))
-%        effinterp=photomeffmachoA;
-%    elseif ((eff==photomeffB)|(eff==photomeffmachobB)|(eff==photomeffmachoB))
-%        effinterp=photomeffmachoB;
-%    end;
-%end;
-
-tinterp=tmachoNEW;
-effinterp=sampleffmachoA;
-
-teffmax=max(tinterp);
-teffmin=min(tinterp);
-
-i1 = find((te<=teffmax)&(te>=teffmin));
-effsim = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-effsim(i1) = interp1(tinterp,effinterp,te(i1));
-
-
-%-----------------------------------------------------------------------------
-% Tirage d'un nombre aleatoire qui servira a decider si l'evt est garde ou non
-%-----------------------------------------------------------------------------
-
-ra = rand(1,length(te))*max(effinterp);
-
-
-% Trace dgamma accepte en fonction de tecorrespondant
-
-size(tecorrespondant);   % verification de leurs tailles pour le tracage
-% size(dgammaccepte);
-% figure(7);
-% plot(tecorrespondant,dgammaccepte,'b.');
-% title('dgammaccepte en fonction de tecorrespondant (resultat du Monte-Carlo)');
-% hold off;
-
-
-ecar=0.5;
-for i = ecar:ecar:max(tecorrespondant);
-    j=find( (i-ecar)<tecorrespondant & tecorrespondant<=i );
-    k=floor(2*i);
-    d=dgammaccepte(j);
-    d=[d,0]; % Pour qu'il y ait au moins un elements (cas de la matrice vide)
-    dg(k)=max(d);
-end;
-i = ecar:ecar:max(tecorrespondant);
-% figure(8);
-% plot(i,dg,'r-');
-% axis([0,100,0,1]);
-% title('dgammaccepte en fonction de tecorrespondant ( envelope ou fonction reelle )');
-% hold off;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% figure(9);
-% ep=interp1(tinterp,effinterp,i);
-% des=ep.*dg;
-% plot(i,des,'g-');
-% axis([0,100,0,0.05]);
-% title('taux d''evt en fonction de te (a un facteur pres  ( epsilon*dgamma) )');
-% hold off;
-
-
-
-% % Trace de la distrib de te (simulation)
-% figure(10);
-% hist(te,1000);
-% title('Distribution de te obtenu a partir de la simulation');
-% hold off;
-% 
-% %Trace de la fonction d'efficacite
-% figure(11);
-% lt = log(te);
-% plot(lt,effsim,'.');
-% title('efficacite de la simulation en fonction des durees d''evenements (echelle log)');
-% hold off;
-% 
-% 
-
-%--------------------------------------------------------------------------------------------------------------------------
-% compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
-%--------------------------------------------------------------------------------------------------------------------------
-
-i1 = find(ra-effsim<=0);
-teobs=te(i1);
-% 
-% lt=log10(teobs);
-% figure(81); %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% plot(lt,ra(i1),'.');
-% title('resultat du Monte-Carlo sur l''efficacite');
-% hold off;
-
-%teobs=te;  c'est faux puisqu'il faut faire
-%l'integration qui se fait soit par le monte carlo soit en essayant de
-%faire le veritable calcul (un des autres essai que j'ai fait).
-
+% exp_ogle_2006
 
 %---------------
 %calcul de gamma
@@ -1064,39 +820,7 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 %------------------------
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Test de l'influence du MC sur les distributions
-
-%figure(12);
-%hist(x,100);
-%mx=mean(x);
-%sx=std(x);
-%title('Distribution de la VA x apres le Monte-carlo (influence) ');
-%hold off;
-%%EST-CE QU'ON PEUT DIRE QUE C'EST LA REPRESENTATION DE LA LOI dGAMMA???
-%figure(13);
-%hist(ds,100);
-%mds=mean(ds);
-%sds=std(ds);
-%title('Distribution de la VA ds apres le Monte-carlo (influence) ');
-%hold off;
-%figure(14);
-%hist(v,100);
-%mv=mean(v);
-%sv=std(v);
-%title('Distribution de la VA v apres le Monte-carlo (influence) ');
-%hold off;
-%figure(15);
-%hist(m,100000);
-%mm=mean(m);
-%sm=std(m);
-%title('Distribution de la VA m apres le Monte-carlo (influence) ');
-%hold off;
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%telechargement de la courbe modèle
+%telechargement de la courbe du modèle
 
 load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
@@ -1114,10 +838,11 @@ bin_max = 30;
 [hist_ogle, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
 [hist_ogle_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max]);
 
+%tracé distribution avec blending
+[histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
-for i = 1:numel(f_li)
-[histb(i,:), edges] = histcounts(teblend(i,:), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-end
+%Courbe expérimentale :
+
 
 i=find(te<30);
 i_model = find(te_model<30);
@@ -1129,6 +854,7 @@ for j =1:length(centre);
 centre(j)=(edges(j)+edges(j+1))/2;
 end
 
+%Graph normalisé
 figure(16)
 hold on;
 plot(centre, hist_1, 'black');
@@ -1138,26 +864,26 @@ title('Distribution de te normalisée');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
+%graph en fonction de l'exposition
 figure(17)
 hold on;
 plot(centre, hist_ogle.*(gam*exposure/length(te(i))), 'black');
 plot(centre, hist_ogle_model.*(28.3855*exposure/length(te_model(i_model))), 'red');
+histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
 title('Distribution de te vu par ogle');
 title('Distribution de te');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 
-%trace la distrib de teobs
+%graph noramlisé avec blending
 figure(1);
 hold on;
-plot(centre, hist)
-plot(centre, histb(1,:))
-plot(centre, histb(2,:))
-plot(centre, histb(3,:))
-legend('model', 'f = 0.4', 'f = 0.5', 'f = 0.6');
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
+gitplot(centre, hist, 'red')
+plot(centre, histb, 'black')
+title('Blending black et sans blending rouge)');
+hold off;
+
 
 
 
@@ -1173,7 +899,6 @@ bords1 = zeros(1, nbbin1) ; centre1 = zeros(1, nbbin1-1);
 bords2 = zeros(1, nbbin2) ; centre2 = zeros(1, nbbin2-1);
 bords5 = zeros(1, nbbin5) ; centre5 = zeros(1, nbbin5-1);
 
-exposure=6.5244;
 teobs = te;
 %Definition des tableaux bords et centre pour une largeur de 1 jour
 for j =1:nbbin1;
