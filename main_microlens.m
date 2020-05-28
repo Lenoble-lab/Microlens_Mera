@@ -69,13 +69,13 @@ global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-% l = 1 *pi/180;    % direction d'observation en radian
-% b = -4 *pi/180;
+l = 1 *pi/180;    % direction d'observation en radian
+b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-l = 4 *pi/180;    % direction d'observation en radian
-b = -1 *pi/180;
+% l = 4 *pi/180;    % direction d'observation en radian
+% b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
