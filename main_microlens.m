@@ -793,8 +793,8 @@ disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
 %Choix de l'expérience à analyser
 %------------
 
-% exp_ogle_2006
-exp_macho_2005
+exp_ogle_2006
+% exp_macho_2005
 
 %---------------
 %calcul de gamma

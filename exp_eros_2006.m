@@ -67,6 +67,6 @@ i = find(raogle-effsimogle<=0);
 
 teobs = te(i);
 
-i = find(raogle-effsimogleblend<=0);
+ib = find(raogle-effsimogleblend<=0);
 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
