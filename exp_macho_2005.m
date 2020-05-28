@@ -74,9 +74,7 @@ i = find(ramacho-effsimmacho<=0);
 
 teobs = te(i);
 
-i = find(ramacho-effsimmachoblend<=0); 
-
-ib = iogleb;
+ib = find(ramacho-effsimmachoblend<=0); 
 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 

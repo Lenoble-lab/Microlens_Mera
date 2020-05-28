@@ -793,7 +793,8 @@ disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
 %Choix de l'expérience à analyser
 %------------
 
-% exp_ogle_2006
+exp_ogle_2006
+% exp_macho_2005
 
 %---------------
 %calcul de gamma
@@ -814,9 +815,7 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 
 
 %------------------------
-%------------------------
 % affichage des resultats
-%------------------------
 %------------------------
 
 
@@ -826,8 +825,8 @@ load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
 
 %Paramètre graph
-nbre_bin = 30;
-bin_max = 30;
+nbre_bin = 100;
+bin_max = 100;
 
 
 %Trace la distribde te normalisée
@@ -842,6 +841,8 @@ bin_max = 30;
 [histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %Courbe expérimentale :
+[hist_ogle_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_ogle_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 
 i=find(te<30);
@@ -867,11 +868,10 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 %graph en fonction de l'exposition
 figure(17)
 hold on;
-plot(centre, hist_ogle.*(gam*exposure/length(te(i))), 'black');
-plot(centre, hist_ogle_model.*(28.3855*exposure/length(te_model(i_model))), 'red');
+plot(centre, hist_ogle_obs.*gamobs*exposure, 'red');
+plot(centre, hist_ogle_obs_b*gamobs*exposure, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
 title('Distribution de te vu par ogle');
-title('Distribution de te');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
@@ -879,7 +879,7 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 %graph noramlisé avec blending
 figure(1);
 hold on;
-gitplot(centre, hist, 'red')
+plot(centre, hist, 'red')
 plot(centre, histb, 'black')
 title('Blending black et sans blending rouge)');
 hold off;
