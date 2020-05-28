@@ -2,6 +2,7 @@
 % Données OGLE II 2006 : Sumi et Al.
 %-----------------------------------
 
+
 %Exposure  OGLE II 2006 p 249
 exposure = 1084267/10^(6)*1330/365.25;
 
