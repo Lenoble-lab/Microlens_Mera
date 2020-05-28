@@ -2,7 +2,6 @@
 % Données OGLE II 2006 : Sumi et Al.
 %-----------------------------------
 
-
 %Exposure  OGLE II 2006 p 249
 exposure = 1084267/10^(6)*1330/365.25;
 
@@ -30,7 +29,7 @@ teffogle2006 = [1.1220;    1.4125;    1.7783;    2.2387;    2.8184;    3.5481;  
 
 %Données
 teff = teogle2006;
-eff = effogle2006;
+eff = teffogle2006;
 
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
@@ -68,6 +67,6 @@ i = find(raogle-effsimogle<=0);
 
 teobs = te(i);
 
-ib = find(raogle-effsimogleblend<=0);
+i = find(raogle-effsimogleblend<=0);
 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
