@@ -4,4 +4,4 @@ function pm = proba(m)
 
 global normfm
 
-pm=fm(m)./normfm;
+pm=fmrecente(m)./normfm;
