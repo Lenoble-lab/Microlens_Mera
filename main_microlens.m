@@ -793,8 +793,9 @@ disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
 %Choix de l'expérience à analyser
 %------------
 
-exp_ogle_2006
+% exp_ogle_2006
 % exp_macho_2005
+exp_eros_2006
 
 %---------------
 %calcul de gamma
@@ -877,7 +878,7 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 
 
 %graph noramlisé avec blending
-figure(1);
+passfigure(1);
 hold on;
 plot(centre, hist, 'red')
 plot(centre, histb, 'black')
