@@ -57,11 +57,10 @@ raeros = rand(1,length(te))*max(effinterperos);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
-
-i = find(raeros-effsimogle<=0);
+i = find(raeros-effsimeros<=0);
 
 teobs = te(i);
 
-ib = find(raeros-effsimogleblend<=0);
+ib = find(raeros-effsimerosblend<=0);
 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
