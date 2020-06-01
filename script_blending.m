@@ -50,6 +50,6 @@ teblend = te;
 teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
 
-taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
-taurblend=real(taurblend);
-disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
+% taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
+% taurblend=real(taurblend);
+% disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
