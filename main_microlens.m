@@ -704,7 +704,7 @@ te=te';
 %---------------
 
 gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
-disp(['gamma (calcule par le te moyen) = ' num2str(gamma)]);
+disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
 gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
@@ -737,12 +737,33 @@ script_blending
 
 %-----------
 %Choix de l'expérience à analyser
+%donne teff : te des observations et eff : efficacité
 %------------
 
-exp_ogle_2006
--% exp_macho_2005
--% exp_eros_2006
+%%
+temax = 100;
+nbre_bin = temax;
 
+exp_ogle_2006
+% teff_ogle = teff;
+[hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+
+
+exp_macho_2005
+[hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+sort(teff)
+figure(1)
+bar(edges(1:end-1),hist_macho)
+
+% exp_eros_2006
+% % teff_eros = teff;
+% [hist_eros, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+% 
+% figure(1)
+% bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
+% legend('OGLE', 'MACHO', 'EROS')
+
+%%
 %---------------
 %calcul de gamma
 %---------------
@@ -780,16 +801,12 @@ bin_max = 100;
 [hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
-%tracé de la distribution avec l'exposition 
-[hist_ogle, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
-[hist_ogle_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max]);
-
 %tracé distribution avec blending
 [histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %Courbe expérimentale :
-[hist_ogle_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-[hist_ogle_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 
 i=find(te<30);
@@ -807,7 +824,7 @@ figure(16)
 hold on;
 plot(centre, hist_1, 'black');
 plot(centre, hist_model, 'red');
-plot(centre, hist_ogle/length(te(i)), 'b')
+% plot(centre, hist_ogle/length(te(i)), 'b')
 title('Distribution de te normalisée');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -815,8 +832,8 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 %graph en fonction de l'exposition
 figure(17)
 hold on;
-plot(centre, hist_ogle_obs.*gamobs*exposure, 'red');
-plot(centre, hist_ogle_obs_b*gamobs*exposure, 'black');
+plot(centre, hist_obs.*gamobs*exposure, 'red');
+plot(centre, hist__obs_b*gamobs*exposure, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
 title('Distribution de te vu par ogle');
 xlabel('t_{e}')
