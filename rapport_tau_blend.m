@@ -69,8 +69,8 @@ Uobs=maxampli(B.*ampli(Umin)+1-B);
 
 %Calcul du facteur d'amplification
 fact(in) = sqrt((maxampli((At - 1)./B +1)).^2-Umin.^2)./(sqrt(1-Uobs.^2));
-% fact(out) = ones(size(out));
-% fact(i0)=zeros(size(i0));
+fact(out) = ones(size(out));
+fact(i0)=zeros(size(i0));
 
 
 il=find(fact~=real(fact)); 
@@ -82,7 +82,7 @@ gmean = mean(fact);
 
 gmean_li(k) = gmean;
 expo_obs_sur_expo_vrai(k) = nbar/(1-exp(-nbar));
-rapport(k) = (gmean * (nbar/(1-exp(-nbar)))).^-1;
+rapport(k) = (gmean * (nbar/(1-exp(-nbar))));
 
 end
 
@@ -97,4 +97,3 @@ plot(f_li, expo_obs_sur_expo_vrai)
 
 figure(3)
 plot(f_li, gmean_li)
-

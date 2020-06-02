@@ -1,3 +1,6 @@
+%----------------------------------------------------
+%Nécessite en argument nbar et f (fraction d'évènements non blendé)
+%----------------------------------------------------
 
 % Preparation de la table pour le tirage aleatoire des luminosités
 
@@ -11,8 +14,8 @@ ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 % Tirage est évenements concernés
 
 ra = rand(size(te)); 
-out = find(ra-f> 0);
-in = find(ra-f<= 0);
+in = find(ra-f> 0);  %Evenements concerné par le blending
+out = find(ra-f<= 0);  %évènements non concernés
 
 % Tirage des luminosités (donc des flux)
 
