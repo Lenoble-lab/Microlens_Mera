@@ -11,8 +11,8 @@ ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 % Tirage est évenements concernés
 
 ra = rand(size(te)); 
-out = find(ra-f> 0);
-in = find(ra-f<= 0);
+in = find(ra-f> 0);
+out = find(ra-f<= 0);
 
 % Tirage des luminosités (donc des flux)
 

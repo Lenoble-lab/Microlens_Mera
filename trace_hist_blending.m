@@ -40,6 +40,7 @@ nbre_bin = temax;
 
 %model
 [hist_model, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,temax], 'Normalization', 'probability');
+disp(['mean te = ' num2str(mean(te))])
 
 %------------------------
 % Application du blending
@@ -64,15 +65,19 @@ nbar = 1.257; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles 
 script_blending 
 [hist_05, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,temax], 'Normalization', 'probability');
 
+disp(['mean te = ' num2str(mean(teblend))])
+
 f = 0.4;
 nbar = 1.6190;
 script_blending 
 [hist_04, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,temax], 'Normalization', 'probability');
+disp(['mean te = ' num2str(mean(teblend))])
 
 f = 0.6;
 nbar = 0.9474;
 script_blending 
 [hist_06, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,temax], 'Normalization', 'probability');
+disp(['mean te = ' num2str(mean(teblend))])
 
 centre = zeros(size(edges)-[0,1]);
 for j =1:length(centre);
