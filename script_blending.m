@@ -14,8 +14,13 @@ ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 % Tirage est évenements concernés
 
 ra = rand(size(te)); 
+<<<<<<< HEAD
 in = find(ra-f> 0);  %Evenements concerné par le blending
 out = find(ra-f<= 0);  %évènements non concernés
+=======
+in = find(ra-f> 0);
+out = find(ra-f<= 0);
+>>>>>>> 51dfeae949a6ebfb684f6220a49dc3f320c9ca73
 
 % Tirage des luminosités (donc des flux)
 
@@ -53,6 +58,6 @@ teblend = te;
 teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
 
-taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
-taurblend=real(taurblend);
-disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
+% taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
+% taurblend=real(taurblend);
+% disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);

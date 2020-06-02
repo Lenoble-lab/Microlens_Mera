@@ -728,11 +728,15 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 %------------------------
 
 % Param�tre pour le blending 
-f = 0.5; % fraction des évenements concernés par le blending
+f = 0.5; % fraction des évenements unblendé f = P(1)
 nbar = 1.257; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
+[hist_0.5, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+
+
+
 
 
 %-----------
