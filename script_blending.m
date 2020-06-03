@@ -14,13 +14,9 @@ ifll = real(ifll./ifll(end));	% on fait en sorte que la primitive varie de 0 a 1
 % Tirage est évenements concernés
 
 ra = rand(size(te)); 
-<<<<<<< HEAD
 in = find(ra-f> 0);  %Evenements concerné par le blending
 out = find(ra-f<= 0);  %évènements non concernés
-=======
-in = find(ra-f> 0);
-out = find(ra-f<= 0);
->>>>>>> 51dfeae949a6ebfb684f6220a49dc3f320c9ca73
+
 
 % Tirage des luminosités (donc des flux)
 
@@ -51,13 +47,21 @@ il=find(fact~=real(fact));
 fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplification infinie, on pose donc une amplification = 1
 	    % On simule te et on observe te,obs, donc nous voulons tracer te,obs
 
-gmean = mean(fact);
+%Calcul de B_min
+Bmin = (At-1)./(ampli(Umin)-1);
+
+i0 = find(B<Bmin);
+fact(i0)=zeros(size(i0));
 
 %Récupération des résultats
 teblend = te;
 teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
+%Pour calculer gmean
+fact(out) = ones(size(out));
 
-% taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
-% taurblend=real(taurblend);
-% disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
+gmean = mean(fact);
+
+taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
+taurblend=real(taurblend);
+disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);

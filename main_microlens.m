@@ -74,8 +74,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-% l = 4 *pi/180;    % direction d'observation en radian
-% b = -1 *pi/180;
+l = 4 *pi/180;    % direction d'observation en radian
+b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -728,36 +728,37 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 %------------------------
 
 % Param�tre pour le blending 
-f = 0.5; % fraction des évenements unblendé f = P(1)
-nbar = 1.257; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
+f = 0.05;   %fraction des évenements unblendé f = P(1)
+nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
+f = 0.5;
+nbar = 1.257;
+f = 0.2;
+nbar = 2.6;
+f = 1;
+nbra = 0;
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
-[hist_0.5, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-
-
-
-
 
 %-----------
 %Choix de l'expérience à analyser
 %donne teff : te des observations et eff : efficacité
 %------------
 
-%%
+
 temax = 100;
 nbre_bin = temax;
 
-exp_ogle_2006
+% exp_ogle_2006
 % teff_ogle = teff;
-[hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-
-
+% [hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+% 
+% 
 exp_macho_2005
-[hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-sort(teff)
-figure(1)
-bar(edges(1:end-1),hist_macho)
+% [hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+% sort(teff)
+% figure(1)
+% bar(edges(1:end-1),hist_macho)
 
 % exp_eros_2006
 % % teff_eros = teff;
@@ -767,7 +768,7 @@ bar(edges(1:end-1),hist_macho)
 % bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
 % legend('OGLE', 'MACHO', 'EROS')
 
-%%
+
 %---------------
 %calcul de gamma
 %---------------
@@ -785,7 +786,22 @@ disp(['gamma (integre par MC) = ' num2str(gamobs)]);
 tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
 disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 
+tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
+tauobsblend=real(tauobsblend);
+% disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
 
+gamobsb = gam/length(te)*length(find(teblend~=0))*max(eff);
+disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
+
+tauobsb=gamobsb*pi/2*uT*mean(teblend)/365.25/1e6;
+disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
+
+disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
+
+length(find(teblend~=0))
+length(teobs)
+
+%%
 %------------------------
 % affichage des resultats
 %------------------------

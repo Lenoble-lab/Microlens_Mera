@@ -37,12 +37,12 @@ rapport = zeros(size(n_li));
 for k = 1:length(f_li)
     
 nbar = n_li (k);
+f = f_li(k);
 
 ra = rand(1,n); 
+in = find(ra-f> 0);  %Evenements concerné par le blending
+out = find(ra-f<= 0);  %évènements non concernés
 
-f = 1-f_n_bar(nbar);
-out = find(ra-f> 0);
-in = find(ra-f<= 0);
 
 % Tirage des luminosités (donc des flux)
 
@@ -58,7 +58,6 @@ B = flux1 ./ (flux1 + flux2);
 
 At=1.34; %on utilse le seuil défini par l'expérience
 Umin = rand(size(in));
-Uobs= zeros(size(in));
 
 %Calcul de B_min
 Bmin = (At-1)./(ampli(Umin)-1);
