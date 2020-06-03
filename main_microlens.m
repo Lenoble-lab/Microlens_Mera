@@ -722,7 +722,57 @@ taur=real(taur);
 disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 
 
+f_n_bar = @(n) n.*exp(-n)./(1-exp(-n));
 
+n = 1e2;
+n_li = (0:1e-3:1).*20;
+
+%f_li : fraction d'étoiles non blendée
+f_li = f_n_bar(n_li);
+
+for k = 1:length(f_li)
+    
+nbar = n_li (k);
+f = f_li(k);
+%retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
+script_blending 
+
+%-----------
+%Choix de l'expérience à analyser
+%donne teff : te des observations et eff : efficacité
+%------------
+
+exp_macho_2005
+
+
+%---------------
+%calcul de gamma
+%---------------
+
+
+%------------------------------------------------------------------------------------------------
+% on ne peut pas calculer le gamma par la formule avec le tobs, car le tau ne prend pas en compte
+% l'efficacite. Par contre, on peut deduire tau experimental a partir du gamma calcule par MC
+%------------------------------------------------------------------------------------------------
+
+
+gamobs = gam/length(te)*length(teobs)*max(eff);
+
+tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
+
+gamobsb = gam/length(te)*length(find(teobsblend~=0))*max(eff);
+
+tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
+
+rapport(k) = tauobsb/tauobs;
+end
+
+figure(1)
+hold on;
+plot(f_li, rapport)
+ylabel('\tau_{obs} / \tau')
+xlabel('fraction de sources sans biais de confusion')
+%%
 %------------------------
 % Application du blending
 %------------------------
@@ -735,8 +785,8 @@ f = 0.5;
 nbar = 1.257;
 f = 0.2;
 nbar = 2.6;
-f = 1;
-nbra = 0;
+% f = 1;
+% nbra = 0;
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
 
@@ -790,17 +840,16 @@ tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
 tauobsblend=real(tauobsblend);
 % disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
 
-gamobsb = gam/length(te)*length(find(teblend~=0))*max(eff);
+gamobsb = gam/length(te)*length(find(teobsblend~=0))*max(eff);
 disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
 
-tauobsb=gamobsb*pi/2*uT*mean(teblend)/365.25/1e6;
+tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
 disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 
 disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 
-length(find(teblend~=0))
-length(teobs)
-
+mean(teobsblend)
+mean(teobs)
 %%
 %------------------------
 % affichage des resultats

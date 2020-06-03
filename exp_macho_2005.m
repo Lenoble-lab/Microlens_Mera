@@ -61,7 +61,7 @@ effsimmachoblend = zeros(1,length(te));
 effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
 effsimmachoblend(i1) = interp1(tinterpmacho,effinterpmacho,teblend(i1));
 
-teobsblend
+
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
