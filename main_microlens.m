@@ -714,65 +714,11 @@ disp(['gamma (integre par MC) = ' num2str(gam)]);
 
 ttobs=tau/(gam/1e6/365.25);
 disp(['<tobs> (en jours) = ' num2str(ttobs)]);
-% N=gam*exposure;
-% disp(['nb d''evt  = ' num2str(N)]);
 
 taur=gam*pi/2*uT*mean(te)/365.25/1e6;
 taur=real(taur);
 disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 
-
-f_n_bar = @(n) n.*exp(-n)./(1-exp(-n));
-
-n = 1e2;
-n_li = (0:1e-3:1).*20;
-
-%f_li : fraction d'étoiles non blendée
-f_li = f_n_bar(n_li);
-
-for k = 1:length(f_li)
-    
-nbar = n_li (k);
-f = f_li(k);
-%retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
-script_blending 
-
-%-----------
-%Choix de l'expérience à analyser
-%donne teff : te des observations et eff : efficacité
-%------------
-
-exp_macho_2005
-
-
-%---------------
-%calcul de gamma
-%---------------
-
-
-%------------------------------------------------------------------------------------------------
-% on ne peut pas calculer le gamma par la formule avec le tobs, car le tau ne prend pas en compte
-% l'efficacite. Par contre, on peut deduire tau experimental a partir du gamma calcule par MC
-%------------------------------------------------------------------------------------------------
-
-
-gamobs = gam/length(te)*length(teobs)*max(eff);
-
-tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
-
-gamobsb = gam/length(te)*length(find(teobsblend~=0))*max(eff);
-
-tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
-
-rapport(k) = tauobsb/tauobs;
-end
-
-figure(1)
-hold on;
-plot(f_li, rapport)
-ylabel('\tau_{obs} / \tau')
-xlabel('fraction de sources sans biais de confusion')
-%%
 %------------------------
 % Application du blending
 %------------------------

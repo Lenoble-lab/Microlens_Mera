@@ -70,7 +70,6 @@ save('graph_iso_model.mat', 'tau_table', 'B', 'L')
 
 
 clear
-tau_load = load('graph_iso_model.mat');
 
 figure(1)
 hold on
