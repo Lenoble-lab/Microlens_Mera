@@ -24,35 +24,38 @@ clear
 %------------------------------------------------
 
 delimiter = ' ';
-VarNames_table6 = {'Field', 'GLON', 'GLAT',  'Nsub',  'Nstar',  'Nev', 'tau',  'etau', 'e_tau', 'E_tau', 'Gamma', 'eGamma', ...
+VarNames_table4 = {'Field', 'glon', 'glat',  'Nsub',  'Nstar',  'Nev', 'tau',  'etau', 'e_tau', 'E_tau', 'Gamma', 'eGamma', ...
 'e_Gamma', 'E_Gamma', 'Gammad', 'eGammad', 'e_Gammad', 'E_Gammad'};
-VarTypes_table6 = {'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double',...
- 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
+VarTypes_table4 = {'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double',...
+ 'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
 
-opts = delimitedTextImportOptions('VariableNames',VarNames_table6,'VariableTypes',VarTypes_table6,...
-                                'Delimiter',delimiter, 'DataLines', 18, ...
+opts = delimitedTextImportOptions('VariableNames',VarNames_table4,'VariableTypes',VarTypes_table4,...
+                                'Delimiter',delimiter, 'DataLines', 37, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table4 = readtable('../sumy&penny/table4.txt',opts);
+table4 = readtable('../sumi_penny/table4.txt',opts);
 
 %----------------
 %Tracé profondeur optique en fonction de la lattitude galactique au centre
 %---------------------
-long = 1;
+glong = 1;
 
-i0 = find(abs(table6.glon - long)<0.5 & table6.glat<0);
+i0 = find(abs(table4.glon - glong)<0.5 & table4.glat<0);
 
 %Calcul modèle
 tau_load = load('graph_iso_model.mat');
 
 [L, B] = meshgrid(tau_load.L, tau_load.B);
 
-i1 = find(tau_load.L==long);
-i2 = find(tau_load.B<0);
+i1 = find(abs(tau_load.L)<5);
+i2 = find(-6<tau_load.B<0);
+i_long = find(abs(tau_load.L-glong) == 0);
 
 figure(1)
 hold on
-errorbar(table6.glat(i0), table7.tau(i0), table7.tau_err(i0), 'o')
-plot(tau_load.B(i2), tau_load.tau_table(i1,i2)*1e6)
+errorbar(table4.glat(i0), table4.tau(i0), table4.e_tau(i0), table4.E_tau(i0), 'o')
+plot(tau_load.B(i2), mean(tau_load.tau_table(i2,i1),2)*1e6)
+plot(tau_load.B(i2), tau_load.tau_table(i2,i_long)*1e6)
+
 legend('Mesure d''OGLE IV', 'Modèle')
 xlabel('b (deg)')
 ylabel('\tau \times 10^{-6}')
