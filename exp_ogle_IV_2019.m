@@ -85,7 +85,7 @@ end
 %----------------
 %Tracé profondeur optique en fonction de la lattitude galactique au centre
 %---------------------
-long = 1;
+long = 0;
 
 %exp ogle
 i0 = find(abs(table6.glon - long)<0.5 & table6.glat<0);
@@ -95,16 +95,20 @@ tau_load = load('graph_iso_model.mat');
 
 [L, B] = meshgrid(tau_load.L, tau_load.B);
 
-i1 = find(tau_load.L==long);
+i1 = find(abs(tau_load.L)<5);
 i2 = find(tau_load.B<0);
+i_long = find(abs(tau_load.L-long) == 0);
 
 figure(1)
 hold on
 errorbar(table6.glat(i0), table7.tau(i0), table7.tau_err(i0), 'o')
-plot(tau_load.B(i2), tau_load.tau_table(i1,i2)*1e6)
+plot(tau_load.B(i2), mean(tau_load.tau_table(i2,i1),2)*1e6)
+plot(tau_load.B(i2), tau_load.tau_table(i2,i_long)*1e6)
+
 legend('Mesure d''OGLE IV', 'Modèle')
 xlabel('b (deg)')
 ylabel('\tau \times 10^{-6}')
+
 %%
 %---------------
 %Efficacité

@@ -74,8 +74,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-l = 4 *pi/180;    % direction d'observation en radian
-b = -1 *pi/180;
+% l = 4 *pi/180;    % direction d'observation en radian
+% b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -727,10 +727,10 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 f = 0.05;   %fraction des évenements unblendé f = P(1)
 nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
-f = 0.5;
-nbar = 1.257;
-f = 0.2;
-nbar = 2.6;
+% f = 0.5;
+% nbar = 1.257;
+% f = 0.2;
+% nbar = 2.6;
 % f = 1;
 % nbra = 0;
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
@@ -786,7 +786,7 @@ tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
 tauobsblend=real(tauobsblend);
 % disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
 
-gamobsb = gam/length(te)*length(find(teobsblend~=0))*max(eff);
+gamobsb = gam/length(te)*length(teobsblend)*max(eff);
 disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
 
 tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;

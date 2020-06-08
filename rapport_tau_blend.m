@@ -30,8 +30,8 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
-% n = 10000;
+% n = 20000;
+n = 10000;
 nbsimul=500; %a augmenter pour meilleure stat
 nbMAX=500;
 
@@ -74,8 +74,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-l = 4 *pi/180;    % direction d'observation en radian
-b = -1 *pi/180;
+% l = 4 *pi/180;    % direction d'observation en radian
+% b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -705,15 +705,19 @@ gamobs = gam/length(te)*length(teobs)*max(eff);
 
 tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
 
-gamobsb = gam/length(te)*length(find(teobsblend~=0))*max(eff);
+gamobsb = gam/length(te)*length(find(teobsblend))*max(eff);
 
 tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
 
-rapport(k) = tauobsb/tauobs;
+rapport_tau(k) = tauobsb/tauobs;
+rapport_mean(k) = mean(teobs)/mean(teobsblend);
+rapport_length(k) = length(teobs)/length(teobsblend);
 end
 
 figure(1)
 hold on;
-plot(f_li, rapport)
+plot(f_li, rapport_tau)
+plot(f_li, rapport_mean)
+plot(f_li, rapport_length)
 ylabel('\tau_{obs} / \tau')
 xlabel('fraction de sources sans biais de confusion')

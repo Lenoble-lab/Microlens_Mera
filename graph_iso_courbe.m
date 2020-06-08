@@ -16,7 +16,7 @@ c=299792458;	GMsol=1.32712497e20;
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 15001.;
 dinf = 800.; %distance en parsec
 
 %-------
@@ -67,15 +67,29 @@ save('graph_iso_model.mat', 'tau_table', 'B', 'L')
 
 
 %% analyse the results
+clear;close all;
+tau_load = load('graph_iso_model.mat');
+
+[L, B] = meshgrid(tau_load.B, tau_load.L);
 
 
-clear
+
+figure(2)
+pcolor(L, B, log10(tau_load.tau_table)); 
+shading interp;
+hold on
+colorbar;
+% contour(x_y, y_x, log10(dens_surf), 'black', 'ShowText', 'on');
+xlabel('longitude galactique (en degrès)')
+ylabel('latitude galactique (en degrés)')
 
 figure(1)
 hold on
 % open_table7_1
 % contour(tau_load.B, tau_load.L, transpose(tau_load.tau_table), 'ShowText', 'on')
+% contour(tau_load.B, tau_load.L, tau_load.tau_table.*1e6, [0.3, 1, 1.5, 2.17, 3], 'ShowText', 'on')
 contour(tau_load.B, tau_load.L, tau_load.tau_table.*1e6, [0.3, 1, 1.5, 2.17, 3], 'ShowText', 'on')
+
 % contour(tau_load.B, tau_load.L, transpose(tau_load.tau_table), [3.5e-6, 4e-6, 1.5e-6, 2.17e-6, 3e-6], 'ShowText', 'on')
 % contour(tau_load.B, tau_load.L, fliplr(transpose(tau_load.tau_table)),[3.5e-6, 6e-6, 1.5e-6, 2.17e-6, 3e-6], 'ShowText', 'on')
 
@@ -87,6 +101,11 @@ ylabel('latitude galactique (en degrés)')
 %-------------------------------
 %calcul de la profondeur optique, let b en degré
 %-------------------------------
+
+%%
+disp('test')
+tau(0,6.4)
+tau(1,6.4)
 
 function res = tau(l1, b1)
     %---------------------------------------       
@@ -108,8 +127,10 @@ function res = tau(l1, b1)
 
     normnu=integral(@nsource,dinf,dsup);
     taux  = integral2(@dtau,0,1,dinf,dsup, 'Method', 'iterated') /normnu;
+
     res=real(taux);
 end
+
 
 
 % Fonction a integrer pour le calcul de profondeur optique 

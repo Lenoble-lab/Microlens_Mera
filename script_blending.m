@@ -50,12 +50,11 @@ fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplificat
 %Calcul de B_min
 Bmin = (At-1)./(ampli(Umin)-1);
 
-i0 = find(B<Bmin);
-fact(i0)=zeros(size(i0));
+i0 = find(B>Bmin);
 
 %Récupération des résultats
-teblend = te;
-teblend(in)=te(in).*fact; % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
+teblend(out) = te(out);
+teblend(i0)=te(i0).*fact(i0); % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
 %Pour calculer gmean
 fact(out) = ones(size(out));
@@ -64,4 +63,4 @@ gmean = mean(fact);
 
 taurblend=taur * gmean * (nbar/(1-exp(-nbar)));
 taurblend=real(taurblend);
-disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);
+% disp(['tau avec blending (Alibert 2005)  = ' num2str(taurblend)]);

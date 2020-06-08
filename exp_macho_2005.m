@@ -6,14 +6,13 @@
 exposure = 2530/365.25 * 1260000/10^6;
 
 
-ttobs=tau/(gam/1e6/365.25);
-disp(['<tobs> (en jours) = ' num2str(ttobs)]);
-N=gam*exposure;
-disp(['nb d''evt  = ' num2str(N)]);
-
-taur=gam*pi/2*uT*mean(te)/365.25/1e6;
-taur=real(taur);
-disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
+% ttobs=tau/(gam/1e6/365.25);
+% disp(['<tobs> (en jours) = ' num2str(ttobs)]);
+% N=gam*exposure;
+% disp(['nb d''evt  = ' num2str(N)]);
+% taur=gam*pi/2*uT*mean(te)/365.25/1e6;
+% taur=real(taur);
+% disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 
 
 %-----------------
@@ -56,10 +55,11 @@ teffmaxm=max(tinterpmacho);
 teffminm=min(tinterpmacho);
 
 i1 = find((te<=teffmaxm)&(te>=teffminm));
+ib = find((teblend<=teffmaxm)&(teblend>=teffminm));
 effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-effsimmachoblend = zeros(1,length(te));
+effsimmachoblend = zeros(1,length(teblend));
 effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
-effsimmachoblend(i1) = interp1(tinterpmacho,effinterpmacho,teblend(i1));
+effsimmachoblend(ib) = interp1(tinterpmacho,effinterpmacho,teblend(ib));
 
 
 %--------------------------------------------------------------------------------------------------------------------------
