@@ -26,19 +26,60 @@ clear
 %------------------------------------------------
 delimiter = ' ';
 VarNames_table2 = {'id', 'ra', 'dec', 'field', 'N_stars', 't0', 'e_t0', 'E_t0', 'te', 'e_te', 'E_te', ...
-'u0', 'e_u0', 'E_u0', 'fs', 'e_fs', 'E_fs', 'I0', 'e_I0', 'E_I0', 'Chi', 'Ndof', 'EWS_id', 'glon', 'glat'};
-VarTypes_table2 = {'double', 'string', 'string', 'double', 'double', 'double', 'double', ...
-'double', 'double', 'double', 'double','double', 'double', 'double', 'double', 'string'}; 
+'u0', 'e_u0', 'E_u0', 'fs', 'e_fs', 'E_fs', 'I0', 'e_I0', 'E_I0', 'Chi', 'Ndof','V' ,'e_V', 'EWS_id', 'glon', 'glat'};
+VarTypes_table2 = {'double', 'string', 'string', 'string', 'double', 'double', 'double', ...
+'double', 'double', 'double', 'double','double', 'double', 'double', 'double', ...
+'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'string', 'double', 'double'}; 
 
 opts = delimitedTextImportOptions('VariableNames',VarNames_table2,'VariableTypes',VarTypes_table2,...
                                 'Delimiter',delimiter, 'DataLines', 8, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table2 = readtable('../OGLEIII/table2.table',opts);
+table2 = readtable('../OGLEIII/table2.txt',opts);
+
+%remet glon dans [-180, 180]:
+re = rem(table2.glon, 180);
+i0 = find(table2.glon~=re);
+table2.glon(i0) = re(i0) - ones(size(i0)).*180;
+
+%--------------------------
+%Efficacité
+%---------------------------
+
+VarNames_eff = {'id', 't_e', 'N_events', 'undef', 'efficiency'};
+VarTypes_eff = {'double', 'double', 'double', 'double', 'double'};
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_eff,'VariableTypes',VarTypes_eff,...
+                                'Delimiter',delimiter,...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+eff = readtable('../OGLEIII/efficiency.dat',opts);
+
+M = 35;
+figure
+loglog(eff.t_e(sort([1:M 1:M])), [0 ; eff.efficiency(sort([1:M-1 1:M-1])) ; 0], '-')
+hold on
+loglog(eff.t_e, eff.efficiency)
+
+%---------------
+%Tracé fig. 1, pour vérifier la transformation des angles en coordonnées
+%galactique
+%-------------
+% figure(2)
+% plot(table2.glon, table2.glat, 'x')
+
+%----------------------
+%tracé figure 7
+%----------------------
+
+%Choix des évènements avec une erreur relative raisonable
+rel_err = (abs(table2.e_te) + table2.E_te)./(2.*table2.te);
+i0 = find(rel_err<0.5);
+
+figure(2)
+semilogxhistnormalise(table2.te(i0), 25)
 
 
 
-nbre_bin =  300;
-bin_max = 300;
+
 [hist_teff, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'BinMethod', 'sturges');
 
 centre = zeros(size(edges)-[0,1]);
@@ -78,19 +119,10 @@ plot(tau_load.B(i2), tau_load.tau_table(i1,i2)*1e6)
 legend('Mesure d''OGLE IV', 'Modèle')
 xlabel('b (deg)')
 ylabel('\tau \times 10^{-6}')
+
+
+
 %%
-%---------------
-%Efficacité
-%-----------
-VarNames = {'log_tE_min', 'log_tE_max', 'efficiency'};
-VarType = {'double', 'double', 'double'};
-
-opts = delimitedTextImportOptions('VariableNames',VarNames,'VariableTypes',VarType,...
-        'Delimiter',' ', 'DataLines', 4, 'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-    
-% eff = readtable(strcat('../OGLEIV/eff/',extractBetween(table3.field(1), 1, 6),'.eff'),opts);
-eff = readtable(strcat('../OGLEIV/eff/','BLG500','.eff'),opts);
-
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
 %-----------------------------------------------------------------------------------------------
@@ -100,7 +132,8 @@ plot((10.^eff.log_tE_min + 10.^eff.log_tE_max)/2, eff.efficiency)
 
 
 [tinterpmacho,indice] = sort(tmacho2005); 
-effinterpmacho = effmacho2005t(indice) ;
+effinterpmacho = effmach
+o2005t(indice) ;
 
 %Il y a des doublons dans les données, il faut les supprimer pour que l'interpolation se passe correctement
 indices = [1:length(tinterpmacho)-1];
@@ -135,3 +168,33 @@ ib = find(ramacho-effsimmachoblend<=0);
 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 
+
+function semilogxhist(val,M)
+% semilogxhist - generate histogram with M bars and log-scale x axis
+vmin=min(val); vmax=max(val);
+edges=vmin*(vmax/vmin).^([0:M]/M);
+count=histc(val,edges); 
+if size(count,2)==1, count=count'; end 
+x=edges(sort([1:M 1:M])); 
+y=[0 count(sort([1:M-1 1:M-1])) 0];
+
+% outline only: semilogx(x, y, '-');
+plot(x, y, '-'); 
+% fill(x, y, 'b'); 
+set(gca,'XScale','log');
+end
+
+function semilogxhistnormalise(val,M)
+% semilogxhist - generate histogram with M bars and log-scale x axis
+vmin=min(val); vmax=max(val);
+edges=vmin*(vmax/vmin).^([0:M]/M);
+count=histcounts(val,edges, 'Normalization', 'probability'); 
+if size(count,2)==1, count=count'; end 
+x=edges(sort([1:M 1:M])); 
+y=[0 count(sort([1:M-1 1:M-1])) 0];
+
+% outline only: semilogx(x, y, '-');
+plot(x, y, '-'); 
+% fill(x, y, 'b'); 
+set(gca,'XScale','log');
+end

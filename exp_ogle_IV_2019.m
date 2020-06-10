@@ -5,9 +5,8 @@
 % S. Kozlowski, J. Skowron, R. Poleski, K. Ulaczyk, M. Gromadzki,
 % K. Rybicki, P. Iwanek, and M. Wrona
 %---------------------------------------------------------------------------------------------------------------
-close all
-clear
-% Exposure ?
+% close all
+% clear
 
 
 % ttobs=tau/(gam/1e6/365.25);
@@ -62,16 +61,11 @@ opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTy
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
 table3 = readtable('../OGLEIV/table3.dat',opts);
 
-teff = table3.tE_best;
 
-nbre_bin =  300;
-bin_max = 300;
-[hist_teff, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'BinMethod', 'sturges');
-
-centre = zeros(size(edges)-[0,1]);
-for j =1:length(centre);
-centre(j)=(edges(j)+edges(j+1))/2;
-end
+% centre = zeros(size(edges)-[0,1]);
+% for j =1:length(centre);
+% centre(j)=(edges(j)+edges(j+1))/2;
+% end
 
 % figure(1)
 % loglog(centre, hist_teff)
@@ -85,84 +79,107 @@ end
 %----------------
 %Tracé profondeur optique en fonction de la lattitude galactique au centre
 %---------------------
-long = 0;
+%Longitude considérée
+% long = 0;
+% 
+% i0 = find(abs(table6.glon - long)<0.5 & table6.glat<-1);
+% 
+% %Calcul modèle
+% tau_load = load('graph_iso_model.mat');
+% 
+% [L, B] = meshgrid(tau_load.L, tau_load.B);
+% 
+% i1 = find(abs(tau_load.L)<2);
+% i2 = find(tau_load.B<-1);
+% i_long = find(abs(tau_load.L-long) == 0);
+% 
+% figure(1)
+% hold on
+% errorbar(table6.glat(i0), table7.tau(i0), table7.tau_err(i0), 'o')
+% plot(tau_load.B(i2), mean(tau_load.tau_table(i2,i1),2)*1e6)
+% plot(tau_load.B(i2), tau_load.tau_table(i2,i_long)*1e6)
+% 
+% legend('Mesure d''OGLE IV', 'Modèle')
+% xlabel('b (deg)')
+% ylabel('\tau \times 10^{-6}')
 
-%exp ogle
-i0 = find(abs(table6.glon - long)<0.5 & table6.glat<0);
-
-%Calcul modèle
-tau_load = load('graph_iso_model.mat');
-
-[L, B] = meshgrid(tau_load.L, tau_load.B);
-
-i1 = find(abs(tau_load.L)<5);
-i2 = find(tau_load.B<0);
-i_long = find(abs(tau_load.L-long) == 0);
-
-figure(1)
-hold on
-errorbar(table6.glat(i0), table7.tau(i0), table7.tau_err(i0), 'o')
-plot(tau_load.B(i2), mean(tau_load.tau_table(i2,i1),2)*1e6)
-plot(tau_load.B(i2), tau_load.tau_table(i2,i_long)*1e6)
-
-legend('Mesure d''OGLE IV', 'Modèle')
-xlabel('b (deg)')
-ylabel('\tau \times 10^{-6}')
-
-%%
 %---------------
 %Efficacité
 %-----------
-VarNames = {'log_tE_min', 'log_tE_max', 'efficiency'};
-VarType = {'double', 'double', 'double'};
+% VarNames = {'log_tE_min', 'log_tE_max', 'efficiency'};
+% VarType = {'double', 'double', 'double'};
+% 
+% opts = delimitedTextImportOptions('VariableNames',VarNames,'VariableTypes',VarType,...
+%         'Delimiter',' ', 'DataLines', 5, 'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+%     
+% % eff = readtable(strcat('../OGLEIV/eff/',extractBetween(table3.field(1), 1, 6),'.eff'),opts);
+% eff = readtable(strcat('../OGLEIV/eff/','BLG500','.eff'),opts);
 
-opts = delimitedTextImportOptions('VariableNames',VarNames,'VariableTypes',VarType,...
-        'Delimiter',' ', 'DataLines', 4, 'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-    
-% eff = readtable(strcat('../OGLEIV/eff/',extractBetween(table3.field(1), 1, 6),'.eff'),opts);
-eff = readtable(strcat('../OGLEIV/eff/','BLG500','.eff'),opts);
+%----------------------------------------------
+%Comparaison avec calculs du MC
+%-----------------------------------------------
+
+%Choix d'un champ 
+field = "BLG507";
+
+%Exposure
+exposure = 2741*table6.N_stars(find(table6.field == field)) /365.25;
+%Récupération des évènements du champs
+
+teff = table3.tE_best(find(extractBetween(table3.field, 1, 6) == field));
+
+%Calcul de l'efficacité
+VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
+VarType_eff_IV = {'double', 'double', 'double'};
+
+opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
+                            'Delimiter',delimiter, 'DataLines', 5, ...
+                   'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+               
+eff_field = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
+
+
 
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
 %-----------------------------------------------------------------------------------------------
 
-figure(1)
-plot((10.^eff.log_tE_min + 10.^eff.log_tE_max)/2, eff.efficiency)
+% M = length(eff_unblend.logE_min);
+% te_graph = [eff_unblend.log_tE_min(1) ; eff_unblend.log_tE_min ; eff_unblend.log_tE_max; eff_unblend.log_tE_max(M)];
+% eff_graph = [0 ; eff_unblend.efficiency(sort([1:M 1:M])) ; 0];
+% figure(1)
+% loglog(10.^sort(te_graph), eff_graph)
 
+te_inter = 10.^(eff_field.log_tE_min);
 
-[tinterpmacho,indice] = sort(tmacho2005); 
-effinterpmacho = effmacho2005t(indice) ;
+teffmaxm=max(te_inter);
+teffminm=min(te_inter);
 
-%Il y a des doublons dans les données, il faut les supprimer pour que l'interpolation se passe correctement
-indices = [1:length(tinterpmacho)-1];
-il = find(tinterpmacho(indices)~=tinterpmacho(indices+1));
-tinterpmacho = [tinterpmacho(il),tinterpmacho(length(tinterpmacho))];
-effinterpmacho = [effinterpmacho(il),effinterpmacho(length(tinterpmacho))];
+i1_unblend = find((te<=teffmaxm)&(te>=teffminm));
+i1_blend = find((teblend<=teffmaxm)&(teblend>=teffminm));
 
+eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+eff_blend = zeros(1,length(teblend));
 
-teffmaxm=max(tinterpmacho);
-teffminm=min(tinterpmacho);
-
-i1 = find((te<=teffmaxm)&(te>=teffminm));
-effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-effsimmachoblend = zeros(1,length(te));
-effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
-effsimmachoblend(i1) = interp1(tinterpmacho,effinterpmacho,teblend(i1));
+eff_unblend(i1_unblend) = interp1(te_inter,eff_field.efficiency,te(i1_unblend));
+eff_blend(i1_blend) = interp1(te_inter,eff_field.efficiency,teblend(i1_blend));
 
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
 
 %tirage au sort pour l'efficacité
-ramacho = rand(1,length(te))*max(effinterpmacho);
+% ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
+% ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
+
+ra_unblend = rand(1,length(te));
+ra_blend = rand(1,length(teblend));
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
-i = find(ramacho-effsimmacho<=0); 
-
+i = find(ra_unblend-eff_unblend<=0); 
 teobs = te(i);
 
-ib = find(ramacho-effsimmachoblend<=0); 
-
+ib = find(ra_blend-eff_blend<=0); 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 

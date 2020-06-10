@@ -30,8 +30,8 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
-% n = 10000;
+% n = 20000;
+n = 5000;
 nbsimul=500; %a augmenter pour meilleure stat
 nbMAX=500;
 
@@ -216,7 +216,7 @@ disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
 mmeanh=integral(@mPmh,minfh,msuph);
 
 %-------------------------------------------------------------
-%% Preparation de la table pour le tirage aleatoire de la masse
+% Preparation de la table pour le tirage aleatoire de la masse
 %-------------------------------------------------------------
 
     %--------------------
@@ -682,7 +682,7 @@ fclose(fid);
 
 
 %----------------------------------------
-%recuperation des evenements selectionnes
+% recuperation des evenements selectionnes
 %----------------------------------------
 
 load evenements.txt
@@ -750,7 +750,7 @@ nbre_bin = temax;
 % [hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
 % 
 % 
-exp_macho_2005
+% exp_macho_2005
 % [hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
 % sort(teff)
 % figure(1)
@@ -764,6 +764,7 @@ exp_macho_2005
 % bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
 % legend('OGLE', 'MACHO', 'EROS')
 
+exp_ogle_IV_2019
 
 %---------------
 %calcul de gamma
@@ -776,27 +777,24 @@ disp('Grandeurs avec intervention de l''efficacite experimentale :')
 % l'efficacite. Par contre, on peut deduire tau experimental a partir du gamma calcule par MC
 %------------------------------------------------------------------------------------------------
 
-gamobs = gam/length(te)*length(teobs)*max(eff);
-disp(['gamma (integre par MC) = ' num2str(gamobs)]);
-
-tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
-disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
-
-tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
-tauobsblend=real(tauobsblend);
-% disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
-
+% gamobs = gam/length(te)*length(teobs)*max(eff);
+% disp(['gamma (integre par MC) = ' num2str(gamobs)]);
+% 
+% tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
+% disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
+% 
+% tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
+% tauobsblend=real(tauobsblend);
+% % disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
+% 
 gamobsb = gam/length(te)*length(teobsblend)*max(eff);
-disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
+% disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
+% 
+% tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
+% disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
+% 
+% disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 
-tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
-disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
-
-disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
-
-mean(teobsblend)
-mean(teobs)
-%%
 %------------------------
 % affichage des resultats
 %------------------------
@@ -812,14 +810,14 @@ nbre_bin = 100;
 bin_max = 100;
 
 
-%Trace la distribde te normalisée
+%Trace la distribde te  pour le modèle et la courbe stockée localement
 [hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
-%tracé distribution avec blending
+%tracé distribution avec blending uniquement la courbe stockée localement
 [histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
-%Courbe expérimentale :
+%Courbe expérimentale (avec l'efficacité) :
 [hist_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
@@ -848,13 +846,13 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 figure(17)
 hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
-plot(centre, hist__obs_b*gamobs*exposure, 'black');
+plot(centre, hist_obs_b*gamobsb*exposure, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
-title('Distribution de te vu par ogle');
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 
+%%
 %graph noramlisé avec blending
 figure(1);
 hold on;

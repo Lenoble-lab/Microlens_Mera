@@ -1,7 +1,8 @@
 %---------------------------------------------------------------------------------------------------------------
 %POSSIBLE SOLUTION OF THE LONG-STANDING DISCREPANCY IN THE MICROLENSING OPTICAL DEPTHTOWARD 
 %THE GALACTIC BULGE BY CORRECTING THE STELLAR NUMBER COUNTT. 
-%Sumi1and M. T. Penny
+%Sumi and M. T. Penny
+%AUssi tiré de Sumi et al 2013 (MOA II)
 %---------------------------------------------------------------------------------------------------------------
 
 close all
@@ -24,53 +25,55 @@ clear
 %------------------------------------------------
 
 delimiter = ' ';
-VarNames_table4 = {'Field', 'glon', 'glat',  'Nsub',  'Nstar',  'Nev', 'tau',  'etau', 'e_tau', 'E_tau', 'Gamma', 'eGamma', ...
+VarNames_table7_MOA = {'blank', 'Field', 'glon', 'glat',  'Nsub',  'Nstar',  'Nev', 'tau',  'etau', 'e_tau', 'E_tau', 'Gamma', 'eGamma', ...
 'e_Gamma', 'E_Gamma', 'Gammad', 'eGammad', 'e_Gammad', 'E_Gammad'};
-VarTypes_table4 = {'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double',...
+VarTypes_table4_MOA = {'string', 'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double',...
  'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
 
-opts = delimitedTextImportOptions('VariableNames',VarNames_table4,'VariableTypes',VarTypes_table4,...
-                                'Delimiter',delimiter, 'DataLines', 37, ...
-                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table4 = readtable('../sumi_penny/table4.txt',opts);
+opts = delimitedTextImportOptions('VariableNames',VarNames_table7_MOA,'VariableTypes',VarTypes_table4_MOA,...
+                                'Delimiter',delimiter, 'DataLines', 22, ...
+                       'WhiteSpace', '  ', 'ConsecutiveDelimitersRule', 'join');
+table7_MOA = readtable('../MOA_II/Table7.dat',opts);
+
+%---------------------------------------------------
+%Table 4 : Microlensing events used in the optical depth and event rate measurements.
+%-----------------------------------------------------
+VarNames_table4_MOA = {'blank',  'ID', 'RA', 'Dec', 'Ndata', 't0', 'tE', 'e_tE', 'u0', 'e_u0', 'Is', 'chi2dof'};
+VarTypes_table4_MOA = {'string', 'string', 'string', 'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'};
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_table4_MOA,'VariableTypes',VarTypes_table4_MOA,...
+                                'Delimiter',delimiter, 'DataLines', 22, ...
+                       'WhiteSpace', '  ', 'ConsecutiveDelimitersRule', 'join');
+                   
+table4_MOA = readtable('../MOA_II/Table4.dat',opts);
+
+
+
+
 
 %----------------
 %Tracé profondeur optique en fonction de la lattitude galactique au centre
 %---------------------
-glong = 1;
-
-i0 = find(abs(table4.glon - glong)<0.5 & table4.glat<0);
-
-%Calcul modèle
-tau_load = load('graph_iso_model.mat');
-
-[L, B] = meshgrid(tau_load.L, tau_load.B);
-
-i1 = find(abs(tau_load.L)<5);
-i2 = find(-6<tau_load.B<0);
-i_long = find(abs(tau_load.L-glong) == 0);
-
-figure(1)
-hold on
-errorbar(table4.glat(i0), table4.tau(i0), table4.e_tau(i0), table4.E_tau(i0), 'o')
-plot(tau_load.B(i2), mean(tau_load.tau_table(i2,i1),2)*1e6)
-plot(tau_load.B(i2), tau_load.tau_table(i2,i_long)*1e6)
-
-legend('Mesure d''OGLE IV', 'Modèle')
-xlabel('b (deg)')
-ylabel('\tau \times 10^{-6}')
-%%
-%---------------
-%Efficacité
-%-----------
-VarNames = {'log_tE_min', 'log_tE_max', 'efficiency'};
-VarType = {'double', 'double', 'double'};
-
-opts = delimitedTextImportOptions('VariableNames',VarNames,'VariableTypes',VarType,...
-        'Delimiter',' ', 'DataLines', 4, 'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-    
-% eff = readtable(strcat('../OGLEIV/eff/',extractBetween(table3.field(1), 1, 6),'.eff'),opts);
-eff = readtable(strcat('../OGLEIV/eff/','BLG500','.eff'),opts);
+% glong = 0;
+% glat = (0:.1:1) .*-6 -1;
+% 
+% tau_mean = zeros(size(glat)-1);
+% lat_mean = zeros(size(glat)-1);
+% e_tau_mean = zeros(size(glat)-1);
+% E_tau_mean = zeros(size(glat)-1);
+% 
+% for i = 2:length(glat)
+% i0 = find(abs(table7_MOA.glon - glong)<5 & glat(i-1)>table7_MOA.glat & table7_MOA.glat>glat(i));
+% i = i-1;
+% tau_mean(i) = mean(table7_MOA.tau(i0));
+% lat_mean(i) = mean(table7_MOA.glat(i0));
+% e_tau_mean(i) = mean(table7_MOA.e_tau(i0));
+% E_tau_mean(i) = mean(table7_MOA.E_tau(i0));
+% 
+% disp([num2str(lat_mean(i)), '    ', num2str(mean(table7_MOA.tau(i0)))])
+% disp(['nbre subfield ', num2str(length(i0))])
+% disp(i)
+% end
 
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
