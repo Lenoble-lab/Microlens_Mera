@@ -11,7 +11,7 @@ exposure = 2530/365.25 * 1260000/10^6;
 % N=gam*exposure;
 % disp(['nb d''evt  = ' num2str(N)]);
 % taur=gam*pi/2*uT*mean(te)/365.25/1e6;
-% taur=real(taur);
+% taur=real(
 % disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 
 
@@ -33,7 +33,7 @@ effmacho2005t = [0.55,0.32,0.43,0.38,0.63,0.39,0.33,0.62,0.39,0.4,0.52,0.31,0.48
 temachoblending2005 = [196.6,148,103,46,68.7,14.2,43,78,133,17.84,46.2,31,63.3,12.7,16.7,3.92,25.7,16.5,19,30,24,122,16.8,15.7,93,26,121.3,12.48,88.5,15,48.7,61,30.6,3.68,13.1,454,38,61,83,48.5,7.5,13.4,11,64.7,21.8,80,20.7,119,45.3,10.9,14.5,13.9];
 temachoblending2005 = temachoblending2005 / 2;
 
-%Données
+%Donnéest
 teff = tmacho2005;
 eff = effmacho2005t;
 
@@ -55,11 +55,11 @@ teffmaxm=max(tinterpmacho);
 teffminm=min(tinterpmacho);
 
 i1 = find((te<=teffmaxm)&(te>=teffminm));
-ib = find((teblend<=teffmaxm)&(teblend>=teffminm));
+iblend = find((teblend<=teffmaxm)&(teblend>=teffminm));
 effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
 effsimmachoblend = zeros(1,length(teblend));
 effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
-effsimmachoblend(ib) = interp1(tinterpmacho,effinterpmacho,teblend(ib));
+effsimmachoblend(iblend) = interp1(tinterpmacho,effinterpmacho,teblend(iblend));
 
 
 %--------------------------------------------------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ effsimmachoblend(ib) = interp1(tinterpmacho,effinterpmacho,teblend(ib));
 
 %tirage au sort pour l'efficacité
 ramacho = rand(1,length(te))*max(effinterpmacho);
+ramachob = rand(1,length(teblend))*max(effinterpmacho);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
@@ -75,7 +76,7 @@ i = find(ramacho-effsimmacho<=0);
 
 teobs = te(i);
 
-ib = find(ramacho-effsimmachoblend<=0); 
+ib1 = find(ramachob-effsimmachoblend<=0); 
 
-teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
+teobsblend = teblend(ib1); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 

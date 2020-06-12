@@ -6,10 +6,10 @@
 % Paweł
 % l Pietrukowicz 1 , and Michałl Pawlak
 %---------------------------------------------------------------------------------------------------------------
-close all
-clear
+% close all
+% clear
 % Exposure ?
-
+exposure = 400;
 
 % ttobs=tau/(gam/1e6/365.25);
 % disp(['<tobs> (en jours) = ' num2str(ttobs)]);
@@ -41,6 +41,7 @@ re = rem(table2.glon, 180);
 i0 = find(table2.glon~=re);
 table2.glon(i0) = re(i0) - ones(size(i0)).*180;
 
+teff = table2.te;
 %--------------------------
 %Efficacité
 %---------------------------
@@ -51,41 +52,32 @@ VarTypes_eff = {'double', 'double', 'double', 'double', 'double'};
 opts = delimitedTextImportOptions('VariableNames',VarNames_eff,'VariableTypes',VarTypes_eff,...
                                 'Delimiter',delimiter,...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-eff = readtable('../OGLEIII/efficiency.dat',opts);
+eff_field = readtable('../OGLEIII/efficiency.dat',opts);
 
 M = 35;
 figure
-loglog(eff.t_e(sort([1:M 1:M])), [0 ; eff.efficiency(sort([1:M-1 1:M-1])) ; 0], '-')
+loglog(eff_field.t_e(sort([1:M 1:M])), [0 ; eff_field.efficiency(sort([1:M-1 1:M-1])) ; 0], '-')
 hold on
-loglog(eff.t_e, eff.efficiency)
+loglog(eff_field.t_e, eff_field.efficiency)
 
-%---------------
-%Tracé fig. 1, pour vérifier la transformation des angles en coordonnées
-%galactique
-%-------------
+eff = eff_field.efficiency;
+
+%----------------------
+%tracé figure 7 (histogramme des évènements)
+%----------------------
+
+% %Choix des évènements avec une erreur relative raisonable
+% rel_err = (abs(table2.e_te) + table2.E_te)./(2.*table2.te);
+% i0 = find(rel_err<0.5);
+% 
 % figure(2)
-% plot(table2.glon, table2.glat, 'x')
-
-%----------------------
-%tracé figure 7
-%----------------------
-
-%Choix des évènements avec une erreur relative raisonable
-rel_err = (abs(table2.e_te) + table2.E_te)./(2.*table2.te);
-i0 = find(rel_err<0.5);
-
-figure(2)
-semilogxhistnormalise(table2.te(i0), 25)
-
-
-
-
-[hist_teff, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'BinMethod', 'sturges');
-
-centre = zeros(size(edges)-[0,1]);
-for j =1:length(centre);
-centre(j)=(edges(j)+edges(j+1))/2;
-end
+% semilogxhistnormalise(table2.te(i0), 25)
+% [hist_teff, edges] = histcounts(table2.te, nbre_bin, 'BinLimits',[0,bin_max], 'BinMethod', 'sturges');
+% 
+% centre = zeros(size(edges)-[0,1]);
+% for j =1:length(centre);
+% centre(j)=(edges(j)+edges(j+1))/2;
+% end
 
 % figure(1)
 % loglog(centre, hist_teff)
@@ -96,76 +88,40 @@ end
 % figure(2)
 % loglog(bin_range, bincounts)
 
-%----------------
-%Tracé profondeur optique en fonction de la lattitude galactique au centre
-%---------------------
-long = 1;
 
-%exp ogle
-i0 = find(abs(table6.glon - long)<0.5 & table6.glat<0);
+%-----------------------------------------
+%Efficacité avec interpolation
+%---------------------------------
 
-%Calcul modèle
-tau_load = load('graph_iso_model.mat');
+teffmaxm=max(eff_field.t_e);
+teffminm=min(eff_field.t_e);
 
-[L, B] = meshgrid(tau_load.L, tau_load.B);
+i1_unblend = find((te<=teffmaxm)&(te>=teffminm));
+i1_blend = find((teblend<=teffmaxm)&(teblend>=teffminm));
 
-i1 = find(tau_load.L==long);
-i2 = find(tau_load.B<0);
-
-figure(1)
-hold on
-errorbar(table6.glat(i0), table7.tau(i0), table7.tau_err(i0), 'o')
-plot(tau_load.B(i2), tau_load.tau_table(i1,i2)*1e6)
-legend('Mesure d''OGLE IV', 'Modèle')
-xlabel('b (deg)')
-ylabel('\tau \times 10^{-6}')
-
-
-
-%%
-%-----------------------------------------------------------------------------------------------
-% Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
-%-----------------------------------------------------------------------------------------------
-
-figure(1)
-plot((10.^eff.log_tE_min + 10.^eff.log_tE_max)/2, eff.efficiency)
-
-
-[tinterpmacho,indice] = sort(tmacho2005); 
-effinterpmacho = effmach
-o2005t(indice) ;
-
-%Il y a des doublons dans les données, il faut les supprimer pour que l'interpolation se passe correctement
-indices = [1:length(tinterpmacho)-1];
-il = find(tinterpmacho(indices)~=tinterpmacho(indices+1));
-tinterpmacho = [tinterpmacho(il),tinterpmacho(length(tinterpmacho))];
-effinterpmacho = [effinterpmacho(il),effinterpmacho(length(tinterpmacho))];
-
-
-teffmaxm=max(tinterpmacho);
-teffminm=min(tinterpmacho);
-
-i1 = find((te<=teffmaxm)&(te>=teffminm));
-effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-effsimmachoblend = zeros(1,length(te));
-effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
-effsimmachoblend(i1) = interp1(tinterpmacho,effinterpmacho,teblend(i1));
+eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+eff_blend = zeros(1,length(teblend));
+% 
+eff_unblend(i1_unblend) = interp1(eff_field.t_e,eff_field.efficiency,te(i1_unblend));
+eff_blend(i1_blend) = interp1(eff_field.t_e,eff_field.efficiency,teblend(i1_blend));
 
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
 
 %tirage au sort pour l'efficacité
-ramacho = rand(1,length(te))*max(effinterpmacho);
+% ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
+% ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
+
+ra_unblend = rand(1,length(te));
+ra_blend = rand(1,length(teblend));
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
-i = find(ramacho-effsimmacho<=0); 
-
+i = find(ra_unblend-eff_unblend<=0); 
 teobs = te(i);
 
-ib = find(ramacho-effsimmachoblend<=0); 
-
+ib = find(ra_blend-eff_blend<=0); 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 
 
