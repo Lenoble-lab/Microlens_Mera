@@ -224,8 +224,8 @@ end
 % ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
 % ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
 
-ra_unblend = rand(1,length(te));
-ra_blend = rand(1,length(teblend));
+ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
+ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 

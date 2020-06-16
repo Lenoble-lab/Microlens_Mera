@@ -38,8 +38,8 @@ table2 = readtable('../OGLEIII/table2.txt',opts);
 
 %remet glon dans [-180, 180]:
 re = rem(table2.glon, 180);
-i0 = find(table2.glon~=re);
-table2.glon(i0) = re(i0) - ones(size(i0)).*180;
+i_err = find(table2.glon~=re);
+table2.glon(i_err) = re(i_err) - ones(size(i_err)).*180;
 
 teff = table2.te;
 %--------------------------
@@ -55,7 +55,7 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_eff,'VariableTypes',V
 eff_field = readtable('../OGLEIII/efficiency.dat',opts);
 
 M = 35;
-figure
+figure(1)
 loglog(eff_field.t_e(sort([1:M 1:M])), [0 ; eff_field.efficiency(sort([1:M-1 1:M-1])) ; 0], '-')
 hold on
 loglog(eff_field.t_e, eff_field.efficiency)
@@ -67,8 +67,12 @@ eff = eff_field.efficiency;
 %----------------------
 
 % %Choix des évènements avec une erreur relative raisonable
-% rel_err = (abs(table2.e_te) + table2.E_te)./(2.*table2.te);
-% i0 = find(rel_err<0.5);
+rel_err = max(abs(table2.e_te), table2.E_te)./(table2.te);
+i_err = find(rel_err<0.5);
+i_BW_dir = find(abs(table2.glon-1)<2 & abs(table2.glat+2)<2);
+i_BW = intersect(i_BW_dir, i_err);
+
+
 % 
 % figure(2)
 % semilogxhistnormalise(table2.te(i0), 25)
@@ -89,13 +93,36 @@ eff = eff_field.efficiency;
 % loglog(bin_range, bincounts)
 
 
+%--------------------------
+%Figure 13 (histogramme corrigé de l'efficacité)
+%---------------------
+bin_max = 300;
+nbre_bin = 20;
+v = table2.te;
+weight = zeros(size(table2.te)); %efficacité
+
+%table d'efficacité pour chaque événements
+for i = 1:length(weight)
+    i0 = find(v(i)<eff_field.t_e,1);
+    weight(i) = 1/eff_field.efficiency(i0);
+end
+
+[histw, vinterval] = histwc(table2.te(i_err), weight(i_err), 50, 1, 400);
+[histw_BW, vinterval_BW] = histwc(table2.te(i_BW), weight(i_BW), 50, 1, 400);
+
+M = length(vinterval);
+M_BW = length(vinterval_BW);
+figure(3)
+loglog(vinterval(sort([1:M 1:M 1:1] )), [0; 0 ; histw(sort([1:M-1 1:M-1])) ; 0])
+hold on
+loglog(vinterval_BW(sort([1:M 1:M 1:1] )), [0; 0 ; histw_BW(sort([1:M-1 1:M-1])) ; 0])
+
 %-----------------------------------------
 %Efficacité avec interpolation
 %---------------------------------
 
 teffmaxm=max(eff_field.t_e);
 teffminm=min(eff_field.t_e);
-
 i1_unblend = find((te<=teffmaxm)&(te>=teffminm));
 i1_blend = find((teblend<=teffmaxm)&(teblend>=teffminm));
 
@@ -113,8 +140,8 @@ eff_blend(i1_blend) = interp1(eff_field.t_e,eff_field.efficiency,teblend(i1_blen
 % ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
 % ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
 
-ra_unblend = rand(1,length(te));
-ra_blend = rand(1,length(teblend));
+ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
+ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
@@ -124,6 +151,19 @@ teobs = te(i);
 ib = find(ra_blend-eff_blend<=0); 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 
+function [histw, vinterval] = histwc(vv, ww, nbins, minn, maxx)
+  minV  = minn;
+  maxV  = maxx;
+  delta = (maxV-minV)/nbins;
+  vinterval = 10.^linspace(log(minV), log(maxV), nbins);
+  histw = zeros(nbins, 1);
+  for i=1:length(vv)
+    ind = find(vinterval < vv(i), 1, 'last' );
+    if ~isempty(ind)
+      histw(ind) = histw(ind) + ww(i);
+    end
+  end
+end
 
 function semilogxhist(val,M)
 % semilogxhist - generate histogram with M bars and log-scale x axis

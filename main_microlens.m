@@ -728,8 +728,8 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 f = 0.05;   %fraction des évenements unblendé f = P(1)
 nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
-% f = 0.5;
-% nbar = 1.257;
+f = 0.5;
+nbar = 1.257;
 % f = 0.2;
 % nbar = 2.6;
 % f = 1;
@@ -739,7 +739,7 @@ script_blending
 
 %-----------
 %Choix de l'expérience à analyser
-%donne teff : te des observations et eff : efficacité
+%donne teff : tet des observations et eff : efficacité
 %------------
 
 
@@ -765,10 +765,10 @@ nbre_bin = temax;
 % bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
 % legend('OGLE', 'MACHO', 'EROS')
 
-% exp_ogle_IV_2019
+exp_ogle_IV_2019
 % exp_MOA_2016
-exp_ogle_III_2015
-exp_ogle_II_2006
+% exp_ogle_III_2015
+% exp_ogle_II_2006
 
 %---------------
 %calcul de gamma
@@ -810,7 +810,7 @@ load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
 
 %Paramètre graph
-bin_max = 50;
+bin_max = 100;
 nbre_bin = bin_max/2;
 
 
@@ -826,7 +826,8 @@ nbre_bin = bin_max/2;
 [hist_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %courbe de l'expérience
-[hist_exp, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_exp_err, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+% [hist_exp_BW, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 i=find(te<30);
 i_model = find(te_model<30);
@@ -856,17 +857,32 @@ histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
-%Graph normalisé expérience et exp simulée avec l'efficacité
+%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE IV
 figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
-bar(centre, hist_exp)
-legend('hist modèle', 'hist modèle avec blending', 'OGLE III')
+M = length(hist_exp_err);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
+
 %%
+%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
+figure(18)
+hold on;
+plot(centre, hist_obs, 'red');
+plot(centre, hist_obs_b, 'black');
+M = length(hist_exp_err);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
+M = length(hist_exp_BW);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)')
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
+
 %graph noramlisé avec blending
 figure(1);
 hold on;
