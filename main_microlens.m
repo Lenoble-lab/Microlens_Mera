@@ -794,8 +794,8 @@ disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 gamobsb = gam/length(te)*length(teobsblend);
 disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
 % 
-% tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
-% disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
+tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
+disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 % 
 % disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 
