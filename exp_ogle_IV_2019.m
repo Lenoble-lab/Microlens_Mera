@@ -132,10 +132,12 @@ table3 = readtable('../OGLEIV/table3.dat',opts);
 %-----------------------------------------------
 
 %Choix d'un champ 
-field = "BLG612";
+% field = "BLG513";
 
 %Exposure
-exposure = 2741*table7.N_stars(find(table7.field == field)) /365.25;
+exposure = 2741*table7.N_stars(table7.field == field) /365.25;
+% exposure = 2741*sum(table5.N18(extractBetween(table5.field,1,6) == field))*1e-6 /365.25;
+
 %Récupération des évènements du champs
 
 disp(['exposure ogle = ', num2str(exposure)])
@@ -166,7 +168,9 @@ M = length(eff_field.log_tE_min);
 te_graph = [eff_field.log_tE_min(1) ; eff_field.log_tE_min ; eff_field.log_tE_max; eff_field.log_tE_max(M)];
 eff_graph = [0 ; eff_field.efficiency(sort([1:M 1:M])) ; 0];
 loglog(10.^sort(te_graph), eff_graph)
-
+legend('table 3', 'données de chaque champ')
+xlabel('t_{e}')
+ylabel('efficacité')
 
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
@@ -262,3 +266,54 @@ end
 disp(['gamma obs calculé comme ogle',num2str(gam_ogle/length(teobs) / exposure)])
 disp(['gamma obs calculé comme ogle avec les donnée ogle efficiency= ',num2str(gam_obs_ogle / exposure)])
 disp(['gamma obs calculé comme ogle avec les donnée ogle efficiency= ',num2str(sum(table3.weight(id_field)) / exposure)])
+
+
+
+
+%------------------
+%test pour faire comme sur MACHO
+%------------------------
+%-----------------------------------------------------------------------------------------------
+% Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
+%-----------------------------------------------------------------------------------------------
+tmacho2005 = teff;
+effmacho2005t = table3.weight(id_field).^-1;
+
+[tinterpmacho,indice] = sort(tmacho2005); 
+effinterpmacho = effmacho2005t(indice) ;
+
+%Il y a des doublons dans les données, il faut les supprimer pour que l'interpolation se passe correctement
+indices = [1:length(tinterpmacho)-1];
+il = find(tinterpmacho(indices)~=tinterpmacho(indices+1));
+tinterpmacho = [tinterpmacho(il);tinterpmacho(length(tinterpmacho))];
+effinterpmacho = [effinterpmacho(il);effinterpmacho(length(tinterpmacho))];
+
+
+teffmaxm=max(tinterpmacho);
+teffminm=min(tinterpmacho);
+
+i1 = find((te<=teffmaxm)&(te>=teffminm));
+iblend = find((teblend<=teffmaxm)&(teblend>=teffminm));
+effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+effsimmachoblend = zeros(1,length(teblend));
+effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
+effsimmachoblend(iblend) = interp1(tinterpmacho,effinterpmacho,teblend(iblend));
+
+
+%--------------------------------------------------------------------------------------------------------------------------
+% compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
+%--------------------------------------------------------------------------------------------------------------------------
+
+%tirage au sort pour l'efficacité
+ramacho = rand(1,length(te))*max(effinterpmacho);
+ramachob = rand(1,length(teblend))*max(effinterpmacho);
+
+% On choisit l'efficacité ici en prenant les bons indices i
+
+i = find(ramacho-effsimmacho<=0); 
+
+% teobs = te(i);
+
+ib1 = find(ramachob-effsimmachoblend<=0); 
+
+% teobsblend = teblend(ib1); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant

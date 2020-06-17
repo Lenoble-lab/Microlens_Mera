@@ -679,7 +679,7 @@ fclose(fid);
 % fin du Monte-Carlo
 %-------------------
 %-------------------
-
+%%
 
 %----------------------------------------
 % recuperation des evenements selectionnes
@@ -854,6 +854,7 @@ hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
 plot(centre, hist_obs_b*gamobsb*exposure, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
