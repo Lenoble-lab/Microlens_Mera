@@ -131,9 +131,6 @@ table3 = readtable('../OGLEIV/table3.dat',opts);
 %Comparaison avec calculs du MC
 %-----------------------------------------------
 
-%Choix d'un champ 
-% field = "BLG513";
-
 %Exposure
 exposure = 2741*table7.N_stars(table7.field == field) /365.25;
 % exposure = 2741*sum(table5.N18(extractBetween(table5.field,1,6) == field))*1e-6 /365.25;
