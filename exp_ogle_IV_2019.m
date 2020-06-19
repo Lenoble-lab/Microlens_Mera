@@ -222,8 +222,6 @@ end
 %--------------------------------------------------------------------------------------------------------------------------
 
 %tirage au sort pour l'efficacité
-% ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
-% ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
 
 ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
 ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
@@ -273,44 +271,44 @@ disp(['gamma obs calculé comme ogle avec les donnée ogle efficiency= ',num2str
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
 %-----------------------------------------------------------------------------------------------
-tmacho2005 = teff;
-effmacho2005t = table3.weight(id_field).^-1;
-
-[tinterpmacho,indice] = sort(tmacho2005); 
-effinterpmacho = effmacho2005t(indice) ;
-
-%Il y a des doublons dans les données, il faut les supprimer pour que l'interpolation se passe correctement
-indices = [1:length(tinterpmacho)-1];
-il = find(tinterpmacho(indices)~=tinterpmacho(indices+1));
-tinterpmacho = [tinterpmacho(il);tinterpmacho(length(tinterpmacho))];
-effinterpmacho = [effinterpmacho(il);effinterpmacho(length(tinterpmacho))];
-
-
-teffmaxm=max(tinterpmacho);
-teffminm=min(tinterpmacho);
-
-i1 = find((te<=teffmaxm)&(te>=teffminm));
-iblend = find((teblend<=teffmaxm)&(teblend>=teffminm));
-effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-effsimmachoblend = zeros(1,length(teblend));
-effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
-effsimmachoblend(iblend) = interp1(tinterpmacho,effinterpmacho,teblend(iblend));
-
-
-%--------------------------------------------------------------------------------------------------------------------------
-% compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
-%--------------------------------------------------------------------------------------------------------------------------
-
-%tirage au sort pour l'efficacité
-ramacho = rand(1,length(te))*max(effinterpmacho);
-ramachob = rand(1,length(teblend))*max(effinterpmacho);
-
-% On choisit l'efficacité ici en prenant les bons indices i
-
-i = find(ramacho-effsimmacho<=0); 
-
-% teobs = te(i);
-
-ib1 = find(ramachob-effsimmachoblend<=0); 
-
-% teobsblend = teblend(ib1); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
+% tmacho2005 = teff;
+% effmacho2005t = table3.weight(id_field).^-1;
+% 
+% [tinterpmacho,indice] = sort(tmacho2005); 
+% effinterpmacho = effmacho2005t(indice) ;
+% 
+% %Il y a des doublons dans les données, il faut les supprimer pour que l'interpolation se passe correctement
+% indices = [1:length(tinterpmacho)-1];
+% il = find(tinterpmacho(indices)~=tinterpmacho(indices+1));
+% tinterpmacho = [tinterpmacho(il);tinterpmacho(length(tinterpmacho))];
+% effinterpmacho = [effinterpmacho(il);effinterpmacho(length(tinterpmacho))];
+% 
+% 
+% teffmaxm=max(tinterpmacho);
+% teffminm=min(tinterpmacho);
+% 
+% i1 = find((te<=teffmaxm)&(te>=teffminm));
+% iblend = find((teblend<=teffmaxm)&(teblend>=teffminm));
+% effsimmacho = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+% effsimmachoblend = zeros(1,length(teblend));
+% effsimmacho(i1) = interp1(tinterpmacho,effinterpmacho,te(i1));
+% effsimmachoblend(iblend) = interp1(tinterpmacho,effinterpmacho,teblend(iblend));
+% 
+% 
+% %--------------------------------------------------------------------------------------------------------------------------
+% % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
+% %--------------------------------------------------------------------------------------------------------------------------
+% 
+% %tirage au sort pour l'efficacité
+% ramacho = rand(1,length(te))*max(effinterpmacho);
+% ramachob = rand(1,length(teblend))*max(effinterpmacho);
+% 
+% % On choisit l'efficacité ici en prenant les bons indices i
+% 
+% i = find(ramacho-effsimmacho<=0); 
+% 
+% % teobs = te(i);
+% 
+% ib1 = find(ramachob-effsimmachoblend<=0); 
+% 
+% % teobsblend = teblend(ib1); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant

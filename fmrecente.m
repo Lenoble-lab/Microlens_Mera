@@ -23,6 +23,9 @@ end
 
 if(length(i2)>=1)
   pm(i2) =c2*((m(i2)).^(alpha2))./m(i2);
+ 
+% pm = fm_kroupa(m);
+% pm = fmchab_modi(m);
 end  
 
 
