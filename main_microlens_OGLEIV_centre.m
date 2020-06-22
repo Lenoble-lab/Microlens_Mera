@@ -21,6 +21,47 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table6,'VariableTypes
                                 'Delimiter',delimiter, 'DataLines', 18, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
 table6 = readtable('../OGLEIV/table6.dat',opts);
+%-----------------------
+%Table 4 Number of events detected in individual timescale bins.
+%------------------------------
+
+delimiter = ' ';
+VarNames_table4 = {'bin', 'log_tE', 'BLG500', 'BLG501', 'BLG504', 'BLG505', 'BLG506', 'BLG511', 'BLG512', 'BLG534', 'BLG611'};
+VarTypes_table4 = {'double', 'double', 'double', 'double', 'double', 'double', 'double',  'double', 'double', 'double', 'double'}; 
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_table4,'VariableTypes',VarTypes_table4,...
+                                'Delimiter',delimiter, 'DataLines', 7, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+table4 = readtable('../OGLEIV/table4_central.txt',opts);
+
+%----------------------------------
+%Table 5. Detection efficiencies for the analyzed fields.
+%-------------------------------------
+
+
+VarNames_table5 = {'bin', 'log_tE', 'BLG500', 'BLG501', 'BLG504', 'BLG505', 'BLG506', 'BLG511', 'BLG512', 'BLG534', 'BLG611'};
+VarTypes_table5 = {'double', 'double', 'double', 'double', 'double', 'double', 'double',  'double', 'double', 'double', 'double'}; 
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_table5,'VariableTypes',VarTypes_table5,...
+                                'Delimiter',delimiter, 'DataLines', 6, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+eff_field = readtable('../OGLEIV/table5_central.txt',opts);
+
+field_list = ["BLG500", "BLG501", "BLG504", "BLG505", "BLG506", "BLG511", "BLG512", "BLG534", "BLG611"];
+
+%------------------------------------------------
+%Table 5. Surface density of stars in OGLE-IV subfields calculated
+%using image-level simulations.
+%---------------------------------------------------
+varNames = {'field', 'ra', 'dec', 'glon', 'glat', 'sigma18', 'sigma21', 'N18', 'N21'};
+varTypes = {'char','double', 'double', 'double', 'double', ...
+    'double', 'double', 'double', 'double'};
+
+opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
+                                'Delimiter',delimiter, 'DataLines', 47, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+table5 = readtable('../OGLEIV/table5.dat',opts);
+
 
 %-----------------------------------------------
 %Table 7. Microlensing optical depth and event rates in the OGLE-IV
@@ -37,39 +78,11 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table7,'VariableTypes
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
 table7 = readtable('../OGLEIV/table7.dat',opts);
 
-%------------------------------------------------
-%Table 5. Surface density of stars in OGLE-IV subfields calculated
-%using image-level simulations.
-%---------------------------------------------------
-varNames = {'field', 'ra', 'dec', 'glon', 'glat', 'sigma18', 'sigma21', 'N18', 'N21'};
-varTypes = {'char','double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double'};
-
-opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
-                                'Delimiter',delimiter, 'DataLines', 47, ...
-                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table5 = readtable('../OGLEIV/table5.dat',opts);
-
-%-----------------
-%Table 3. Best-fitting parameters of the analyzed microlensing events in low-cadence OGLE fields.
-%-----------------
-varNames = {'name', 'field', 'star_id', 'ra', 'dec', 'ra_deg', 'dec_deg', 'glon',...
-    'glat', 't0_best', 'tE_best', 'u0_best', 'Is_best', 'fs_best', 't0_med', 't0_err1', 't0_err2', 'tE_med',...
-    'tE_err1', 'tE_err2', 'u0_med', 'u0_err1', 'u0_err2', 'Is_med', 'Is_err1', 'Is_err2', 'fs_med', 'fs_err1', 'fs_err2', 'weight', 'ews_id'} ;
-varTypes = {'char','string', 'int32' ,'char', 'char', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'char'} ;
-
-opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
-                                'Delimiter',delimiter, 'DataLines', 47, ...
-                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table3 = readtable('../OGLEIV/table3.dat',opts);
-
 %-------------
 % Choix du champ à analyser
 %------------
 
-% field = 'BLG513';
+field = "BLG500";
 
 %------------------
 %fichiers resultats
@@ -465,10 +478,14 @@ ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 %---------------------------------
 
 ra=rand(1,n);
-m(idml) = interp1(ifmmdm,mmdm,ra(idml));
-m(idel) = interp1(ifmmde,mmde,ra(idel));
-m(ibul) = interp1(ifmmbu,mmbu,ra(ibul));
-m(ihl) = interp1(ifmmh,mmh,ra(ihl));
+[ifmmdm, index] = unique(ifmmdm); 
+m(idml) = interp1(ifmmdm,mmdm(index),ra(idml));
+[ifmmde, index] = unique(ifmmde); 
+m(idel) = interp1(ifmmde,mmde(index),ra(idel));
+[ifmmbu, index] = unique(ifmmbu); 
+m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
+[ifmmh, index] = unique(ifmmh); 
+m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 
 %-------------------------------------------------------
 %cas particulier : population de WD dans le de
@@ -701,7 +718,7 @@ fclose(fid);
 %-------------------
 %-------------------
 %%
-close all
+
 %----------------------------------------
 % recuperation des evenements selectionnes
 %----------------------------------------
@@ -720,7 +737,7 @@ m=m';
 te=te';
 
 disp(' ')
-
+close all
 %---------------
 %calcul de gamma
 %---------------
@@ -746,8 +763,8 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 %------------------------
 
 % Param�tre pour le blending 
-f = 0.05;   %fraction des évenements unblendé f = P(1)
-nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
+% f = 0.05;   %fraction des évenements unblendé f = P(1)
+% nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
 f = 0.5;
 nbar = 1.257;
@@ -767,29 +784,56 @@ script_blending
 temax = 100;
 nbre_bin = temax;
 
-% exp_ogle_2006
-% teff_ogle = teff;
-% [hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-% 
-% 
-% exp_macho_2005
-% [hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-% sort(teff)
-% figure(1)
-% bar(edges(1:end-1),hist_macho)
+%----------------
+% Données de l'expérience OGLE
+%----------------------
 
-% exp_eros_2006
-% % teff_eros = teff;
-% [hist_eros, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-% 
-% figure(1)
-% bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
-% legend('OGLE', 'MACHO', 'EROS')
+%Exposure
+exposure = 2741*table7.N_stars(table7.field == field) /365.25;
+% exposure = 2741*sum(table5.N18(extractBetween(table5.field,1,6) == field))*1e-6 /365.25;
 
-exp_ogle_IV_2019
-% exp_MOA_2016
-% exp_ogle_III_2015
-% exp_ogle_II_2006
+%Récupération des évènements du champs
+
+disp(['exposure ogle = ', num2str(exposure)])
+disp(['gamma observé ogle = ' num2str(table7.gam(find(extractBetween(table7.field, 1, 6) == field)))])
+disp(['tau observé ogle = ' num2str(table7.tau(find(extractBetween(table7.field, 1, 6) == field)))])
+
+
+%-------------
+%Calcul de l'efficacité à partir des données OGLE IV
+%-----------------
+eff = eval(['eff_field.',convertStringsToChars(field)]);
+
+te_inter = 10.^(eff_field.log_tE);
+
+teffmaxm=max(te_inter);
+teffminm=min(te_inter);
+
+i1_unblend = find((te<=teffmaxm)&(te>=teffminm));
+i1_blend = find((teblend<=teffmaxm)&(teblend>=teffminm));
+
+eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+eff_blend = zeros(1,length(teblend));
+
+eff_unblend(i1_unblend) = interp1(te_inter,eff,te(i1_unblend));
+eff_blend(i1_blend) = interp1(te_inter,eff,teblend(i1_blend));
+
+%--------------------------------------------------------------------------------------------------------------------------
+% compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
+%--------------------------------------------------------------------------------------------------------------------------
+
+%tirage au sort pour l'efficacité
+
+ra_unblend = rand(1,length(te))*max(eff);
+ra_blend = rand(1,length(teblend))*max(eff);
+
+% On choisit l'efficacité ici en prenant les bons indices i
+
+i = find(ra_unblend-eff_unblend<=0); 
+teobs = te(i);
+
+ib = find(ra_blend-eff_blend<=0); 
+teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
 
 %---------------
 %calcul de gamma
@@ -830,32 +874,34 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
 
-%Paramètre graph
-bin_max = 100;
-nbre_bin = bin_max/2;
+%les bins sont imposé par le choix de OGLE IV
 
+te_max = 150;
+i_inf = find(10.^(table4.log_tE+0.07) < te_max);
+edges = 10.^[-1; table4.log_tE(i_inf)+0.07];
 
 %Trace la distribde te  pour le modèle et la courbe stockée localement
-[hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-[hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+hist = histcounts(te, edges, 'Normalization', 'probability');
+hist_model = histcounts(te_model, edges, 'Normalization', 'probability');
 
 %tracé distribution avec blending uniquement la courbe stockée localement
-[histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+histb= histcounts(teblend, edges, 'Normalization', 'probability');
 
 %Courbe expérimentale (avec l'efficacité) :
-[hist_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-[hist_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+hist_obs = histcounts(teobs,edges, 'Normalization', 'probability');
+hist_obs_b = histcounts(teobsblend, edges, 'Normalization', 'probability');
 
-%courbe de l'expérience
-[hist_exp_err, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-% [hist_exp_BW, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-
-
-centre = zeros(size(edges)-[0,1]);
+centre = zeros(size(edges)-[1,0]);
 
 for j =1:length(centre);
-centre(j)=(edges(j)+edges(j+1))/2;
+centre(j)=10.^((log10(edges(j))+log10(edges(j+1)))/2);
 end
+i_ogle = find(table4.log_tE<log10(max(edges)));
+
+%expérience
+hist_tot = eval(['table4.', convertStringsToChars(field)]);
+hist_exp = hist_tot(i_ogle);
+
 
 %Graph normalisé
 figure(16)
@@ -871,7 +917,7 @@ figure(17)
 hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
 plot(centre, hist_obs_b*gamobsb*exposure, 'black');
-histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
+plot(10.^table4.log_tE(i_ogle), hist_exp)
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -881,8 +927,7 @@ figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
-M = length(hist_exp_err);
-plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
+plot(10.^table4.log_tE(i_ogle), hist_exp/sum(hist_exp))
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
