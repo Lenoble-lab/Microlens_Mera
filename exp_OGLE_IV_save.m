@@ -11,7 +11,7 @@ path_field = strcat('../graph/OGLEIV/', field);
 % saveas(1, strcat(path_field, '/efficacité_', field), 'epsc')
 
 %Enregistrement hist normalisé
-saveas(18, strcat(path_field, '/hist_normalise_', field), 'epsc')
+% saveas(18, strcat(path_field, '/hist_normalise_', field), 'epsc')
 
 %Enregistrement hist à l'échelle
 % saveas(17, strcat(path_field, '/hist_scale_', field), 'epsc')

@@ -94,7 +94,7 @@ table3 = readtable('../OGLEIV/table3.dat',opts);
 %Longitude considérée
 % long = 0;
 % 
-% i0 = find(abs(table6.glon - long)<0.5 & table6.glat<-1);
+% i0 = find(abs(table6.glon - long)tabl<0.5 & table6.glat<-1);
 % 
 % %Calcul modèle
 % tau_load = load('graph_iso_model.mat');
@@ -242,13 +242,13 @@ gam_obs_ogle = 0;
 gam_obs_star_count = 0;
 expo = zeros(size(id_field));
 % for i = 1:length(id_field)
-% % for i = 1:10
-%     id_eve = id_field(i);
-%     expo(i) = 2741*table5.N21(table5.field == table3.field(id_eve)) / (365.25 * 1e6);
-%     gam_obs_star_count = gam_obs_star_count + table3.weight(id_eve)/expo(i);
-% %     disp([num2str(gam_obs_star_count), ' ', num2str(expo_i)]);
-% 
-% end
+for i = 1:10
+    id_eve = id_field(i);
+    expo(i) = 2741*table5.N21(table5.field == table3.field(id_eve)) / (365.25 * 1e6);
+    gam_obs_star_count = gam_obs_star_count + table3.weight(id_eve)/expo(i);
+    disp([num2str(gam_obs_star_count), ' ', num2str(expo(i))]);
+
+end
 disp(['gama avec star count bon ', num2str(gam_obs_star_count)])
 for i = 1:length(te_inter_min)
     i1_unblend = find(teobs>=te_inter_min(i) & teobs<=te_inter_max(i));

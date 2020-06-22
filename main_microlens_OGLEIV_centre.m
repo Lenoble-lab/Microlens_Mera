@@ -82,7 +82,7 @@ table7 = readtable('../OGLEIV/table7.dat',opts);
 % Choix du champ à analyser
 %------------
 
-field = "BLG500";
+field = "BLG505";
 
 %------------------
 %fichiers resultats
@@ -789,7 +789,7 @@ nbre_bin = temax;
 %----------------------
 
 %Exposure
-exposure = 2741*table7.N_stars(table7.field == field) /365.25;
+exposure = 2011*table7.N_stars(table7.field == field) /365.25;
 % exposure = 2741*sum(table5.N18(extractBetween(table5.field,1,6) == field))*1e-6 /365.25;
 
 %Récupération des évènements du champs
@@ -802,9 +802,13 @@ disp(['tau observé ogle = ' num2str(table7.tau(find(extractBetween(table7.field
 %-------------
 %Calcul de l'efficacité à partir des données OGLE IV
 %-----------------
+figure(1)
 eff = eval(['eff_field.',convertStringsToChars(field)]);
 
 te_inter = 10.^(eff_field.log_tE);
+
+loglog(te_inter, eff)
+hold on
 
 teffmaxm=max(te_inter);
 teffminm=min(te_inter);
@@ -818,14 +822,56 @@ eff_blend = zeros(1,length(teblend));
 eff_unblend(i1_unblend) = interp1(te_inter,eff,te(i1_unblend));
 eff_blend(i1_blend) = interp1(te_inter,eff,teblend(i1_blend));
 
+
+%---------------
+%Test avec autre efficacité
+%------------------------
+VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
+VarType_eff_IV = {'double', 'double', 'double'};
+
+opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
+                            'Delimiter',delimiter, 'DataLines', 5, ...
+                   'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+               
+eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
+
+
+eff_2019 = eff_field_2019.efficiency;
+
+%Graph
+M = length(eff_field_2019.log_tE_min);
+te_graph = [eff_field_2019.log_tE_min(1) ; eff_field_2019.log_tE_min ; eff_field_2019.log_tE_max; eff_field_2019.log_tE_max(M)];
+eff_graph = [0 ; eff_field_2019.efficiency(sort([1:M 1:M])) ; 0];
+loglog(10.^sort(te_graph), eff_graph)
+legend('2017', '2019')
+title(strcat('efficacité selon les deux données du champ ', field));
+te_inter_min = 10.^(eff_field_2019.log_tE_min);
+te_inter_max = 10.^(eff_field_2019.log_tE_max);
+
+teffmaxm=max(te_inter_max);
+teffminm=min(te_inter_min);
+
+eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+eff_blend = zeros(1,length(teblend));
+
+for i = 1:length(te_inter_min)
+    i1_unblend = find(te>=te_inter_min(i) & te<=te_inter_max(i));
+    i1_blend = find(teblend>=te_inter_min(i) & teblend<=te_inter_max(i));
+    
+    eff_unblend(i1_unblend) = ones(size(i1_unblend)) .* eff_field_2019.efficiency(i);
+    eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field_2019.efficiency(i);
+    
+end
+
+
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
 
 %tirage au sort pour l'efficacité
 
-ra_unblend = rand(1,length(te))*max(eff);
-ra_blend = rand(1,length(teblend))*max(eff);
+ra_unblend = rand(1,length(te))*max(eff_2019);
+ra_blend = rand(1,length(teblend))*max(eff_2019);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
@@ -834,6 +880,7 @@ teobs = te(i);
 
 ib = find(ra_blend-eff_blend<=0); 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
+
 
 %---------------
 %calcul de gamma
@@ -874,8 +921,7 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
 
-%les bins sont imposé par le choix de OGLE IV
-
+%les bins sont imposés par le choix de OGLE IV
 te_max = 150;
 i_inf = find(10.^(table4.log_tE+0.07) < te_max);
 edges = 10.^[-1; table4.log_tE(i_inf)+0.07];
@@ -900,7 +946,7 @@ i_ogle = find(table4.log_tE<log10(max(edges)));
 
 %expérience
 hist_tot = eval(['table4.', convertStringsToChars(field)]);
-hist_exp = hist_tot(i_ogle);
+hist_exp = hist_tot;
 
 
 %Graph normalisé
@@ -917,7 +963,8 @@ figure(17)
 hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
 plot(centre, hist_obs_b*gamobsb*exposure, 'black');
-plot(10.^table4.log_tE(i_ogle), hist_exp)
+M = length(i_ogle);
+plot(10.^[-2;table4.log_tE(i_ogle(sort([1:M 1:M])))], [0;0; hist_exp(sort([1:M-1 1:M-1])) ; 0], '-')
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -927,7 +974,8 @@ figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
-plot(10.^table4.log_tE(i_ogle), hist_exp/sum(hist_exp))
+M = length(i_ogle);
+plot(10.^[-2;table4.log_tE(i_ogle(sort([1:M 1:M])))], [0;0; hist_exp(sort([1:M-1 1:M-1]))/sum(hist_exp) ; 0], '-')
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')

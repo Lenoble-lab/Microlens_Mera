@@ -36,6 +36,20 @@ opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTy
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
 table3_IV = readtable('../OGLEIV/table3.dat',opts);
 
+%-----------------------
+%Table 4 Number of events detected in individual timescale bins, OGLE IV
+%2017
+%------------------------------
+
+delimiter = ' ';
+VarNames_table4 = {'bin', 'log_tE', 'BLG500', 'BLG501', 'BLG504', 'BLG505', 'BLG506', 'BLG511', 'BLG512', 'BLG534', 'BLG611'};
+VarTypes_table4 = {'double', 'double', 'double', 'double', 'double', 'double', 'double',  'double', 'double', 'double', 'double'}; 
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_table4,'VariableTypes',VarTypes_table4,...
+                                'Delimiter',delimiter, 'DataLines', 7, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+table4_2017 = readtable('../OGLEIV/table4_central.txt',opts);
+
 %---------------------------------------------------
 %Table 4 : Microlensing events used in the optical depth and event rate measurements.
 %-----------------------------------------------------
@@ -85,7 +99,43 @@ end
 
 %Plot des graphes
 
+%Comparaison différents champs de OGLE IV
 
+field_2017 = ["BLG501", "BLG506"];
+field_2019 = ["BLG535", "BLG513"];
+%les bins sont imposés par le choix de OGLE IV
+te_max = 150;
+
+i_inf = find(10.^(table4_2017.log_tE+0.07) < te_max);
+edges = 10.^[-1; table4_2017.log_tE(i_inf)+0.07];
+i_ogle = find(table4_2017.log_tE<log10(max(edges)));
+
+figure(1)
+hold on;
+for field = field_2017
+hist_exp = eval(['table4_2017.', convertStringsToChars(field)]);
+M = length(i_ogle);
+% plot(10.^[-2;table4_2017.log_tE(i_ogle(sort([1:M 1:M])))], [0;0; hist_exp(sort([1:M-1 1:M-1])) ; 0], '-')
+plot(10.^table4_2017.log_tE(i_ogle), hist_exp(i_ogle))
+end
+
+centre = zeros(size(edges)-[1,0]);
+for j =1:length(centre);
+centre(j)=(edges(j)+edges(j+1))/2;
+end
+
+for field = field_2019
+id_field = find(extractBetween(table3_IV.field, 1, 6) == field & table3_IV.Is_med<=21);
+teff = table3_IV.tE_best(id_field);
+hist = histcounts(teff, edges);
+M = length(hist);
+% plot(edges(sort([1:M 1:M])), [0 , 0, hist(sort([1:M 2:M-1]))])
+plot(centre, hist)
+end
+legend([field_2017, field_2019])
+    
+
+%%
 %Histogramme complet des évènements
 nbre_bin = 30;
 figure(1)
