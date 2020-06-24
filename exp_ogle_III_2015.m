@@ -55,10 +55,10 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_eff,'VariableTypes',V
 eff_field = readtable('../OGLEIII/efficiency.dat',opts);
 
 M = 35;
-figure(1)
-loglog(eff_field.t_e(sort([1:M 1:M])), [0 ; eff_field.efficiency(sort([1:M-1 1:M-1])) ; 0], '-')
-hold on
-loglog(eff_field.t_e, eff_field.efficiency)
+% figure(1)
+% loglog(eff_field.t_e(sort([1:M 1:M])), [0 ; eff_field.efficiency(sort([1:M-1 1:M-1])) ; 0], '-')
+% hold on
+% loglog(eff_field.t_e, eff_field.efficiency)
 
 eff = eff_field.efficiency;
 
@@ -72,7 +72,7 @@ i_err = find(rel_err<0.5);
 i_BW_dir = find(abs(table2.glon-1)<2 & abs(table2.glat+2)<2);
 i_BW = intersect(i_BW_dir, i_err);
 
-
+i_fs = find(table2.fs>0.2);
 % 
 % figure(2)
 % semilogxhistnormalise(table2.te(i0), 25)
@@ -96,26 +96,26 @@ i_BW = intersect(i_BW_dir, i_err);
 %--------------------------
 %Figure 13 (histogramme corrigé de l'efficacité)
 %---------------------
-bin_max = 300;
-nbre_bin = 20;
-v = table2.te;
-weight = zeros(size(table2.te)); %efficacité
-
-%table d'efficacité pour chaque événements
-for i = 1:length(weight)
-    i0 = find(v(i)<eff_field.t_e,1);
-    weight(i) = 1/eff_field.efficiency(i0);
-end
-
-[histw, vinterval] = histwc(table2.te(i_err), weight(i_err), 50, 1, 400);
-[histw_BW, vinterval_BW] = histwc(table2.te(i_BW), weight(i_BW), 50, 1, 400);
-
-M = length(vinterval);
-M_BW = length(vinterval_BW);
-figure(3)
-loglog(vinterval(sort([1:M 1:M 1:1] )), [0; 0 ; histw(sort([1:M-1 1:M-1])) ; 0])
-hold on
-loglog(vinterval_BW(sort([1:M 1:M 1:1] )), [0; 0 ; histw_BW(sort([1:M-1 1:M-1])) ; 0])
+% bin_max = 300;
+% nbre_bin = 20;
+% v = table2.te;
+% weight = zeros(size(table2.te)); %efficacité
+% 
+% %table d'efficacité pour chaque événements
+% for i = 1:length(weight)
+%     i0 = find(v(i)<eff_field.t_e,1);
+%     weight(i) = 1/eff_field.efficiency(i0);
+% end
+% 
+% [histw, vinterval] = histwc(table2.te(i_err), weight(i_err), 50, 1, 400);
+% [histw_BW, vinterval_BW] = histwc(table2.te(i_BW), weight(i_BW), 50, 1, 400);
+% 
+% M = length(vinterval);
+% M_BW = length(vinterval_BW);
+% figure(3)
+% loglog(vinterval(sort([1:M 1:M 1:1] )), [0; 0 ; histw(sort([1:M-1 1:M-1])) ; 0])
+% hold on
+% loglog(vinterval_BW(sort([1:M 1:M 1:1] )), [0; 0 ; histw_BW(sort([1:M-1 1:M-1])) ; 0])
 
 %-----------------------------------------
 %Efficacité avec interpolation

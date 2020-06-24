@@ -1,52 +1,16 @@
-%But calculer tau, gamma et <te> pour chaque champ de OGLEIV selon un modèle considéré
-%On charge les données OGLE IV et ensuite on calcule pour chaque direction (=champ) via MC ces données
+% Programme de micro-lentilles gravitationnelles (bulbe et disque)
 
 clear
 
-%-----------------------------------------------
-%Table 6. Basic information about analyzed fields
-%------------------------------------------------
-delimiter = ' ';
-VarNames_table6 = {'field', 'ra', 'dec', 'glon', 'glat', 'N_stars', 'N_epochs'};
-VarTypes_table6 = {'string', 'double', 'double', 'double', 'double', 'double', 'double'}; 
+%------------------
+%fichiers resultats
+%------------------
 
-opts = delimitedTextImportOptions('VariableNames',VarNames_table6,'VariableTypes',VarTypes_table6,...
-                                'Delimiter',delimiter, 'DataLines', 18, ...
-                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table6 = readtable('../OGLEIV/table6.dat',opts);
-
-%-----------------------------------------------
-%Table 7. Microlensing optical depth and event rates in the OGLE-IV
-% fields (averaged over sources brighter than I=21).
-%-----------------------------------------------
-
-VarNames_table7 = {'field', 'glon', 'glat', 'tau', 'tau_err', 'gam', 'gam_err', 'gam_deg2',...
-    'gam_deg2_err', 't_E_mean', 't_E_mean_err', 'N_events', 'N_stars'};
-VarTypes_table7 = {'string', 'double', 'double', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double', 'double', 'double'}; 
-
-opts = delimitedTextImportOptions('VariableNames',VarNames_table7,'VariableTypes',VarTypes_table7,...
-                                'Delimiter',delimiter, 'DataLines', 25, ...
-                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table7 = readtable('../OGLEIV/table7.dat',opts);
-
-
-fichier ='../graph/comp_modele_OGLEIV.txt';
-
-fid = fopen(fichier, 'w');
-
-fprintf(fid, ['Calcul pour chaque champ des données de mon modèle, comparée avec celle de OGLE IV \n' ...
-'Les variables stockées sont, dans l ordre : \n ' ...
-'Champ; \n longitude; \n lattitude; \n N_stars; \n N_events; ' ...
-'\n gam_OGLE; \n tau_OGLE (10^-6); \n mean_te_ogle; \n ' ...
-'Gammax \n' ...
-'gamma calculé par le modèle (brut); \n tau (10^-6); ----------------- \n mean_te ----------------------\n ' ...
-'gamma avec efficacité du champ considéré \n tau (10^-6); ---------------- \n mean_te -------------------\n '...
-'gamma avec efficacité et blending \n tau (10^-6); ---------------- \n mean_te --------------------\n' ]);
-
+fichevents='evenements.sim1.txt';
+fichres='resultat.sim1.txt';
+fichpara='para.sim1.txt';
 
 global vsr vsp vst vlp vlt vlr
-
 %----------------------------------
 % Constantes physiques (unites SI)
 %----------------------------------
@@ -67,6 +31,7 @@ vlimit = 1000e3;
 %----------------------
 
 n = 20000;
+% n = 5000;
 nbsimul=500; %a augmenter pour meilleure stat
 nbMAX=500;
 
@@ -96,22 +61,21 @@ Lkpc=Ro/1000;  % distance Sun-GC en kpc
 global Rcoro
 Rcoro = 3500;
 
-fprintf(fid, ' n = %10.0f, nbsimul = %10.0f, nbmax = %10.0f \n', [n, nbsimul, nbMAX]);
 
 %---------------------------------------       
 % param�tres du calcul de microlentilles
 %---------------------------------------
-% for field = table7.field
-for id_field = 1:length(table7.field)
- 
-field = table7.field(id_field);  
-disp(field)
 global l b
 
-% on suit la direction du champ considéré
+% definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
+% A priori c'est cette definition qui est juste.
+l = 1 *pi/180;    % direction d'observation en radian
+b = -4 *pi/180;
 
-l = table7.glon(table7.field == field) *pi/180;    % direction d'observation en radian
-b = table7.glat(table7.field == field) *pi/180;
+
+% definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
+% l = 4 *pi/180;    % direction d'observation en radian
+% b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -192,7 +156,15 @@ Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
 tau = Ctau * integral2(@dtau,0,1,dinf,dsup, 'Method', 'iterated') /normnu;
 taucx=tau;
 tau=real(taucx);
+disp(['tau = ' num2str(taucx)]);
 
+%-----------------------------------------------------------------------------
+%calcul de la profondeur optique dans le cas d'une source a distance constante
+%-----------------------------------------------------------------------------
+
+%Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
+%tau  = Ctau*quad('dtaud',0,1,1e-2);
+%disp(['tau = ' num2str(tau)]);
 
 %-------------------------------------------------------
 %calcul de la masse moyenne et de la normalisation de fm
@@ -205,6 +177,8 @@ tau=real(taucx);
 global normfmdm mmeandm
 
 normfmdm=integral(@fmdm,minfdm,msupdm);
+disp(['integrale de la fonction de masse du disque mince = ' num2str(normfmdm)]);
+
 mmeandm=integral(@mPmdm,minfdm,msupdm);
 
     %--------------------
@@ -214,6 +188,8 @@ mmeandm=integral(@mPmdm,minfdm,msupdm);
 global normfmde mmeande
 
 normfmde=integral(@fmde,minfde,msupde);
+disp(['integrale de la fonction de masse du disque epais = ' num2str(normfmde)]);
+
 mmeande=integral(@mPmde,minfde,msupde);
 
 
@@ -224,6 +200,8 @@ mmeande=integral(@mPmde,minfde,msupde);
 global normfmbu mmeanbu
 
 normfmbu=integral(@fmbu,minfbu,msupbu);
+disp(['integrale de la fonction de masse du bulbe = ' num2str(normfmbu)]);
+
 mmeanbu=integral(@mPmbu,minfbu,msupbu);
 
     %------------
@@ -233,6 +211,8 @@ mmeanbu=integral(@mPmbu,minfbu,msupbu);
     global normfmh mmeanh
 
 normfmh=integral(@fmh,minfh,msuph);
+disp(['integrale de la fonction de masse du halo = ' num2str(normfmh)]);
+
 mmeanh=integral(@mPmh,minfh,msuph);
 
 %-------------------------------------------------------------
@@ -262,7 +242,7 @@ ifmmde = ifmmde./ifmmde(end);	% on fait en sorte que la primitive varie de 0 a 1
     %-------------
     % cas du bulbe
     %-------------
-
+ 
 mmbu = (0:1e-5:1).*(msupbu-minfbu)+minfbu;
 fmmbu = probabu(mmbu);
 ifmmbu = cumsum(fmmbu);	% primitive bu la fonction bu masse fm
@@ -302,6 +282,12 @@ ifds = real(ifds./ifds(end));	% on fait en sorte que la primitive varie de 0 a 1
 %-------------------------------------------
 
 for compteur = 1:nbMAX,
+    
+    if ( rem(compteur,100) == 0 )
+    
+disp(['compteur = ' num2str(compteur)]);
+
+    end
 
 % randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
 
@@ -317,6 +303,7 @@ clear x ds m v
 end
 
 Gammax=max(gmax);
+disp(['Gammax = ' num2str(Gammax)]);
 
 
 %---------------------
@@ -330,11 +317,22 @@ Gammax=max(gmax);
 % ouverture des fichiers de donnees
 %----------------------------------
 
+fid = fopen(fichevents,'w');
+fid1 = fopen('evenements.txt','w');
+fids = fopen('strange.txt','w');
+
 dgamma=[];
 dgammaccepte=[];        % initialisation pour les traitement ulterieur des donnees
-te=[];
+tecorrespondant=[];
 
 for compteur = 1:nbsimul,
+
+  if ( rem(compteur,100) == 0 )  
+    
+disp(['compteur = ' num2str(compteur)]);
+
+  end
+
 
 %---------------------------------------------------
 % Initialisation aleatoire des generateurs aleatoire
@@ -381,15 +379,38 @@ idel=find(rhodm(R,z,th)./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th))./rhotot
 ibul=find((rhodm(R,z,th)+rhode(R,z,th))./rhotot<ra & ra <= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 
+
+%-----------------------------------------------------------------
+% test : methode de Peale. Lentilles et sources ont les proprietes
+% du disque si R>Rcoro, et du bulbe sinon
+%-----------------------------------------------------------------
+
+% [R,z,th]= toGC(x.*ds);
+% ibul=find(R<=Rcoro);
+% idml=find(R>Rcoro);
+% idel=find(R<0.);
+% ihl=find(R<0.);
+
+% [R,z,th]= toGC(ds);
+% ibus=find(R<=Rcoro);
+% idms=find(R>Rcoro);
+% ides=find(R<0.);
+% ihs=find(R<0.);
+
+
 %---------------------------------
 %tirage de la masse de la lentille
 %---------------------------------
 
 ra=rand(1,n);
-m(idml) = interp1(ifmmdm,mmdm,ra(idml));
-m(idel) = interp1(ifmmde,mmde,ra(idel));
-m(ibul) = interp1(ifmmbu,mmbu,ra(ibul));
-m(ihl) = interp1(ifmmh,mmh,ra(ihl));
+[ifmmdm, index] = unique(ifmmdm); 
+m(idml) = interp1(ifmmdm,mmdm(index),ra(idml));
+[ifmmde, index] = unique(ifmmde); 
+m(idel) = interp1(ifmmde,mmde(index),ra(idel));
+[ifmmbu, index] = unique(ifmmbu); 
+m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
+[ifmmh, index] = unique(ifmmh); 
+m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 
 %-------------------------------------------------------
 %cas particulier : population de WD dans le de
@@ -399,7 +420,7 @@ fraction=0;
 raWD=rand(size(idel));
 iWD=find(raWD<fraction);
 if (length(iWD)>=1)
-m(idel(iWD))=0.6*ones(size(iWD));
+  m(idel(iWD))=0.6*ones(size(iWD));
 end;  
 
 %-------------------------------------------------------
@@ -410,7 +431,7 @@ fraction=0;
 raWD=rand(size(ibul));
 iWD=find(raWD<fraction);
 if (length(iWD)>=1)
-m(ibul(iWD))=0.6*ones(size(iWD));
+  m(ibul(iWD))=0.6*ones(size(iWD));
 end;  
 
 %-------------------------------------------------------
@@ -421,9 +442,14 @@ fraction=0.;
 raWD=rand(size(idml));
 iWD=find(raWD<fraction);
 if (length(iWD)>=1)
-m(idml(iWD))=0.6*ones(size(iWD));
+  m(idml(iWD))=0.6*ones(size(iWD));
 end;  
 
+%----------------------------------------------
+% test : toutes les lentilles ont la meme masse 
+%----------------------------------------------
+
+%m=0.6*ones(size(x));
 
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
@@ -510,6 +536,21 @@ vrots(ides)=vrotde(R(ides),z(ides),th(ides));
 vrots(ibus)=vrotb(R(ibus),z(ibus),th(ibus));
 vrots(ihs)=vroth(R(ihs),z(ihs),th(ihs));
 
+%cas particulier pour comparer avec Peale, la vitesse de rotation de la source est nulle
+
+%vrots=zeros(size(x));
+
+%---------------------------------------------------------------------------------
+% cas particulier ou la source est a une distance fixe, et immobile ( cas du LMC )
+%---------------------------------------------------------------------------------
+
+%Lsource=8000; 				 % distance de la source, en parsecs
+%ds=Lsource*ones(size(m));
+%sigrs=zeros(size(m));
+%sigps=zeros(size(m));
+%sigts=zeros(size(m));
+%vrots=zeros(size(m));
+
 %---------------------------------------------------
 % Tirage pour les vitesses, (l)entille puis (s)ource
 %---------------------------------------------------
@@ -529,7 +570,7 @@ vlim=vlimit*ones(size(v));
 
 vi = find(v-vlim>0);
 if (length(vi)>=1)
-disp(['vitesse superieure a vlimite : ' num2str(max(v(vi)))]);
+  disp(['vitesse superieure a vlimite : ' num2str(max(v(vi)))]);
 end;  
 
 %-------------------------------------------------------------------------
@@ -551,43 +592,137 @@ dgammaccepte=[dgammaccepte,g(i)];
 %------------------------
 
 if (length(i)>=1)
-te_i = (2/c*sqrt(GMsol*pc)/86400).*sqrt(ds(i).*m(i).*x(i).*(1-x(i)))./v(i);
-te = [te, te_i];
+  te = (2/c*sqrt(GMsol*pc)/86400).*sqrt(ds(i).*m(i).*x(i).*(1-x(i)))./v(i);
+  
+  tecorrespondant=[tecorrespondant,te];
+  
+  evnts = [x(i);ds(i);v(i);m(i);te];
+  fprintf(fid,'%12.8f  %12.8f  %12.8f  %12.8f  %12.8f\n',evnts);
+  fprintf(fid1,'%12.8f  %12.8f  %12.8f  %12.8f  %12.8f\n',evnts);
 end;
 
 
+if (length(j)>=1)
+  strange = [x(j);ds(j);v(j);m(j)];
+  fprintf(fids,'%12.8f  %12.8f  %12.8f  %12.8f\n',strange);
+end;
+
+
+
+%if ( compteur == nbsimul )
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%TEST des distributions des VA principales
+
+%figure(1);
+%hist(x,100);
+%mx=mean(x);
+%sx=std(x);
+%title('Distribution de la VA x pendant le Monte-carlo');
+%hold off;
+%OK : loi uniforme
+%figure(2);
+%hist(ds,100);
+%mds=mean(ds);
+%sds=std(ds);
+%title('Distribution de la VA ds pendant le Monte-carlo');
+%hold off;
+% OK donne une distribution correcte max sur le GC
+%figure(3);
+%hist(v,100);
+%mv=mean(v);
+%sv=std(v);
+%title('Distribution de la VA v pendant le Monte-carlo');
+%hold off;
+%%distrib correcte???
+%figure(4);
+%hist(m,10000);
+%mm=mean(m);
+%sm=std(m);
+%title('Distribution de la VA m pendant le Monte-carlo');
+%hold off;
+% OK: loi de la FM (log-normal et expo)
+%end;
+
+
 clear x glr glt glp sigrl sigtl sigpl vrotl ds gsr gst gsp sigrs sigts sigps vrots 
-clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts strange
+clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strange
 
 end
 
 
 
+fclose(fid);
+fclose(fids);
+
+
 %---------------------
-% Analyse des résultats
+%% Analyse des résultats
 %---------------------
 
 close all;
+fid=fopen(fichres,'w');
+
+fprintf(fid,'%15.11f  \n',tau);
+fprintf(fid,'%12.8f  \n',Gammax);
+
+fclose(fid);
+
+fid=fopen(fichpara,'w');
+
+fprintf(fid,'%15.11f  \n',n);
+fprintf(fid,'%15.11f  \n',nbsimul);
+fprintf(fid,'%15.11f  \n',tau);
+fprintf(fid,'%15.11f  \n',Gammax);
+fprintf(fid,'%15.11f  \n',uT);
+fprintf(fid,'%15.11f  \n',AT);
+
+fclose(fid);
+
+%-------------------
+%-------------------
+% fin du Monte-Carlo
+%-------------------
+%-------------------
+%%
+
+%----------------------------------------
+% recuperation des evenements selectionnes
+%----------------------------------------
+
+load evenements.txt
+x=evenements(:,1);
+ds=evenements(:,2);
+v=evenements(:,3);
+m=evenements(:,4);
+te=evenements(:,5);
+
+x=x';
+ds=ds';
+v=v';
+m=m';
+te=te';
+
+disp(' ')
 
 %---------------
 %calcul de gamma
 %---------------
 
 gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
-% disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
+disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
 gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
 gam=gam1*Gammax;
-% disp(['gamma (integre par MC) = ' num2str(gam)]);
+disp(['gamma (integre par MC) = ' num2str(gam)]);
 
 
 ttobs=tau/(gam/1e6/365.25);
-% disp(['<tobs> (en jours) = ' num2str(ttobs)]);
+disp(['<tobs> (en jours) = ' num2str(ttobs)]);
 
 taur=gam*pi/2*uT*mean(te)/365.25/1e6;
 taur=real(taur);
-% disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
+disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 
 %------------------------
 % Application du blending
@@ -606,95 +741,131 @@ nbar = 1.257;
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
 
-
-%Calcul de l'efficacité
-VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
-VarType_eff_IV = {'double', 'double', 'double'};
-
-opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
-                            'Delimiter',delimiter, 'DataLines', 5, ...
-                   'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-               
-eff_field = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
+%-----------
+%Choix de l'expérience à analyser
+%donne teff : tet des observations et eff : efficacité
+%------------
 
 
-eff = eff_field.efficiency;
+temax = 100;
+nbre_bin = temax;
 
-te_inter_min = 10.^(eff_field.log_tE_min);
-te_inter_max = 10.^(eff_field.log_tE_max);
+% exp_ogle_2006
+% teff_ogle = teff;
+% [hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+% 
+% 
+% exp_macho_2005
+% [hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+% sort(teff)
+% figure(1)
+% bar(edges(1:end-1),hist_macho)
 
-teffmaxm=max(te_inter_max);
-teffminm=min(te_inter_min);
+% exp_eros_2006
+% % teff_eros = teff;
+% [hist_eros, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
+% 
+% figure(1)
+% bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
+% legend('OGLE', 'MACHO', 'EROS')
 
-eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-eff_blend = zeros(1,length(teblend));
+% exp_ogle_IV_2019
+% exp_MOA_2016
+exp_ogle_III_2015
+% exp_ogle_II_2006
 
-for i = 1:length(te_inter_min)
-    i1_unblend = find(te>=te_inter_min(i) & te<=te_inter_max(i));
-    i1_blend = find(teblend>=te_inter_min(i) & teblend<=te_inter_max(i));
-    
-    eff_unblend(i1_unblend) = ones(size(i1_unblend)) .* eff_field.efficiency(i);
-    eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field.efficiency(i);
-    
-end
+%---------------
+%calcul de gamma
+%---------------
 
-%tirage au sort pour l'efficacité
-ra_unblend = rand(1,length(te))*max(eff_field.efficiency);
-ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
+disp('Grandeurs avec intervention de l''efficacite experimentale :')
 
-% On choisit l'efficacité ici en prenant les bons indices i
-
-i = find(ra_unblend-eff_unblend<=0); 
-teobs = te(i);
-
-ib = find(ra_blend-eff_blend<=0); 
-teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant
-
-%-------------------------------
-%Exploitation des résultats avec efficacité expérimentale
-%-------------------------------
+%------------------------------------------------------------------------------------------------
+% on ne peut pas calculer le gamma par la formule avec le tobs, car le tau ne prend pas en compte
+% l'efficacite. Par contre, on peut deduire tau experimental a partir du gamma calcule par MC
+%------------------------------------------------------------------------------------------------
 
 gamobs = gam/length(te)*length(teobs);
-% disp(['gamma (integre par MC) = ' num2str(gamobs)]);
-
+disp(['gamma (integre par MC) = ' num2str(gamobs)]);
+% 
 tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
-% disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
-
+disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
+% 
+% tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
+% tauobsblend=real(tauobsblend);
+% % disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
+% 
 gamobsb = gam/length(te)*length(teobsblend);
-% disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
-
+disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
+% 
 tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
-% disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
+disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
+% 
+% disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 
-%----------------------------------
-%enregistrement dans le fichier txt
-%------------------------------------
+%------------------------
+% affichage des resultats
+%------------------------
 
-disp(gam)
-evnts = [l*180/pi; b*180/pi; table7.N_stars(table7.field == field); table7.N_events(table7.field == field) ; ...
-table7.gam(table7.field == field); table7.tau(table7.field == field); table7.t_E_mean(table7.field == field); ...
-Gammax; gam; tau*1e6; mean(te); gamobs; tauobs*1e6; mean(teobs); ...
-gamobsb; tauobsb*1e6; mean(teblend)];
-fprintf(fid, field);
-fprintf(fid,'  %12.8f  %12.8f  %12.8f  %12.8f %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f\n',evnts);
+
+%telechargement de la courbe du modèle
+
+load ../graph/evenements_1.txt
+te_model = evenements_1(:,5);
+
+%Paramètre graph
+bin_max = 100;
+nbre_bin = bin_max/2;
+
+
+%Trace la distribde te  pour le modèle et la courbe stockée localement
+[hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+%tracé distribution avec blending uniquement la courbe stockée localement
+[histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+%Courbe expérimentale (avec l'efficacité) :
+[hist_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+%courbe de l'expérience
+[hist_exp_err, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_exp_BW, edges] = histcounts(teff(i_BW), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_exp_fs, edges] = histcounts(teff(i_fs), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+i=find(te<30);
+i_model = find(te_model<30);
+[hist_1, edges] = histcounts(te(i), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+
+centre = zeros(size(edges)-[0,1]);
+
+for j =1:length(centre);
+centre(j)=(edges(j)+edges(j+1))/2;
 end
 
-%--------------------------------------
-%% 2nd partie : exploitation des résultats
-%------------------------------
-
-%-----------------------------------------------
-%Table 6. Basic information about analyzed fields
-%------------------------------------------------
-delimiter = ' ';
-VarNames_comp = {'field', 'glon', 'glat', 'N_stars', 'N_events', 'gam_OGLE', 'tau_OGLE', 'mean_te_ogle', 'Gammax', 'gamma_brut', 'tau_brut','mean_te_brut', 'gamma_eff', 'tau_eff', 'mean_te_eff', ...
-    'gamma_eff_blend', 'tau_eff_blend', 'mean_te_eff_blend'};
+%Graph normalisé
+figure(16)
+hold on;
+plot(centre, hist_1, 'black');
+plot(centre, hist_model, 'red');
+title('comparaison local et modèle')
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
 
 
-VarTypes_comp = {'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
-
-opts = delimitedTextImportOptions('VariableNames',VarNames_comp,'VariableTypes',VarTypes_comp,...
-                                'Delimiter',delimiter, 'DataLines', 22, ...
-                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-comp_modele = readtable('../graph/comp_modele_OGLEIV.txt',opts);
+%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
+figure(18)
+hold on;
+plot(centre, hist_obs, 'red');
+plot(centre, hist_obs_b, 'black');
+M = length(hist_exp_err);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
+M = length(hist_exp_BW);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
+M = length(hist_exp_fs);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_fs(sort([1:M 2:M-1]))])
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)', 'OGLE III(non blendé)')
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
 

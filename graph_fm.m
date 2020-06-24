@@ -7,7 +7,7 @@ msup=10;
 
 m = (0:1e-5:1).*(msup-minf)+minf;
 
-fm05 = fmrecente(m)/integral(@fmrecente, 0.01, 100);
+fm05 = fmchab05(m)/integral(@fmrecente, 0.01, 100);
 fm03 = fmchab03(m)/integral(@fmchab03, 0.01, 100);
 fmkroupa = fm_kroupa(m)/integral(@fm_kroupa, 0.01, 100);
 fm_modi = fmchab_modi(m)/integral(@fmchab_modi, 0.01, 100);
