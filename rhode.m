@@ -20,7 +20,7 @@ htd = 760;	        % Echelle de hauteur en pc
 Ltd = 3000; 	        % Echelle de longueur en pc
 rhtd = 0.05/20;        % densite au voisinage solaire, en Msol/pc^3
 
-res = rhtd.*exp(-R./Ltd-abs(z)./htd+Ro./Ltd);
+res = 0*rhtd.*exp(-R./Ltd-abs(z)./htd+Ro./Ltd);
 
 %--------------------
 % pas de disque epais

@@ -4,7 +4,7 @@ global dsup dinf
 
 res = zeros(size(x));
 
-bet=-1;
+bet=0;
 
 
 i1 = find(x>=dinf & x<=dsup);

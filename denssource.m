@@ -29,7 +29,7 @@ res = res + rhodm(R,z,th);
 %----------------------
 
 % res = res + rhode(R,z,th)*mmeande;
-res = res + rhode(R,z,th);
+% res = res + rhode(R,z,th);
 
 %--------------
 % source : halo

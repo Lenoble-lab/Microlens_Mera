@@ -24,7 +24,7 @@ function rh = rhodwek(R,z,th)
     %-------------------------
    %Donnee de calchi novatti
    %------------------------
-%     rho0 = 2.4 ; %Masse du bulbe 1.410^10M_sol (Calchi Novatti)
+    rho0 = 2.4 ; %Masse du bulbe 1.410^10M_sol (Calchi Novatti)
 
    %-------------------------
    %Donnee de Iocco
@@ -57,7 +57,7 @@ function rh = rhodwek(R,z,th)
     z0=430;
 
     M_b= 1.8*1e10; 
-    rho0 = M_b/(6.57*pi*x0*y0*z0);
+%     rho0 = M_b/(6.57*pi*x0*y0*z0);
     
     
     %%-----------------------%%

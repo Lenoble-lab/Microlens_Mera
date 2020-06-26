@@ -140,5 +140,7 @@ fraction=0;
 %---------------------------
 %fonctions de masse externes
 %---------------------------
-
-pm=fmrecente(m);
+pm = fm_kroupa(m);
+% pm=pdmf_disk_chab03(m);
+% pm = fmchab05(m);
+% pm = fmbu(m);

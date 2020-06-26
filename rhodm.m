@@ -23,8 +23,8 @@ hd=250;
 Ld=3000;
 rhsol=0.05;
 
-res = rhsol*exp(-R./Ld-abs(z)./hd+Ro./Ld);
-
+% res = rhsol*exp(-R./Ld-abs(z)./hd+Ro./Ld);
+res = rhodHetG(R,z,th);
 
 %--------------------
 % pas de disque mince

@@ -74,8 +74,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-% l = 4 *pi/180;    % direction d'observation en radian
-% b = -1 *pi/180;
+l = 1.5 *pi/180;    % direction d'observation en radian
+b = -2.68 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -755,7 +755,7 @@ nbre_bin = temax;
 % [hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
 % 
 % 
-% exp_macho_2005
+exp_macho_2005
 % [hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
 % sort(teff)
 % figure(1)
@@ -771,7 +771,7 @@ nbre_bin = temax;
 
 % exp_ogle_IV_2019
 % exp_MOA_2016
-exp_ogle_III_2015
+% exp_ogle_III_2015
 % exp_ogle_II_2006
 
 %---------------
@@ -849,6 +849,7 @@ hold on;
 plot(centre, hist_1, 'black');
 plot(centre, hist_model, 'red');
 title('comparaison local et modèle')
+legend('local', 'model')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
@@ -858,7 +859,7 @@ hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
 plot(centre, hist_obs_b*gamobsb*exposure, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'expérience')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
@@ -869,24 +870,10 @@ plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
 M = length(hist_exp_err);
 plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+legend('hist modèle', 'hist modèle avec blending (f=0.5)','expérience')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
-
-%%
-%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
-figure(18)
-hold on;
-plot(centre, hist_obs, 'red');
-plot(centre, hist_obs_b, 'black');
-M = length(hist_exp_err);
-plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-M = length(hist_exp_BW);
-plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)')
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
 
 %graph noramlisé avec blending
 figure(1);

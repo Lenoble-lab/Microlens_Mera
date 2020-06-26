@@ -22,7 +22,7 @@ eta_list = eta(R);
 %-----------------------%
 beta = 0;
 rho_0 = 0.044 * eta(Ro);
-
+% rho_0 = 36/(2*h1);
 %-----------------------%
 %% disque épais et disque mince %%
 %valeur de Han&Gould, réutilisée sans Iocco, 2018

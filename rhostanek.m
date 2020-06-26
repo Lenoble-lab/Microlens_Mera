@@ -17,7 +17,7 @@ i1 = find(R<=Rcoro);
 %%-----------------------%%
 %% Modèle de Calchi Novatti 2008, Stanek et al 1997
 %%-----------------------%%
-phi=28; %angle de la barre avec l'axe soleil-GC
+phi=23.8; %angle de la barre avec l'axe soleil-GC
 alpha=pi*phi/180;
 beta=0;
 x0=890;
@@ -27,7 +27,7 @@ z0=x0.*2.8/10;
 
 M_b = 1.8e10;
 rho0 = M_b/(x0*y0*z0*8*pi);
-
+rho0 = 9.6;
 % calcul des coordonnees dans le repere principal du bulbe
 
 ca=cos(alpha);
@@ -51,4 +51,4 @@ r = rho0.*exp(-a);
 % r(i0) = r(i0).*exp(-(R(i0)-Rcoro).^2/(2*500^2));
 
 %Calchi Novatti (arrêt brusque)
-% r(i0) = zeros(size(i0));
+r(i0) = zeros(size(i0));
