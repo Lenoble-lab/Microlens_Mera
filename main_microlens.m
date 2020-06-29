@@ -849,6 +849,7 @@ hold on;
 plot(centre, hist_1, 'black');
 plot(centre, hist_model, 'red');
 title('comparaison local et modèle')
+lengend('local', 'model')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 

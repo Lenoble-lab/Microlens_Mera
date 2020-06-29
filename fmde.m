@@ -140,4 +140,6 @@ m0=0.095;
 %fonctions de masse externes
 %---------------------------
 
-pm=fmrecente(m);
+% pm=pdmf_disk_chab03(m);
+% pm = fmchab05(m);
+pm = fmdm(m);

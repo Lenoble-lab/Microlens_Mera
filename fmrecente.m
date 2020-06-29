@@ -23,9 +23,8 @@ end
 
 if(length(i2)>=1)
   pm(i2) =c2*((m(i2)).^(alpha2))./m(i2);
- 
+end
+pm = fmchab05(m);
 % pm = fm_kroupa(m);
 % pm = fmchab_modi(m);
-end  
-
-
+pm = PDMF_Maraston(pm,m);
