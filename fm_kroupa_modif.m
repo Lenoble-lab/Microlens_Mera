@@ -1,8 +1,8 @@
 %fm de Kroupa de 2001
 
-function pm = fm_kroupa(m)
+function pm = fm_kroupa_modif(m)
 pm = zeros(size(m));
-    
+
 global minf msup
 
 m1 = 0.01;
@@ -28,10 +28,13 @@ alpha_bd = -1.6;
 alpha_MS = -1.7;
 alpha = -2;
 
-% alpha_bd = 1;
-% alpha_MS = -0.15;
-% alpha = -1;
-
+%--------------
+%Valeurs de Wegg 2017
+%----------------
+alpha_bd = 0;
+alpha_MS = -1.1;
+alpha = -2.3;
+m3 = 0.5;
 
 
 
@@ -49,4 +52,4 @@ end
 
 if (length(i1)>=1)
     pm(i3) = c * m2^(alpha_bd)/m2^(alpha_MS) * m3^(alpha_MS)/m3^(alpha)*m(i3).^(alpha);
-end
+end 

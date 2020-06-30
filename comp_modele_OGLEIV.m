@@ -33,20 +33,18 @@ table7 = readtable('../OGLEIV/table7.dat',opts);
 
 fichier ='../graph/comp_modele_OGLEIV.txt';
 
-fid = fopen(fichier, 'w')
+fid = fopen(fichier, 'w');
 
-fprintf(fid, 'Calcul pour chaque champ des données de mon modèle, comparée avec celle de OGLE IV \n
-Les variables stockées sont, dans l'ordre : \n 
-Champ; \n longitude; \n lattitude; \n N_stars; \n N_events; 
-\n gam_OGLE; \n tau_OGLE; \n mean_te_ogle; \n 
-gamma calculé par le modèle (brut); \n tau ----------------- \n mean_te ----------------------\n 
-gamma avec efficacité du champ considéré \n tau ---------------- \n mean_te -------------------\n
-gamma avec efficacité et blending \n tau ---------------- \n mean_te --------------------')
+fprintf(fid, ['Calcul pour chaque champ des données de mon modèle, comparée avec celle de OGLE IV \n' ...
+'Les variables stockées sont, dans l ordre : \n ' ...
+'Champ; \n longitude; \n lattitude; \n N_stars; \n N_events; ' ...
+'\n gam_OGLE; \n tau_OGLE (10^-6); \n mean_te_ogle; \n ' ...
+'Gammax \n' ...
+'gamma calculé par le modèle (brut); \n tau (10^-6); ----------------- \n mean_te ----------------------\n ' ...
+'gamma avec efficacité du champ considéré \n tau (10^-6); ---------------- \n mean_te -------------------\n '...
+'gamma avec efficacité et blending \n tau (10^-6); ---------------- \n mean_te --------------------\n' ]);
 
 
-% for field = table7.field
-
-for field = ["BLG500"; "BLG513"]
 global vsr vsp vst vlp vlt vlr
 
 %----------------------------------
@@ -98,10 +96,16 @@ Lkpc=Ro/1000;  % distance Sun-GC en kpc
 global Rcoro
 Rcoro = 3500;
 
+fprintf(fid, ' n = %10.0f, nbsimul = %10.0f, nbmax = %10.0f \n', [n, nbsimul, nbMAX]);
 
 %---------------------------------------       
 % param�tres du calcul de microlentilles
 %---------------------------------------
+% for field = table7.field
+for id_field = 1:length(table7.field)
+ 
+field = table7.field(id_field);  
+disp(field)
 global l b
 
 % on suit la direction du champ considéré
@@ -328,7 +332,7 @@ Gammax=max(gmax);
 
 dgamma=[];
 dgammaccepte=[];        % initialisation pour les traitement ulterieur des donnees
-tecorrespondant=[];
+te=[];
 
 for compteur = 1:nbsimul,
 
@@ -547,23 +551,20 @@ dgammaccepte=[dgammaccepte,g(i)];
 %------------------------
 
 if (length(i)>=1)
-te = (2/c*sqrt(GMsol*pc)/86400).*sqrt(ds(i).*m(i).*x(i).*(1-x(i)))./v(i);
-
-tecorrespondant=[tecorrespondant,te];
-
-evnts = [x(i);ds(i);v(i);m(i);te];
+te_i = (2/c*sqrt(GMsol*pc)/86400).*sqrt(ds(i).*m(i).*x(i).*(1-x(i)))./v(i);
+te = [te, te_i];
 end;
 
 
 clear x glr glt glp sigrl sigtl sigpl vrotl ds gsr gst gsp sigrs sigts sigps vrots 
-clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strange
+clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts strange
 
 end
 
 
 
 %---------------------
-%% Analyse des résultats
+% Analyse des résultats
 %---------------------
 
 close all;
@@ -669,9 +670,31 @@ tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
 %enregistrement dans le fichier txt
 %------------------------------------
 
-
-evnts = [field; l*180/pi; b*180/pi; table7.N_stars(table7.field == field); table7.N_events(table7.field == field) ; ...
-table7.gam(table7.field == field); table7.tau(table7.field == field)); table7.t_E_mean(table7.field == field)); gam; tau; mean(te); gamobs; tauobs; mean(teobs); ...
-gamobsb; tauobsb; mean(teblend)];
-fprintf(fid,'%12.8f  %12.8f  %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f\n',evnts);
+disp(gam)
+evnts = [l*180/pi; b*180/pi; table7.N_stars(table7.field == field); table7.N_events(table7.field == field) ; ...
+table7.gam(table7.field == field); table7.tau(table7.field == field); table7.t_E_mean(table7.field == field); ...
+Gammax; gam; tau*1e6; mean(te); gamobs; tauobs*1e6; mean(teobs); ...
+gamobsb; tauobsb*1e6; mean(teblend)];
+fprintf(fid, field);
+fprintf(fid,'  %12.8f  %12.8f  %12.8f  %12.8f %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f\n',evnts);
 end
+
+%--------------------------------------
+%% 2nd partie : exploitation des résultats
+%------------------------------
+
+%-----------------------------------------------
+%Table 6. Basic information about analyzed fields
+%------------------------------------------------
+delimiter = ' ';
+VarNames_comp = {'field', 'glon', 'glat', 'N_stars', 'N_events', 'gam_OGLE', 'tau_OGLE', 'mean_te_ogle', 'Gammax', 'gamma_brut', 'tau_brut','mean_te_brut', 'gamma_eff', 'tau_eff', 'mean_te_eff', ...
+    'gamma_eff_blend', 'tau_eff_blend', 'mean_te_eff_blend'};
+
+
+VarTypes_comp = {'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_comp,'VariableTypes',VarTypes_comp,...
+                                'Delimiter',delimiter, 'DataLines', 22, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+comp_modele = readtable('../graph/comp_modele_OGLEIV.txt',opts);
+

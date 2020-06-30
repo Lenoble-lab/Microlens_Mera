@@ -71,7 +71,7 @@ varTypes = {'char','string', 'int32' ,'char', 'char', 'double', 'double', 'doubl
 opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
                                 'Delimiter',delimiter, 'DataLines', 47, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table3 = readtable('../OGLEIV/table3.dat',opts);
+table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 
 
 % centre = zeros(size(edges)-[0,1]);
@@ -94,7 +94,7 @@ table3 = readtable('../OGLEIV/table3.dat',opts);
 %Longitude considérée
 % long = 0;
 % 
-% i0 = find(abs(table6.glon - long)<0.5 & table6.glat<-1);
+% i0 = find(abs(table6.glon - long)tabl<0.5 & table6.glat<-1);
 % 
 % %Calcul modèle
 % tau_load = load('graph_iso_model.mat');
@@ -165,7 +165,7 @@ M = length(eff_field.log_tE_min);
 te_graph = [eff_field.log_tE_min(1) ; eff_field.log_tE_min ; eff_field.log_tE_max; eff_field.log_tE_max(M)];
 eff_graph = [0 ; eff_field.efficiency(sort([1:M 1:M])) ; 0];
 loglog(10.^sort(te_graph), eff_graph)
-legend('table 3', 'données de chaque champ')
+legend({'table 3', strcat('data from ', field, '.eff')}, 'Location','southeast')
 xlabel('t_{e}')
 ylabel('efficacité')
 
@@ -242,11 +242,11 @@ gam_obs_ogle = 0;
 gam_obs_star_count = 0;
 expo = zeros(size(id_field));
 % for i = 1:length(id_field)
-% % for i = 1:10
+% for i = 1:10
 %     id_eve = id_field(i);
 %     expo(i) = 2741*table5.N21(table5.field == table3.field(id_eve)) / (365.25 * 1e6);
 %     gam_obs_star_count = gam_obs_star_count + table3.weight(id_eve)/expo(i);
-% %     disp([num2str(gam_obs_star_count), ' ', num2str(expo_i)]);
+%     disp([num2str(gam_obs_star_count), ' ', num2str(expo(i))]);
 % 
 % end
 disp(['gama avec star count bon ', num2str(gam_obs_star_count)])

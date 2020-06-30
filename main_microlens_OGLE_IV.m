@@ -63,13 +63,13 @@ varTypes = {'char','string', 'int32' ,'char', 'char', 'double', 'double', 'doubl
 opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
                                 'Delimiter',delimiter, 'DataLines', 47, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table3 = readtable('../OGLEIV/table3.dat',opts);
+table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 
 %-------------
 % Choix du champ à analyser
 %------------
 
-% field = 'BLG513';
+% field = 'BLG535';
 
 %------------------
 %fichiers resultats
@@ -99,7 +99,7 @@ vlimit = 1000e3;
 
 n = 20000;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=1000; %a augmenter pour meilleure stat
 nbMAX=500;
 
 %----------------------------------------------------------------------
@@ -138,6 +138,7 @@ global l b
 
 l = table6.glon(table6.field == field) *pi/180;    % direction d'observation en radian
 b = table6.glat(table6.field == field) *pi/180;
+
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -465,11 +466,14 @@ ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 %---------------------------------
 
 ra=rand(1,n);
-m(idml) = interp1(ifmmdm,mmdm,ra(idml));
-m(idel) = interp1(ifmmde,mmde,ra(idel));
-m(ibul) = interp1(ifmmbu,mmbu,ra(ibul));
-m(ihl) = interp1(ifmmh,mmh,ra(ihl));
-
+[ifmmdm, index] = unique(ifmmdm); 
+m(idml) = interp1(ifmmdm,mmdm(index),ra(idml));
+[ifmmde, index] = unique(ifmmde); 
+m(idel) = interp1(ifmmde,mmde(index),ra(idel));
+[ifmmbu, index] = unique(ifmmbu); 
+m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
+[ifmmh, index] = unique(ifmmh); 
+m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 %-------------------------------------------------------
 %cas particulier : population de WD dans le de
 %-------------------------------------------------------
@@ -786,9 +790,9 @@ nbre_bin = temax;
 % bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
 % legend('OGLE', 'MACHO', 'EROS')
 
-exp_ogle_IV_2019
+% exp_ogle_IV_2019
 % exp_MOA_2016
-% exp_ogle_III_2015
+exp_ogle_III_2015
 % exp_ogle_II_2006
 
 %---------------

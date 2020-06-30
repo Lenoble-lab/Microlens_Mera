@@ -8,11 +8,27 @@ pm = zeros(size(m));
 global minf msup
 
 m1=1.0;
-
+%-------------
+% Moniez et al 2017
+%-------------------
 sigma=0.55;
 m0=0.51;
 c2=0.0415/log(10);
 alpha2=-1.35;       % attention c'est alpha = -1.35 +/- 0.3
+
+%--------
+%Wegg et al 2017
+%-------------
+sigma=0.55;
+m0=0.165;
+c2=0.0415/log(10);
+
+%--------
+%différents tests
+%-------------
+% sigma=0.55;
+% m0=0.1;
+% c2=0.0415/log(10);
 
 c1=0.093/log(10)*exp(-((log10(m1)-log10(0.2)).^2)./(2*sigma^2))/(exp(-((log10(m1)-log10(m0)).^2)./(2*sigma^2)));
 
