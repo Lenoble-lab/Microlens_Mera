@@ -7,8 +7,6 @@ clear
 %------------------
 
 fichevents='evenements.sim1.txt';
-fichres='resultat.sim1.txt';
-fichpara='para.sim1.txt';
 
 global vsr vsp vst vlp vlt vlr
 %----------------------------------
@@ -655,15 +653,9 @@ fclose(fids);
 %% Analyse des résultats
 %---------------------
 
-close all;
-fid=fopen(fichres,'w');
+fid=fopen('simul_para.txt','w');
 
-fprintf(fid,'%15.11f  \n',tau);
-fprintf(fid,'%12.8f  \n',Gammax);
-
-fclose(fid);
-
-fid=fopen(fichpara,'w');
+fprintf(fid,'%15.11f  \n',tau)
 
 fprintf(fid,'%15.11f  \n',n);
 fprintf(fid,'%15.11f  \n',nbsimul);
@@ -673,6 +665,7 @@ fprintf(fid,'%15.11f  \n',uT);
 fprintf(fid,'%15.11f  \n',AT);
 
 fclose(fid);
+
 
 %-------------------
 %-------------------
