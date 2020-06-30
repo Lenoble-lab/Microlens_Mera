@@ -71,7 +71,7 @@ varTypes = {'char','string', 'int32' ,'char', 'char', 'double', 'double', 'doubl
 opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
                                 'Delimiter',delimiter, 'DataLines', 47, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table3 = readtable('../OGLEIV/table3.dat',opts);
+table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 
 
 % centre = zeros(size(edges)-[0,1]);

@@ -63,13 +63,13 @@ varTypes = {'char','string', 'int32' ,'char', 'char', 'double', 'double', 'doubl
 opts = delimitedTextImportOptions('VariableNames',varNames,'VariableTypes',varTypes,...
                                 'Delimiter',delimiter, 'DataLines', 47, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-table3 = readtable('../OGLEIV/table3.dat',opts);
+table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 
 %-------------
 % Choix du champ à analyser
 %------------
 
-% field = 'BLG513';
+% field = 'BLG535';
 
 %------------------
 %fichiers resultats
@@ -99,7 +99,7 @@ vlimit = 1000e3;
 
 n = 20000;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=1000; %a augmenter pour meilleure stat
 nbMAX=500;
 
 %----------------------------------------------------------------------
@@ -138,6 +138,7 @@ global l b
 
 l = table6.glon(table6.field == field) *pi/180;    % direction d'observation en radian
 b = table6.glat(table6.field == field) *pi/180;
+
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification

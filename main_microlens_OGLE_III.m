@@ -866,7 +866,7 @@ M = length(hist_exp_BW);
 plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
 M = length(hist_exp_fs);
 plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_fs(sort([1:M 2:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)', 'OGLE III(non blendé)')
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)', 'OGLE III(non blendé, f_{s}>0.2)')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
