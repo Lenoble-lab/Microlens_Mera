@@ -5,6 +5,7 @@
 % donnee. Ce qui revient a passer des coordonnees spheriques centrees
 % sur le Soleil aux coordonnees cylindriques centrees sur la Galaxie.
 % Les unites sont le pc partout.
+%L'origine de theta et la direction du soleil
 
 function [R, z, theta] = toGC(d)
 global Ro sinl cosl cosbl cosb sinb elev
