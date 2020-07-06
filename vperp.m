@@ -1,6 +1,6 @@
 function vt = vperp(x,glr,glt,glp,sigrl,sigtl,sigpl,vrotl,L,gsr,gst,gsp,sigrs,sigts,sigps,vrots)
 
-global cosb cosbl sinb L0 sinl vsp vsr vst vlr vlp vlt Ro
+global cosb cosbl sinb L0 sinl vsp vsr vst vlr vlp vlt Ro elev
 
 
 %------------------
@@ -13,9 +13,9 @@ vxsol=0; vzsol=0; vysol=-200e3;
 % VITESSE DU SOLEIL, Brunthaler et al. 2010
 %------------------
 
-% vxsol = -11.1; 
-% vzsol = 7.25; 
-% vysol = vrotdm(Ro,elev,0) + 12.24;
+vxsol = -11.1; 
+vzsol = 7.25; 
+vysol = vrotdm(Ro,elev,0) + 12.24;
 
 %-----------------------------------------------------------
 % CALCUL DES COORDONNEES PAR RAPPORT AU CENTRE DE LA GALAXIE

@@ -40,10 +40,12 @@ teffmaxe=max(tinterperos);
 teffmine=min(tinterperos);
 
 i1 = find((te<=teffmaxe)&(te>=teffmine));
+i1blend = find((teblend<=teffmaxe)&(teblend>=teffmine));
+
 effsimeros = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
 effsimerosblend = zeros(1,length(te));
 effsimeros(i1) = interp1(tinterperos,effinterperos,te(i1));
-effsimerosblend(i1) = interp1(tinterperos,effinterperos,teblend(i1));
+effsimerosblend(i1blend) = interp1(tinterperos,effinterperos,teblend(i1blend));
 
 %-----------------------------------------------------------------------------
 % Tirage d'un nombre aleatoire qui servira a decider si l'evt est garde ou non

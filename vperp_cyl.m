@@ -1,24 +1,15 @@
 function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigrs,sigts,sigzs,vrots)
 
     global cosb cosbl sinb L0 sinl vsp vsr vst vlr vlp vlt Ro elev
-    
-    
-    %------------------
-    % VITESSE DU SOLEIL
-    %------------------
-    
-    vxsol=0; 
-    vzsol=0; 
-    vysol=-200e3;
-    
+
 
     %------------------
     % VITESSE DU SOLEIL, Brunthaler et al. 2010
     %------------------
     
-    vxsol = -11.1; 
-    vzsol = 7.25; 
-    vysol = vrotdm(Ro,elev,0) + 12.24;
+    vxsol = -11.1e3; 
+    vzsol = 7.25e3; 
+    vysol = vrotdm(Ro,elev,0) + 12.24e3;
 
 
     %-----------------------------------------------------------
@@ -26,7 +17,7 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     %-----------------------------------------------------------
     
     [R, z, th] = toGC(x.*L);
-    r  = sqrt(R.*R+z.*z);
+%     r  = sqrt(R.*R+z.*z);
     
     %-------------------------------------------------------------------------
     % Conversion des g en vitesse. g varie entre 0 et 1, et le v correspondant
@@ -36,7 +27,7 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     vlr = sigrl.*erfinv(2.*glr-1);
     vlt = sigtl.*erfinv(2.*glt-1)+vrotl;
     vlz = sigzl.*erfinv(2.*glz-1);
-    
+
     %-----------------------------------------------
     % calcul des angles pour conversion en cartesien
     %-----------------------------------------------
@@ -44,7 +35,7 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
 %     sth = x.*L*cosb.*sinl./R;
 %     cth = -(Ro-x.*L.*cosbl)./R;
 
-    cth = -cos(th);
+    cth = cos(th);
     sth = sin(th);
     
     %----------------------------------
@@ -57,13 +48,13 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     %-----------------------------------------------------------------------------
     % on tient compte maintenant de la vitesse du Soleil et de la source (eq 3.21)
     %-----------------------------------------------------------------------------
-    
+
     %----------------------------------------------
     % Meme calcul mais pour la source cette fois-ci
     %----------------------------------------------
     
     [R, z, th] = toGC(L);	% utilisation des memes variables pour economiser
-    r  = sqrt(R.*R+z.*z);	% la memoire
+%     r  = sqrt(R.*R+z.*z);	% la memoire
     
     vsr = sigrs.*erfinv(2.*gsr-1);
     vst = sigts.*erfinv(2.*gst-1)+vrots;
@@ -72,7 +63,7 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
 %     sth = x.*L*cosb.*sinl./R;
 %     cth = -(Ro-x.*L.*cosbl)./R;
 
-    cth = -cos(th);
+    cth = cos(th);
     sth = sin(th);
     %----------------------------------
     % calcul de la vitesse en cartesien
@@ -86,9 +77,9 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     % CALCUL DE LA VITESSE RELATIVE
     %------------------------------
     
-    vlx = vlx - (1-x).*vxsol + x.*vsx;
-    vly = vly - (1-x).*vysol + x.*vsy;
-    vlz = vlz - (1-x).*vzsol + x.*vsz;
+    vlx = vlx - (1-x).*vxsol - x.*vsx;
+    vly = vly - (1-x).*vysol - x.*vsy;
+    vlz = vlz - (1-x).*vzsol - x.*vsz;
     
     %----------------------------------------------
     % Vitesse projet�e le long de la ligne de vis�e
@@ -101,5 +92,4 @@ function vt = vperp_cyl(x,glr,glt,glz,sigrl,sigtl,sigzl,vrotl,L,gsr,gst,gsz,sigr
     % Norme de la vitesse perpendiculairement � la ligne de vis�e
     %------------------------------------------------------------
     
-    vt = sqrt(v-vr.*vr);
-    
+    vt = real(sqrt(v-vr.*vr));

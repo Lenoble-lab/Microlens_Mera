@@ -31,7 +31,7 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table7,'VariableTypes
 table7 = readtable('../OGLEIV/table7.dat',opts);
 
 
-fichier ='../graph/comp_modele_OGLEIV.txt';
+fichier ='../graph/comp_modele_OGLEIV_Marason.txt';
 
 fid = fopen(fichier, 'w');
 
@@ -386,10 +386,15 @@ ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 %---------------------------------
 
 ra=rand(1,n);
-m(idml) = interp1(ifmmdm,mmdm,ra(idml));
-m(idel) = interp1(ifmmde,mmde,ra(idel));
-m(ibul) = interp1(ifmmbu,mmbu,ra(ibul));
-m(ihl) = interp1(ifmmh,mmh,ra(ihl));
+[ifmmdm, index] = unique(ifmmdm); 
+m(idml) = interp1(ifmmdm,mmdm(index),ra(idml));
+[ifmmde, index] = unique(ifmmde); 
+m(idel) = interp1(ifmmde,mmde(index),ra(idel));
+[ifmmbu, index] = unique(ifmmbu); 
+m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
+[ifmmh, index] = unique(ifmmh); 
+m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
+%------------------------------------------------
 
 %-------------------------------------------------------
 %cas particulier : population de WD dans le de
@@ -684,7 +689,7 @@ end
 %------------------------------
 
 %-----------------------------------------------
-%Table 6. Basic information about analyzed fields
+%Table information about fields
 %------------------------------------------------
 delimiter = ' ';
 VarNames_comp = {'field', 'glon', 'glat', 'N_stars', 'N_events', 'gam_OGLE', 'tau_OGLE', 'mean_te_ogle', 'Gammax', 'gamma_brut', 'tau_brut','mean_te_brut', 'gamma_eff', 'tau_eff', 'mean_te_eff', ...

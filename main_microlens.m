@@ -78,7 +78,21 @@ b = -4 *pi/180;
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 
+%eros
+% uT = 0.75;
+% AT = 1.6;
 
+% Macho
+% uT = 0.83;
+%----------------
+%liste pour observer ensuite la pdmf
+%----------------------
+m_tot_imf = [];
+m_tot_pdmf = [];
+frac_M_tot = [];
+frac_N_tot = [];
+v_tot = [];
+L_tot = [];
 %-----------------------------------
 % Param�tres de la fonction de masse
 %-----------------------------------
@@ -268,7 +282,6 @@ ifmmh = ifmmh./ifmmh(end);	% on fait en sorte que la primitive varie de 0 a 1
 % ifds = ifds./ifds(end);	% on fait en sorte que la primitive varie de 0 a 1
 
 dd = (0:1e-5:1).*(dsup-dinf)+dinf;
-disp(dd(500));
 fds = nsource (dd);
 ifds = cumsum(fds);	% primitive 
 ifds = ifds-ifds(1);
@@ -346,12 +359,16 @@ ra = rand(1,n);
 [ifds, index] = unique(ifds); 
 
 ds = interp1(ifds,dd(index),ra);
+L_tot = [L_tot, ds];
 
 %------------
 % Tirage de x
 %------------
 
-x=rand(1,n);
+dl=rand(1,n).*ds;
+x = dl./ds;
+% rapport = dinf./ds;
+% x=(rand(1,n)-rapport)/(1-rapport) + rapport;
 
 %------------------------------------------
 %a quelle population appartient la source ?
@@ -401,14 +418,18 @@ ihl=find(ra >= (rhodm(R,z,th)+rhode(R,z,th)+rhobulbe(R,z,th))./rhotot);
 %---------------------------------
 
 ra=rand(1,n);
-[ifmmdm, index] = unique(ifmmdm); 
+[ifmmdm, index] = unique(ifmmdm, 'last'); 
 m(idml) = interp1(ifmmdm,mmdm(index),ra(idml));
+
 [ifmmde, index] = unique(ifmmde); 
 m(idel) = interp1(ifmmde,mmde(index),ra(idel));
 [ifmmbu, index] = unique(ifmmbu); 
 m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
+
 [ifmmh, index] = unique(ifmmh); 
 m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
+
+% m = zeros(size(ra))+1;
 
 %-------------------------------------------------------
 %cas particulier : population de WD dans le de
@@ -443,11 +464,19 @@ if (length(iWD)>=1)
   m(idml(iWD))=0.6*ones(size(iWD));
 end;  
 
-%----------------------------------------------
-% test : toutes les lentilles ont la meme masse 
-%----------------------------------------------
+%-----------------
+%PDMF
+%------------------
 
-%m=0.6*ones(size(x));
+% m_tot_imf = [m_tot_imf, m];
+[m, frac_N, frac_M] = PDMF_gould_1(m);
+% [m, frac_N, frac_M] = PDMF_Maraston_1(m);
+
+% m = ones(size(x));
+m_tot_pdmf = [m_tot_pdmf, m];
+% frac_N_tot = [frac_N_tot ; frac_N];
+% frac_M_tot = [frac_M_tot ; frac_M];
+length(find(x == 0))
 
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
@@ -525,7 +554,7 @@ sigzs(ibus)=sigzb(R(ibus),z(ibus),th(ibus));
 % sigps(idms)=sigpdm(R(idms),z(idms),th(idms));
 % sigps(ides)=sigpde(R(ides),z(ides),th(ides));
 % sigps(ibus)=sigpb(R(ibus),z(ibus),th(ibus));
-% sigps(ihs)=sigph(R(ihs),z(ihs),th(ihs));
+% % sigps(ihs)=sigph(R(ihs),z(ihs),th(ihs));
 
 
 
@@ -564,6 +593,7 @@ glp = rand(1,n);	gsp = rand(1,n);
 %coordonées cylindriques
 v = vperp_cyl(x,glr,glp,glt,sigrl,sigtl,sigzl,vrotl,ds,gsr,gsp,gst,sigrs,sigts,sigzs,vrots);
 
+v_tot = [v_tot, v];
 vlim=vlimit*ones(size(v));
 
 vi = find(v-vlim>0);
@@ -648,7 +678,7 @@ clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strang
 end
 
 
-
+fclose(fid1);
 fclose(fid);
 fclose(fids);
 
@@ -659,7 +689,7 @@ fclose(fids);
 
 fid=fopen('simul_para.txt','w');
 
-fprintf(fid,'%15.11f  \n',tau)
+fprintf(fid,'%15.11f  \n',tau);
 
 fprintf(fid,'%15.11f  \n',n);
 fprintf(fid,'%15.11f  \n',nbsimul);
@@ -689,13 +719,68 @@ v=evenements(:,3);
 m=evenements(:,4);
 te=evenements(:,5);
 
-x=x';
-ds=ds';
+% x=x';
+% ds=ds';
 v=v';
 m=m';
 te=te';
 
 disp(' ')
+close all
+
+%------------------
+%Test pour la PDMF
+%--------------
+
+figure(40)
+hold on
+[Y, edges] = histcounts(m_tot_pdmf, 500, 'BinLimits',[0,5]);
+M = length(Y);
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m))
+title("PDMF")
+set(gca, 'YScale', 'log')
+% axis([0 10 1e-2 1e3])
+
+disp(['fraction de rémanents en nombre (WD, NS, BH) ', num2str(mean(frac_N_tot))])
+disp(['fraction de rémanents en masse (WD, NS, BH) ', num2str(mean(frac_M_tot))])
+
+%-------------
+%test distrib vitesse
+%------------------
+figure(41)
+hold on
+[v_bu_bu, edges] = histcounts(v_tot(intersect(ibul, ibus)), 500);
+[v_dm_bu, edges] = histcounts(v_tot(intersect([idml, idel], ibus)), 500);
+[v_dm_dm, edges] = histcounts(v_tot(intersect([idml, idel], [idms, ides])), 500);
+
+v_dm = v_tot(intersect([idml, idel], [idms, ides]));
+v_test = v_dm(find(ds(intersect([idml, idel], [idms, ides]))>8e3));
+[v_dm_dm_1, edges_1] = histcounts(v_test, 500);
+
+[v_retenu, edges] = histcounts(v, 500);
+
+M = length(Y);
+plot(edges(sort([1:M 2:M+1])), v_bu_bu(sort([1:M 1:M])))
+plot(edges(sort([1:M 2:M+1])), v_dm_bu(sort([1:M 1:M])))
+plot(edges(sort([1:M 2:M+1])), v_dm_dm(sort([1:M 1:M])))
+% plot(edges_1(sort([1:M 2:M+1])), v_dm_dm_1(sort([1:M 1:M])))
+% plot(edges(sort([1:M 2:M+1])), v_retenu(sort([1:M 1:M])))
+legend('bulbe/bulbe', 'bulbe/disque', 'disque/disque')
+title("vitesse")
+set(gca, 'YScale', 'log')
+% axis([2e3 10e3 0 3e6])
+
+
+%%
+%-------------
+%test distrib L
+%------------------
+figure(42)
+hold on
+[Y, edges] = histcounts(L_tot, 500);
+M = length(Y);
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m))
+title("Distance source")
 
 %---------------
 %calcul de gamma
@@ -741,7 +826,7 @@ script_blending
 
 
 temax = 100;
-nbre_bin = temax;
+nbre_bin = temax/5;
 
 % exp_ogle_2006
 % teff_ogle = teff;
@@ -808,11 +893,11 @@ te_model = evenements_1(:,5);
 
 %Paramètre graph
 bin_max = 100;
-nbre_bin = bin_max/2;
+nbre_bin = bin_max;
 
 
 %Trace la distribde te  pour le modèle et la courbe stockée localement
-[hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_local, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %tracé distribution avec blending uniquement la courbe stockée localement
@@ -826,9 +911,6 @@ nbre_bin = bin_max/2;
 [hist_exp_err, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 % [hist_exp_BW, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
-i=find(te<30);
-i_model = find(te_model<30);
-[hist_1, edges] = histcounts(te(i), nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 centre = zeros(size(edges)-[0,1]);
 
@@ -839,10 +921,10 @@ end
 %Graph normalisé
 figure(16)
 hold on;
-plot(centre, hist_1, 'black');
+plot(centre, hist_local, 'black');
 plot(centre, hist_model, 'red');
 title('comparaison local et modèle')
-lengend('local', 'model')
+legend('local', 'model')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
@@ -852,7 +934,7 @@ hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
 plot(centre, hist_obs_b*gamobsb*exposure, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+legend('hist modèle', 'hist modèle avec blending (f=0.5)','expérience')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
@@ -862,245 +944,221 @@ hold on;
 plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
 M = length(hist_exp_err);
-plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+plot(edges(sort([1:M 1:M])), [0 , hist_exp_err(sort([1:M 1:M-1]))])
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'expérience')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 
-%%
-%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
-figure(18)
-hold on;
-plot(centre, hist_obs, 'red');
-plot(centre, hist_obs_b, 'black');
-M = length(hist_exp_err);
-plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-M = length(hist_exp_BW);
-plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)')
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
 
-%graph noramlisé avec blending
-figure(1);
-hold on;
-plot(centre, hist, 'red')
-plot(centre, histb, 'black')
-title('Blending black et sans blending rouge)');
-hold off;
-
-
-
-
-temaxgraphe=100;  % pour le trace des graphe
-temax=5000;       % pour le calcul integral
-
-% Definition des differents nombres de bin pour les graphiques
-nbbin1=temaxgraphe;
-nbbin2=temaxgraphe/2;     
-nbbin5=temaxgraphe/5;
-
-bords1 = zeros(1, nbbin1) ; centre1 = zeros(1, nbbin1-1);
-bords2 = zeros(1, nbbin2) ; centre2 = zeros(1, nbbin2-1);
-bords5 = zeros(1, nbbin5) ; centre5 = zeros(1, nbbin5-1);
-
-teobs = te;
-%Definition des tableaux bords et centre pour une largeur de 1 jour
-for j =1:nbbin1;
-bords1(j)=temaxgraphe/nbbin1*(j-1);
-end;
-for j =1:nbbin1-1;
-centre1(j)=(bords1(j)+bords1(j+1))/2;
-end
-centre1(nbbin1)=bords1(nbbin1)+(bords1(nbbin1)-bords1(nbbin1-1))/2;
-
-i=find(teobs<temaxgraphe); % ce tableau i est le meme pour les trois graphes
-
-h1=histc(teobs(i),bords1)*gamobs*exposure/length(teobs(i));
-
-%Definition des tableaux bords et centre pour une largeur de 2 jour
-for j =1:nbbin2;
-bords2(j)=temaxgraphe/nbbin2*(j-1);
-end;
-for j =1:nbbin2-1;
-centre2(j)=(bords2(j)+bords2(j+1))/2;
-end
-centre2(nbbin2)=bords2(nbbin2)+(bords2(nbbin2)-bords2(nbbin2-1))/2;
-
-h2=histc(teobs(i),bords2)*gamobs*exposure/length(teobs(i));
-
-%Definition des tableaux bords et centre pour une largeur de 5 jour
-for j =1:nbbin5;
-bords5(j)=temaxgraphe/nbbin5*(j-1);
-end;
-for j =1:nbbin5-1;
-centre5(j)=(bords5(j)+bords5(j+1))/2;
-end
-centre5(nbbin5)=bords5(nbbin5)+(bords5(nbbin5)-bords5(nbbin5-1))/2;
-
-h5=histc(teobs(i),bords5)*gamobs*exposure/length(teobs(i));
-
-
-% Tracage de ces trois graphes ensemble
-figure(18);
-hold off;
-hold on;
-plot(centre1,h1,'b-');
-plot(centre2,h2,'r-');
-plot(centre5,h5,'g-');
-axis([0,30,0,20]);
-title('Diagramme des evenements obtenu par simulation pour des largeurs de representation differentes');
-legend('largeur de 1 jour','largeur de 2 jours','largeur de 5 jours');
-xlabel('durees d''evenements');
-ylabel('nombre d''evenements par unite de temps');
-hold off;
-
-
-% TRACAGE des trois graphiques precedents separement avec la distribution experimentale correspondante
-
-figure(19);
-j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes
-hist(teff(j),bords1);% essayer aussi hi1=hist(teff(i),bords1)*gamobs*exposure/length(teff(i));
-teff(j);
-%bar(centre1,hi1,'r');
-hold on;
-plot(centre1,h1,'r');
-title('comparaison experience/simulation pour une largeur de 1 jours');
-legend('experience','simulation');
-hold off;
-
-figure(20);
-hist(teff(j),bords2);   % essayer aussi hi2=hist(teff(i),bords2)*gamobs*exposure/length(teff(i));
-%bar(centre2,hi2,'r');
-hold on;
-plot(centre2,h2,'r');
-title('comparaison experience/simulation pour une largeur de 2 jours');
-legend('experience','simulation');
-hold off;
-
-figure(21);
-hist(teff(j),bords5);   % essayer aussi hi5=hist(teff(i),bords5)*gamobs*exposure/length(teff(i));
-%bar(centre5,hi5,'r');
-hold on;
-plot(centre5,h5,'r');
-title('comparaison experience/simulation pour une largeur de 5 jours');
-legend('experience','simulation');
-hold off;
-
-
-
-
-% Calcul du nombre total d'evenement pour les differents cas
-
-%calcul du nombre total d'evenements a partir de gamobs et l'exposure
-nombre1=exposure*gamobs;
-%calcul du nombre total d'evenements a partir de la simulation pour une largeur de 1 jour
-nbbin1=temax;
-for j =1:nbbin1;
-bords1(j)=temax/nbbin1*(j-1);
-end;
-i=find(teobs<temax); %c'est le meme tableau pour les trois (quatres) largeurs
-hn1=histc(teobs(i),bords1)*gamobs*exposure/length(teobs(i));
-diff=length(teobs)-length(i); % c'est la meme valeur pour tous
-nombre2=sum(hn1);
-%calcul du nombre total d'evenements a partir de la simulation pour une largeur de 2 jours
-nbbin2=temax/2;     
-for j =1:nbbin2;
-bords2(j)=temax/nbbin2*(j-1);
-end;
-hn2=histc(teobs(i),bords2)*gamobs*exposure/length(teobs(i));
-nombre3=sum(hn2);
-%calcul du nombre total d'evenements a partir de la simulation pour une largeur de 5 jours     
-nbbin5=temax/5;
-for j =1:nbbin5;
-bords5(j)=temax/nbbin5*(j-1);
-end;
-hn5=histc(teobs(i),bords5)*gamobs*exposure/length(teobs(i));
-nombre4=sum(hn5);
-%calcul du nombre total d'evenements a partir de la simulation pour une largeur de 0.5 jour
-nbbin=2*temax;
-for j =1:nbbin;
-bords(j)=temax/nbbin*(j-1);
-end;
-hn=histc(teobs(i),bords)*gamobs*exposure/length(teobs(i));
-nombre5=sum(hn);
-%calcul du nombre total d'evenements a partir des donnes experimentales
-nombre6=length(teff);
-
-%Affichage de ces resultats
-disp(['Il n''y a pas eu prise en compte de ' num2str(diff) 'elements']);
-disp(['nb d''evt avec gamobs :' num2str(nombre1) ]);
-disp(['nb d''evt avec 1 j :' num2str(nombre2) ]);
-disp(['nb d''evt avec 2 j :' num2str(nombre3) ]);
-disp(['nb d''evt avec 5 j :' num2str(nombre4) ]);
-disp(['nb d''evt avec 0.5 j :' num2str(nombre5) ]);
-disp(['nb d''evt par l''experience :' num2str(nombre6) ]);
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Trace dgamma (c'est le dgamma global et non pas celui apres le Monte-Carlo)
-% Pour avoir quelque chose de coherent, trace plutot dgammaccepte
-% figure(22);
-% mgam=max(dgamma);
-% y=0:mgam/100000:mgam;
-% h4=histc(dgamma,y);
-% h4=h4+1;
-% h4=log(h4);
-% bar(y,h4);
-% title('distrib de dgamma');
+% temaxgraphe=100;  % pour le trace des graphe
+% temax=5000;       % pour le calcul integral
+% 
+% % Definition des differents nombres de bin pour les graphiques
+% nbbin1=temaxgraphe;
+% nbbin2=temaxgraphe/2;     
+% nbbin5=temaxgraphe/5;
+% 
+% bords1 = zeros(1, nbbin1) ; centre1 = zeros(1, nbbin1-1);
+% bords2 = zeros(1, nbbin2) ; centre2 = zeros(1, nbbin2-1);
+% bords5 = zeros(1, nbbin5) ; centre5 = zeros(1, nbbin5-1);
+% 
+% teobs = te;
+% %Definition des tableaux bords et centre pour une largeur de 1 jour
+% for j =1:nbbin1;
+% bords1(j)=temaxgraphe/nbbin1*(j-1);
+% end;
+% for j =1:nbbin1-1;
+% centre1(j)=(bords1(j)+bords1(j+1))/2;
+% end
+% centre1(nbbin1)=bords1(nbbin1)+(bords1(nbbin1)-bords1(nbbin1-1))/2;
+% 
+% i=find(teobs<temaxgraphe); % ce tableau i est le meme pour les trois graphes
+% 
+% h1=histc(teobs(i),bords1)*gamobs*exposure/length(teobs(i));
+% 
+% %Definition des tableaux bords et centre pour une largeur de 2 jour
+% for j =1:nbbin2;
+% bords2(j)=temaxgraphe/nbbin2*(j-1);
+% end;
+% for j =1:nbbin2-1;
+% centre2(j)=(bords2(j)+bords2(j+1))/2;
+% end
+% centre2(nbbin2)=bords2(nbbin2)+(bords2(nbbin2)-bords2(nbbin2-1))/2;
+% 
+% h2=histc(teobs(i),bords2)*gamobs*exposure/length(teobs(i));
+% 
+% %Definition des tableaux bords et centre pour une largeur de 5 jour
+% for j =1:nbbin5;
+% bords5(j)=temaxgraphe/nbbin5*(j-1);
+% end;
+% for j =1:nbbin5-1;
+% centre5(j)=(bords5(j)+bords5(j+1))/2;
+% end
+% centre5(nbbin5)=bords5(nbbin5)+(bords5(nbbin5)-bords5(nbbin5-1))/2;
+% 
+% h5=histc(teobs(i),bords5)*gamobs*exposure/length(teobs(i));
+% 
+% 
+% % Tracage de ces trois graphes ensemble
+% figure(18);
 % hold off;
-%trace dgamma avec une echelle log pour la lisibilite
-%figure(23);
-%%dgamma=dgamma*1000+1;
-%ldg=log(dgamma)/log(1000);
-%hist(ldg,100000);
-%title('distrib de dgamma echelle log1000');
-%hold off;
-%n'a pas trop d'interet
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Densite (Avec les espacements pour ramener les dimensions)
-
-%figure(24);
-%l=length(teff);
-%milieu(1)=0;
-%for i=2:l
-%%    milieu(i)=(teff(i-1)+teff(i))/2;
-%end;
-%for i=1:(l-1)
-%    ecart(i)=milieu(i+1)-milieu(i);
-%end;
-%ecart(l)=(teff(l)-milieu(l))*2;
-%h3=1./ecart;
-%bar(t,h3,'g');
-%title('idee bizarre');
-%hold off;
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% En essayant de comparer des "resultats" normalises
-% Ne sert a rien s'il n'y a pas une coherence avant
-%figure(25);
-%m1=max(h);
-%h1=h1/m1;
-%plot(centre,h1,'b-');
-%hold on;
-%h2=histc(teff,bords);
-%m2=max(h2);
-%h2=h2/m2;
-%plot(centre,h2,'r-.');  ne pas tracer avec celui la
-%bar(centre,h2,'g');
-%title('comparaison en normalisee');
-%hold off;
-
+% hold on;
+% plot(centre1,h1,'b-');
+% plot(centre2,h2,'r-');
+% plot(centre5,h5,'g-');
+% axis([0,30,0,20]);
+% title('Diagramme des evenements obtenu par simulation pour des largeurs de representation differentes');
+% legend('largeur de 1 jour','largeur de 2 jours','largeur de 5 jours');
+% xlabel('durees d''evenements');
+% ylabel('nombre d''evenements par unite de temps');
+% hold off;
+% 
+% 
+% % TRACAGE des trois graphiques precedents separement avec la distribution experimentale correspondante
+% 
+% figure(19);
+% j=find(teff<temaxgraphe);  % c'est le meme tableau pour les trois graphes
+% hist(teff(j),bords1);% essayer aussi hi1=hist(teff(i),bords1)*gamobs*exposure/length(teff(i));
+% teff(j);
+% %bar(centre1,hi1,'r');
+% hold on;
+% plot(centre1,h1,'r');
+% title('comparaison experience/simulation pour une largeur de 1 jours');
+% legend('experience','simulation');
+% hold off;
+% 
+% figure(20);
+% hist(teff(j),bords2);   % essayer aussi hi2=hist(teff(i),bords2)*gamobs*exposure/length(teff(i));
+% %bar(centre2,hi2,'r');
+% hold on;
+% plot(centre2,h2,'r');
+% title('comparaison experience/simulation pour une largeur de 2 jours');
+% legend('experience','simulation');
+% hold off;
+% 
+% figure(21);
+% hist(teff(j),bords5);   % essayer aussi hi5=hist(teff(i),bords5)*gamobs*exposure/length(teff(i));
+% %bar(centre5,hi5,'r');
+% hold on;
+% plot(centre5,h5,'r');
+% title('comparaison experience/simulation pour une largeur de 5 jours');
+% legend('experience','simulation');
+% hold off;
+% 
+% 
+% 
+% 
+% % Calcul du nombre total d'evenement pour les differents cas
+% 
+% %calcul du nombre total d'evenements a partir de gamobs et l'exposure
+% nombre1=exposure*gamobs;
+% %calcul du nombre total d'evenements a partir de la simulation pour une largeur de 1 jour
+% nbbin1=temax;
+% for j =1:nbbin1;
+% bords1(j)=temax/nbbin1*(j-1);
+% end;
+% i=find(teobs<temax); %c'est le meme tableau pour les trois (quatres) largeurs
+% hn1=histc(teobs(i),bords1)*gamobs*exposure/length(teobs(i));
+% diff=length(teobs)-length(i); % c'est la meme valeur pour tous
+% nombre2=sum(hn1);
+% %calcul du nombre total d'evenements a partir de la simulation pour une largeur de 2 jours
+% nbbin2=temax/2;     
+% for j =1:nbbin2;
+% bords2(j)=temax/nbbin2*(j-1);
+% end;
+% hn2=histc(teobs(i),bords2)*gamobs*exposure/length(teobs(i));
+% nombre3=sum(hn2);
+% %calcul du nombre total d'evenements a partir de la simulation pour une largeur de 5 jours     
+% nbbin5=temax/5;
+% for j =1:nbbin5;
+% bords5(j)=temax/nbbin5*(j-1);
+% end;
+% hn5=histc(teobs(i),bords5)*gamobs*exposure/length(teobs(i));
+% nombre4=sum(hn5);
+% %calcul du nombre total d'evenements a partir de la simulation pour une largeur de 0.5 jour
+% nbbin=2*temax;
+% for j =1:nbbin;
+% bords(j)=temax/nbbin*(j-1);
+% end;
+% hn=histc(teobs(i),bords)*gamobs*exposure/length(teobs(i));
+% nombre5=sum(hn);
+% %calcul du nombre total d'evenements a partir des donnes experimentales
+% nombre6=length(teff);
+% 
+% %Affichage de ces resultats
+% disp(['Il n''y a pas eu prise en compte de ' num2str(diff) 'elements']);
+% disp(['nb d''evt avec gamobs :' num2str(nombre1) ]);
+% disp(['nb d''evt avec 1 j :' num2str(nombre2) ]);
+% disp(['nb d''evt avec 2 j :' num2str(nombre3) ]);
+% disp(['nb d''evt avec 5 j :' num2str(nombre4) ]);
+% disp(['nb d''evt avec 0.5 j :' num2str(nombre5) ]);
+% disp(['nb d''evt par l''experience :' num2str(nombre6) ]);
+% 
+% 
+% 
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Trace dgamma (c'est le dgamma global et non pas celui apres le Monte-Carlo)
+% % Pour avoir quelque chose de coherent, trace plutot dgammaccepte
+% % figure(22);
+% % mgam=max(dgamma);
+% % y=0:mgam/100000:mgam;
+% % h4=histc(dgamma,y);
+% % h4=h4+1;
+% % h4=log(h4);
+% % bar(y,h4);
+% % title('distrib de dgamma');
+% % hold off;
+% %trace dgamma avec une echelle log pour la lisibilite
+% %figure(23);
+% %%dgamma=dgamma*1000+1;
+% %ldg=log(dgamma)/log(1000);
+% %hist(ldg,100000);
+% %title('distrib de dgamma echelle log1000');
+% %hold off;
+% %n'a pas trop d'interet
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Densite (Avec les espacements pour ramener les dimensions)
+% 
+% %figure(24);
+% %l=length(teff);
+% %milieu(1)=0;
+% %for i=2:l
+% %%    milieu(i)=(teff(i-1)+teff(i))/2;
+% %end;
+% %for i=1:(l-1)
+% %    ecart(i)=milieu(i+1)-milieu(i);
+% %end;
+% %ecart(l)=(teff(l)-milieu(l))*2;
+% %h3=1./ecart;
+% %bar(t,h3,'g');
+% %title('idee bizarre');
+% %hold off;
+% 
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % En essayant de comparer des "resultats" normalises
+% % Ne sert a rien s'il n'y a pas une coherence avant
+% %figure(25);
+% %m1=max(h);
+% %h1=h1/m1;
+% %plot(centre,h1,'b-');
+% %hold on;
+% %h2=histc(teff,bords);
+% %m2=max(h2);
+% %h2=h2/m2;
+% %plot(centre,h2,'r-.');  ne pas tracer avec celui la
+% %bar(centre,h2,'g');
+% %title('comparaison en normalisee');
+% %hold off;
+% 

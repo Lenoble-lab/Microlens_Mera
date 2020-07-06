@@ -3,17 +3,17 @@ clear *
 global dsup dinf Ro elev Rcoro
 
 Rcoro = 3500;
-elev = 0;
+elev = 26;
 Ro = 8000;
-dsup = 8500.;
+dsup = 14000.;
 dinf = 100.; %distance en parsec
 
 global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-l = 1.5 *pi/180;    % direction d'observation en radian
-b = -2.68 *pi/180;
+l = 1 *pi/180;    % direction d'observation en radian
+b = -4 *pi/180;
 
 
 global sinb cosb  cosbl sinl cosl
@@ -30,22 +30,22 @@ x = (0:1e-5:1).*(dsup-dinf)+dinf;
 % dens_E2 = rhostanek(R, z, th);
 % dens_HetG = rhobuHetG(R, z, th);
 
-% dens_d = rhodHetG(R, z, th);
-% dens_dm = rhodm(R, z, th);
-% dens_de = rhode(R, z, th);
+dens_d = rhobulbe(R, z, th);
+dens_dm = rhodm(R, z, th);
+dens_de = rhode(R, z, th);
 
 i0 = find( R <= Rcoro );   
 i1 = find( R > Rcoro);
 
-vrot(i1) = vrotdm(R(i1),z(i1),th(i1));
-vrot(i0) = vrotb(R(i0),z(i0),th(i0));
+% vrot(i1) = vrotdm(R(i1),z(i1),th(i1));
+% vrot(i0) = vrotb(R(i0),z(i0),th(i0));
 
-figure(1)
+figure(42)
 hold on;
-plot(x,vrotdm(x,z,th).*1e-3);
-title('Vitesse de rotation en fonction de R');
-xlabel('distance au centre galactique')
-ylabel('vitesse en km/s')
+% plot(x,vrotdm(x,z,th).*1e-3);
+% title('Vitesse de rotation en fonction de R');
+% xlabel('distance au centre galactique')
+% ylabel('vitesse en km/s')
 % plot(x, vrotb(R,z,th).*1e-2);
 % plot(x, dens_zhao);
 % plot(x, dens_E2);
@@ -53,13 +53,13 @@ ylabel('vitesse en km/s')
 % legend('bulbe (Zhao)', 'E2 (Stanek)', 'G2 (dwek)', 'H&G');
 
 
-% plot(x, dens_d)
-% plot(x, dens_dm)
-% plot(x, dens_de)  
-% legend('H et G', 'dm', 'de')
-% 
-% xlabel('distance au soleil (en pc))');
-% ylabel('densité de masse en M_{sol}/pc^{3}');
+plot(x, dens_d.*3/max(dens_d), 'x')
+plot(x, dens_dm)
+plot(x, dens_de)  
+legend('bulbe', 'dm', 'de')
+
+xlabel('distance au soleil (en pc))');
+ylabel('densité de masse en M_{sol}/pc^{3}');
 
 %% Integration pour le calcul de la masse
 clear *
