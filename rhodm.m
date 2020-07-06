@@ -30,7 +30,7 @@ res = rhsol*exp(-R./Ld-abs(z)./hd+Ro./Ld);
 % pas de disque mince
 %--------------------
 
-%res = zeros(size(R));
+% res = zeros(size(R));
 
 %--------------
 % disque de BGS

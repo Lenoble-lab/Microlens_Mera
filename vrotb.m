@@ -25,5 +25,5 @@ v=39.1e3.*R./1000;
 %-------------------------
 % rayon de corotation a Rc
 %-------------------------
-
+    
 %v = 200e3.*R./Rcoro;           % Rcoro doit etre en pc

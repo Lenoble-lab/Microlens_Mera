@@ -78,11 +78,31 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table7,'VariableTypes
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
 table7 = readtable('../OGLEIV/table7.dat',opts);
 
+%-----------------------------------------------
+%Raw te
+%-----------------------------------------------
+
+VarNames_table_event = {'Name', 't_0', 't_E', 'u_0'};
+VarTypes_table_event = {'string', 'double', 'double', 'double'}; 
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_table_event,'VariableTypes',VarTypes_table_event,...
+                                'Delimiter',delimiter, 'DataLines', 8, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+table_event = readtable('../OGLEIV/OGLE-IV-events-FFP.txt',opts);
+
+
 %-------------
 % Choix du champ à analyser
 %------------
 
 field = "BLG500";
+
+%-------------
+%donnée expérimentales
+%----------------
+
+i_field = find(extractBetween(table_event.Name, 1,6) == field);
+teff = table_event.t_E(i_field);
 
 %------------------
 %fichiers resultats
@@ -240,6 +260,14 @@ disp(['tau = ' num2str(taucx)]);
 %Ctau = 4*pi*GMsol*uT*uT/c/c/pc;
 %tau  = Ctau*quad('dtaud',0,1,1e-2);
 %disp(['tau = ' num2str(tau)]);
+
+%----------------
+%liste pour observer ensuite la pdmf
+%----------------------
+m_tot_imf = [];
+m_tot_pdmf = [];
+frac_M_tot = [];
+frac_N_tot = [];
 
 %-------------------------------------------------------
 %calcul de la masse moyenne et de la normalisation de fm
@@ -487,45 +515,19 @@ m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
 [ifmmh, index] = unique(ifmmh); 
 m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 
-%-------------------------------------------------------
-%cas particulier : population de WD dans le de
-%-------------------------------------------------------
+%-----------------
+%PDMF
+%------------------
 
-fraction=0;
-raWD=rand(size(idel));
-iWD=find(raWD<fraction);
-if (length(iWD)>=1)
-  m(idel(iWD))=0.6*ones(size(iWD));
-end;  
+m_tot_imf = [m_tot_imf, m];
+% [m, frac_N, frac_M] = PDMF_gould_1(m);
+[m, frac_N, frac_M] = PDMF_Maraston_1(m);
 
-%-------------------------------------------------------
-%cas particulier : population de WD dans le bulbe
-%-------------------------------------------------------
+m_tot_pdmf = [m_tot_pdmf, m];
+frac_N_tot = [frac_N_tot ; frac_N];
+frac_M_tot = [frac_M_tot ; frac_M];
 
-fraction=0;
-raWD=rand(size(ibul));
-iWD=find(raWD<fraction);
-if (length(iWD)>=1)
-  m(ibul(iWD))=0.6*ones(size(iWD));
-end;  
-
-%-------------------------------------------------------
-%cas particulier : population de WD dans le dm
-%-------------------------------------------------------
-
-fraction=0.;
-raWD=rand(size(idml));
-iWD=find(raWD<fraction);
-if (length(iWD)>=1)
-  m(idml(iWD))=0.6*ones(size(iWD));
-end;  
-
-%----------------------------------------------
-% test : toutes les lentilles ont la meme masse 
-%----------------------------------------------
-
-%m=0.6*ones(size(x));
-
+% m = zeros(size(x)) + 0.6;
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
 %----------------------------------------------
@@ -738,6 +740,31 @@ te=te';
 
 disp(' ')
 close all
+
+%------------------
+%Test pour la PDMF
+%--------------
+figure(40)
+hold on
+[Y, edges] = histcounts(m_tot_pdmf, 500, 'BinLimits',[0,5]);
+M = length(Y);
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/M)
+title("PDMF")
+set(gca, 'YScale', 'log')
+% axis([0 10 1e-2 1e3])
+
+disp(['fraction de rémanents en nombre (WD, NS, BH) ', num2str(mean(frac_N_tot))])
+disp(['fraction de rémanents en masse (WD, NS, BH) ', num2str(mean(frac_M_tot))])
+
+figure(41)
+[Y_imf, edges] = histcounts(m_tot_imf);
+M = length(Y_imf);
+plot(edges(sort([1:M 2:M+1])), Y_imf(sort([1:M 1:M]))/M)
+title('IMF')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+axis([0 10 1 1e2])
+
 %---------------
 %calcul de gamma
 %---------------
@@ -800,16 +827,17 @@ disp(['tau observé ogle = ' num2str(table7.tau(find(extractBetween(table7.field
 
 
 %-------------
-%Calcul de l'efficacité à partir des données OGLE IV
+%Calcul de l'efficacité à partir des données de OGLE IV pour l'article de
+%2017 (nature)
 %-----------------
 figure(1)
-eff = eval(['eff_field.',convertStringsToChars(field)]);
+eff_2017 = eval(['eff_field.',convertStringsToChars(field)]);
 
 te_inter = 10.^eff_field.log_tE;
 
 te_inter_plot = 10.^[-1; eff_field.log_tE + 0.07];
-M = length(eff);
-loglog([te_inter_plot(sort([1:M 1:M]));10^(2.5)], [eff(sort([1:M 1:M 1]))])
+M = length(eff_2017);
+loglog([te_inter_plot(sort([1:M 1:M]));10^(2.5)], [eff_2017(sort([1:M 1:M 1]))])
 hold on
 
 teffmaxm=max(te_inter);
@@ -821,12 +849,12 @@ i1_blend = find((teblend<=teffmaxm)&(teblend>=teffminm));
 eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
 eff_blend = zeros(1,length(teblend));
 
-eff_unblend(i1_unblend) = interp1(te_inter,eff,te(i1_unblend));
-eff_blend(i1_blend) = interp1(te_inter,eff,teblend(i1_blend));
+eff_unblend(i1_unblend) = interp1(te_inter,eff_2017,te(i1_unblend));
+eff_blend(i1_blend) = interp1(te_inter,eff_2017,teblend(i1_blend));
 
 
 %---------------
-%Test avec autre efficacité
+%efficacité du dossier /eff
 %------------------------
 VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
 VarType_eff_IV = {'double', 'double', 'double'};
@@ -838,7 +866,7 @@ opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableT
 eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
 
 
-eff_2019 = eff_field_2019.efficiency;
+% eff_2019 = eff_field_2019.efficiency;
 
 %Graph
 M = length(eff_field_2019.log_tE_min);
@@ -872,10 +900,13 @@ teffminm=min(te_inter_min);
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
 
+%choix de l'éfficacité
+eff = eff_2017;
+
 %tirage au sort pour l'efficacité
 
-ra_unblend = rand(1,length(te))*max(eff_2019);
-ra_blend = rand(1,length(teblend))*max(eff_2019);
+ra_unblend = rand(1,length(te))*max(eff);
+ra_blend = rand(1,length(teblend))*max(eff);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
@@ -925,37 +956,38 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 load ../graph/evenements_1.txt
 te_model = evenements_1(:,5);
 
-%les bins sont imposés par le choix de OGLE IV
-te_max = 150;
-i_inf = find(10.^(table4.log_tE+0.07) < te_max);
-edges = 10.^[-1; table4.log_tE(i_inf)+0.07];
+%Paramètre graph
+bin_max = 100;
+nbre_bin = bin_max/2;
 
-%Trace la distribde te  pour le modèle et la courbe stockée localement
-hist = histcounts(te, edges, 'Normalization', 'probability');
-hist_model = histcounts(te_model, edges, 'Normalization', 'probability');
+%Trace la distrib de te  pour le modèle et la courbe stockée localement
+[hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %tracé distribution avec blending uniquement la courbe stockée localement
-histb= histcounts(teblend, edges, 'Normalization', 'probability');
+[histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %Courbe expérimentale (avec l'efficacité) :
-hist_obs = histcounts(teobs,edges, 'Normalization', 'probability');
-hist_obs_b = histcounts(teobsblend, edges, 'Normalization', 'probability');
+[hist_obs, edges] = histcounts(teobs, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_obs_b, edges] = histcounts(teobsblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
-centre = zeros(size(edges)-[1,0]);
+centre = zeros(size(edges)-[0,1]);
 
 for j =1:length(centre);
-centre(j)=10.^((log10(edges(j))+log10(edges(j+1)))/2);
+centre(j)=(edges(j)+edges(j+1))/2;
 end
-i_ogle = find(table4.log_tE<log10(max(edges)));
 
 %expérience
-hist_tot = eval(['table4.', convertStringsToChars(field)]);
+[hist_exp_normalise, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
+[hist_exp, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max]);
+
 
 %Graph normalisé
 figure(16)
 hold on;
 plot(centre, hist, 'black');
 plot(centre, hist_model, 'red');
+legend('local', 'model')
 title('comparaison local et modèle')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -965,8 +997,7 @@ figure(17)
 hold on;
 plot(centre, hist_obs.*gamobs*exposure, 'red');
 plot(centre, hist_obs_b*gamobsb*exposure, 'black');
-M = length(i_ogle);
-plot(10.^[-2;table4.log_tE(i_ogle(sort([1:M 1:M])))], [0;0; hist_tot(sort([1:M-1 1:M-1])) ; 0], '-')
+plot(centre, hist_exp)
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -976,8 +1007,7 @@ figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
-M = length(i_ogle);
-plot(10.^[-2;table4.log_tE(i_ogle(sort([1:M 1:M])))], [0;0; hist_tot(sort([1:M-1 1:M-1]))./sum(hist_tot) ; 0], '-')
+plot(centre, hist_exp_normalise)
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')

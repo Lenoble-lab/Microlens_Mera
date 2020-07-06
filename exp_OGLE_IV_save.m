@@ -4,7 +4,8 @@
 % Liste des champs : 
 % field_li = ["BLG507", "BLG508", "BLG513", "BLG515", "BLG535", "BLG612"];
 %chemin d'enregistremen
-path_field = strcat('../graph/OGLEIV/', field, '/Gould');
+type = 'Gould';
+path_field = strcat('../graph/OGLEIV/', field, '/', type);
 
 %Création dossier
 mkdir(path_field);
@@ -13,18 +14,18 @@ mkdir(path_field);
 % saveas(1, strcat(path_field, '/efficacité_', field), 'epsc')
 
 %Enregistrement hist normalisé
-saveas(18, strcat(path_field, '/hist_Gould_normalise_', field), 'epsc')
+saveas(18, strcat(path_field, '/hist_', type, '_normalise_', field), 'epsc')
 
 %Enregistrement hist à l'échelle
 % saveas(17, strcat(path_field, '/hist_scale_', field), 'epsc')
 % print(17, '-depsc', '-r600', strcat(path_field, '/hist_scale_', field))
 % saveas(17, strcat(path_field, '/hist_', field, '.png'))
-print(17, '-dpng','-r600', strcat(path_field, '/hist_Gould_', field));
+print(17, '-dpng','-r600', strcat(path_field, '/hist_', type, '_', field));
 
 %Enregistrement des données
-file = fopen(strcat(path_field, '/data_Gould_', field),'w');
+file = fopen(strcat(path_field, '/data_', type, '_', field),'w');
 
-fprintf(file, strcat('Donnée du champ  ', field, ' pour la FM de 2005 et les prescriptions de Gould  \n'));
+fprintf(file, strcat('Donnée du champ  ', field, ' pour la FM de 2005 et les prescriptions de Marason  \n'));
 fprintf(file, '(long, lat) = (%5.4f,%5.4f) \n',  table6.glon(table6.field == field), table6.glat(table6.field == field));
 fprintf(file, 'N_events = %5.1f \n', table7.N_events(table7.field == field));
 fprintf(file, 'N_star = %5.3f 10^6 \n', table7.N_stars(table7.field == field));

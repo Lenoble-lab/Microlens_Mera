@@ -283,7 +283,7 @@ mmeanh=integral(@mPmh,minfh,msuph);
 %-------------------------------------------------------------
 
     %--------------------
-    % cas du disque mince
+    % cas du disque minc
     %--------------------
 
 mmdm = (0:1e-5:1).*(msupdm-minfdm)+minfdm;
@@ -790,9 +790,9 @@ nbre_bin = temax;
 % bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
 % legend('OGLE', 'MACHO', 'EROS')
 
-% exp_ogle_IV_2019
+exp_ogle_IV_2019
 % exp_MOA_2016
-exp_ogle_III_2015
+% exp_ogle_III_2015
 % exp_ogle_II_2006
 
 %---------------
