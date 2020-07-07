@@ -31,7 +31,6 @@ vlimit = 1000e3;
 n = 20000;
 % n = 5000;
 nbsimul=500; %a augmenter pour meilleure stat
-nbMAX=500;
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -85,7 +84,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 % Macho
 % uT = 0.83;
 %----------------
-%liste pour observer ensuite la pdmf
+%liste pour observer ensuite les distributions
 %----------------------
 m_tot_imf = [];
 m_tot_pdmf = [];
