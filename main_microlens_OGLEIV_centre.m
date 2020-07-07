@@ -95,7 +95,7 @@ table_event = readtable('../OGLEIV/OGLE-IV-events-FFP.txt',opts);
 % Choix du champ à analyser
 %------------
 
-field = "BLG500";
+field = "BLG505";
 
 %-------------
 %donnée expérimentales

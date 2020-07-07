@@ -292,31 +292,11 @@ ifds = real(ifds./ifds(end));	% on fait en sorte que la primitive varie de 0 a 1
 % calcul du maximum de Gamma par monte carlo
 %-------------------------------------------
 
-for compteur = 1:nbMAX,
-    
-    if ( rem(compteur,100) == 0 )
-    
-disp(['compteur = ' num2str(compteur)]);
+Gammax = -dgammax(fminsearch(@dgammax,[0.5, 15e3]));
 
-    end
+disp(['Gammax = ' num2str(Gammax*1e-12) '*1e12']);
 
-% randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
-
-x=rand(1,n);
-ds=rand(1,n)*(dsup-dinf)+dinf;
-m=rand(1,n)*(msuptot-minftot)+minftot;
-v=rand(1,n)*vlimit;
-
-gmax(compteur)=max(dgam(x,ds,v,m));
-
-clear x ds m v
-
-end
-
-Gammax=max(gmax);
-disp(['Gammax = ' num2str(Gammax)]);
-
-
+%%
 %---------------------
 %---------------------
 % debut du Monte-Carlo
@@ -365,11 +345,11 @@ L_tot = [L_tot, ds];
 % Tirage de x
 %------------
 
-dl=rand(1,n).*ds;
-x = dl./ds;
+% dl=rand(1,n).*ds;
+% x = dl./ds;
 % rapport = dinf./ds;
 % x=(rand(1,n)-rapport)/(1-rapport) + rapport;
-
+x = rand(1,n);
 %------------------------------------------
 %a quelle population appartient la source ?
 %------------------------------------------
@@ -429,40 +409,6 @@ m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
 [ifmmh, index] = unique(ifmmh); 
 m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 
-% m = zeros(size(ra))+1;
-
-%-------------------------------------------------------
-%cas particulier : population de WD dans le de
-%-------------------------------------------------------
-
-fraction=0;
-raWD=rand(size(idel));
-iWD=find(raWD<fraction);
-if (length(iWD)>=1)
-  m(idel(iWD))=0.6*ones(size(iWD));
-end;  
-
-%-------------------------------------------------------
-%cas particulier : population de WD dans le bulbe
-%-------------------------------------------------------
-
-fraction=0;
-raWD=rand(size(ibul));
-iWD=find(raWD<fraction);
-if (length(iWD)>=1)
-  m(ibul(iWD))=0.6*ones(size(iWD));
-end;  
-
-%-------------------------------------------------------
-%cas particulier : population de WD dans le dm
-%-------------------------------------------------------
-
-fraction=0.;
-raWD=rand(size(idml));
-iWD=find(raWD<fraction);
-if (length(iWD)>=1)
-  m(idml(iWD))=0.6*ones(size(iWD));
-end;  
 
 %-----------------
 %PDMF
@@ -476,7 +422,6 @@ end;
 m_tot_pdmf = [m_tot_pdmf, m];
 % frac_N_tot = [frac_N_tot ; frac_N];
 % frac_M_tot = [frac_M_tot ; frac_M];
-length(find(x == 0))
 
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
@@ -636,42 +581,6 @@ if (length(j)>=1)
 end;
 
 
-
-%if ( compteur == nbsimul )
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%TEST des distributions des VA principales
-
-%figure(1);
-%hist(x,100);
-%mx=mean(x);
-%sx=std(x);
-%title('Distribution de la VA x pendant le Monte-carlo');
-%hold off;
-%OK : loi uniforme
-%figure(2);
-%hist(ds,100);
-%mds=mean(ds);
-%sds=std(ds);
-%title('Distribution de la VA ds pendant le Monte-carlo');
-%hold off;
-% OK donne une distribution correcte max sur le GC
-%figure(3);
-%hist(v,100);
-%mv=mean(v);
-%sv=std(v);
-%title('Distribution de la VA v pendant le Monte-carlo');
-%hold off;
-%%distrib correcte???
-%figure(4);
-%hist(m,10000);
-%mm=mean(m);
-%sm=std(m);
-%title('Distribution de la VA m pendant le Monte-carlo');
-%hold off;
-% OK: loi de la FM (log-normal et expo)
-%end;
-
-
 clear x glr glt glp sigrl sigtl sigpl vrotl ds gsr gst gsp sigrs sigts sigps vrots 
 clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strange
 
@@ -719,8 +628,8 @@ v=evenements(:,3);
 m=evenements(:,4);
 te=evenements(:,5);
 
-% x=x';
-% ds=ds';
+x=x';
+ds=ds';
 v=v';
 m=m';
 te=te';
@@ -747,31 +656,31 @@ disp(['fraction de rémanents en masse (WD, NS, BH) ', num2str(mean(frac_M_tot))
 %-------------
 %test distrib vitesse
 %------------------
-figure(41)
-hold on
-[v_bu_bu, edges] = histcounts(v_tot(intersect(ibul, ibus)), 500);
-[v_dm_bu, edges] = histcounts(v_tot(intersect([idml, idel], ibus)), 500);
-[v_dm_dm, edges] = histcounts(v_tot(intersect([idml, idel], [idms, ides])), 500);
+% figure(41)
+% hold on
+% [v_bu_bu, edges] = histcounts(v_tot(intersect(ibul, ibus)), 500);
+% [v_dm_bu, edges] = histcounts(v_tot(intersect([idml, idel], ibus)), 500);
+% [v_dm_dm, edges] = histcounts(v_tot(intersect([idml, idel], [idms, ides])), 500);
+% 
+% v_dm = v_tot(intersect([idml, idel], [idms, ides]));
+% v_test = v_dm(find(ds(intersect([idml, idel], [idms, ides]))>8e3));
+% [v_dm_dm_1, edges_1] = histcounts(v_test, 500);
+% 
+% [v_retenu, edges] = histcounts(v, 500);
+% 
+% M = length(Y);
+% plot(edges(sort([1:M 2:M+1])), v_bu_bu(sort([1:M 1:M])))
+% plot(edges(sort([1:M 2:M+1])), v_dm_bu(sort([1:M 1:M])))
+% plot(edges(sort([1:M 2:M+1])), v_dm_dm(sort([1:M 1:M])))
+% % plot(edges_1(sort([1:M 2:M+1])), v_dm_dm_1(sort([1:M 1:M])))
+% % plot(edges(sort([1:M 2:M+1])), v_retenu(sort([1:M 1:M])))
+% legend('bulbe/bulbe', 'bulbe/disque', 'disque/disque')
+% title("vitesse")
+% set(gca, 'YScale', 'log')
+% % axis([2e3 10e3 0 3e6])
 
-v_dm = v_tot(intersect([idml, idel], [idms, ides]));
-v_test = v_dm(find(ds(intersect([idml, idel], [idms, ides]))>8e3));
-[v_dm_dm_1, edges_1] = histcounts(v_test, 500);
-
-[v_retenu, edges] = histcounts(v, 500);
-
-M = length(Y);
-plot(edges(sort([1:M 2:M+1])), v_bu_bu(sort([1:M 1:M])))
-plot(edges(sort([1:M 2:M+1])), v_dm_bu(sort([1:M 1:M])))
-plot(edges(sort([1:M 2:M+1])), v_dm_dm(sort([1:M 1:M])))
-% plot(edges_1(sort([1:M 2:M+1])), v_dm_dm_1(sort([1:M 1:M])))
-% plot(edges(sort([1:M 2:M+1])), v_retenu(sort([1:M 1:M])))
-legend('bulbe/bulbe', 'bulbe/disque', 'disque/disque')
-title("vitesse")
-set(gca, 'YScale', 'log')
-% axis([2e3 10e3 0 3e6])
 
 
-%%
 %-------------
 %test distrib L
 %------------------
