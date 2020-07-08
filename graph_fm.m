@@ -5,6 +5,9 @@ global minf msup
 minf=0.01;
 msup=100;
 
+% integral(@rapport_masse, 0, 0.07)/integral(@rapport_masse, 0.01, 100)
+% integral(@rapport_masse, 0.01, 0.07)/integral(@rapport_masse, 0.01, 100)
+
 m = (0:1e-5:1).*(msup-minf)+minf;
 fm05 = fmchab05(m);
 % fm_maraston = PDMF_Maraston(fm05,m);
@@ -21,13 +24,13 @@ figure(1);
 set(gca, 'YScale', 'log')
 hold on;
 plot(log10(m),fm05);
-plot(log10(m),fm_maraston, 'm');
+plot(log10(m),fm_maraston);
 plot(log10(m),fm_gould);
-plot(log10(m(idx)),fm_maraston(idx).*sqrt(m(idx)), 'xm');
+plot(log10(m(idx)),fm_maraston(idx), 'x', 'Color', [0.8500 0.3250 0.0980]);
 ylabel('\xi(log(m))');
 xlabel('log_{10} (M_{sol})');
 legend('fm 005', 'fm Maraston', 'fm Gould')
-axis([-1.5 1.5 1e-7 1]);
+axis([-2 2 1e-6 1]);
 
 
 
@@ -50,24 +53,33 @@ axis([-1.5 1.5 1e-7 1]);
 % xlabel('log_{10} (M_{sol})');
 % %axis([0,100,0,0.05]);
 
-fm_bu = fmbu(m)/integral(@fmbu, 0.01, 100);
-fm_de = fm_bu;
-fm_dm = fm_bu;
-fm_de = fmde(m)/integral(@fmde, 0.01, 100);
-fm_dm = fmdm(m)/integral(@fmdm, 0.01, 100);
+% fm_bu = fmbu(m)/integral(@fmbu, 0.01, 100);
+% fm_de = fm_bu;
+% fm_dm = fm_bu;
+% fm_de = fmde(m)/integral(@fmde, 0.01, 100);
+% fm_dm = fmdm(m)/integral(@fmdm, 0.01, 100);
+% 
+% figure(2);
+% set(gca, 'YScale', 'log')
+% hold on;
+% plot(log10(m),fm_bu);
+% plot(log10(m),fm_de);
+% plot(log10(m),fm_dm);
+% hold off
+% 
+% legend('FM bulbe', 'FM de','FM dm');
+% ylabel('\xi(log(m))');
+% xlabel('log_{10} (M_{sol})');
+%axis([0,100,0,0.05]);
 
-figure(2);
-set(gca, 'YScale', 'log')
-hold on;
-plot(log10(m),fm_bu);
-plot(log10(m),fm_de);
-plot(log10(m),fm_dm);
-hold off
+function pm = rapport_masse(m)
 
-legend('FM bulbe', 'FM de','FM dm');
-ylabel('\xi(log(m))');
-xlabel('log_{10} (M_{sol})');
-% %axis([0,100,0,0.05]);
+pm = fmchab05(m);
+% pm = fm_kroupa(m);
+% pm = fmchab_modi(m);
+pm = PDMF_Maraston(pm,m);
+% pm = PDMF_gould(pm,m).*m;
+end
 
 function pm = fmrecente_maraston(m)
 

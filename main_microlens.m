@@ -28,9 +28,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
+n = 10000;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=1000; %a augmenter pour meilleure stat
 nbMAX=500;
 
 %----------------------------------------------------------------------
@@ -292,8 +292,9 @@ ifds = real(ifds./ifds(end));	% on fait en sorte que la primitive varie de 0 a 1
 % calcul du maximum de Gamma par monte carlo
 %-------------------------------------------
 
-Gammax = -dgammax(fminsearch(@dgammax,[0.5, 15e3]));
-
+couple_max = fminsearch(@dgammax,[0.47, 15e3]);
+Gammax = -dgammax(couple_max);
+disp(['Couple max = ' num2str(couple_max)])
 disp(['Gammax = ' num2str(Gammax*1e-12) '*1e12']);
 
 %%
@@ -415,13 +416,13 @@ m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 %------------------
 
 % m_tot_imf = [m_tot_imf, m];
-[m, frac_N, frac_M] = PDMF_gould_1(m);
-% [m, frac_N, frac_M] = PDMF_Maraston_1(m);
+% [m, frac_N, frac_M] = PDMF_gould_1(m);
+[m, frac_N, frac_M] = PDMF_Maraston_1(m);
 
 % m = ones(size(x));
 m_tot_pdmf = [m_tot_pdmf, m];
-% frac_N_tot = [frac_N_tot ; frac_N];
-% frac_M_tot = [frac_M_tot ; frac_M];
+frac_N_tot = [frac_N_tot ; frac_N];
+frac_M_tot = [frac_M_tot ; frac_M];
 
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
@@ -648,10 +649,12 @@ M = length(Y);
 plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m))
 title("PDMF")
 set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+
 % axis([0 10 1e-2 1e3])
 
-disp(['fraction de rémanents en nombre (WD, NS, BH) ', num2str(mean(frac_N_tot))])
-disp(['fraction de rémanents en masse (WD, NS, BH) ', num2str(mean(frac_M_tot))])
+disp(['fraction de rémanents en nombre (BD, MS, WD, NS, BH) ', num2str(mean(frac_N_tot))])
+disp(['fraction de rémanents en masse (BD, MS, WD, NS, BH) ', num2str(mean(frac_M_tot))])
 
 %-------------
 %test distrib vitesse
@@ -690,6 +693,7 @@ hold on
 M = length(Y);
 plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m))
 title("Distance source")
+set(gca, 'YScale', 'log')
 
 %---------------
 %calcul de gamma
@@ -797,7 +801,7 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 
 %telechargement de la courbe du modèle
 
-load ../graph/evenements_1.txt
+load ../graph/07_07_evenements/evenements_1.txt
 te_model = evenements_1(:,5);
 
 %Paramètre graph

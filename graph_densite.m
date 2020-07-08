@@ -1,12 +1,12 @@
 
-clear *
+% clear *
 global dsup dinf Ro elev Rcoro
 
-Rcoro = 3500;
-elev = 26;
-Ro = 8000;
-dsup = 14000.;
-dinf = 100.; %distance en parsec
+% Rcoro = 3500;
+% elev = 26;
+% Ro = 8000;
+% dsup = 14000.;
+% dinf = 100.; %distance en parsec
 
 global l b
 
@@ -39,8 +39,12 @@ i1 = find( R > Rcoro);
 
 % vrot(i1) = vrotdm(R(i1),z(i1),th(i1));
 % vrot(i0) = vrotb(R(i0),z(i0),th(i0));
-
 figure(42)
+
+plot(x, (dens_d+dens_dm+dens_de)*4/max(dens_d+dens_dm+dens_de))
+
+
+figure()
 hold on;
 % plot(x,vrotdm(x,z,th).*1e-3);
 % title('Vitesse de rotation en fonction de R');
@@ -53,10 +57,12 @@ hold on;
 % legend('bulbe (Zhao)', 'E2 (Stanek)', 'G2 (dwek)', 'H&G');
 
 
-plot(x, dens_d.*3/max(dens_d), 'x')
+plot(x, dens_d)
 plot(x, dens_dm)
-plot(x, dens_de)  
-legend('bulbe', 'dm', 'de')
+plot(x, dens_de)
+plot(x, (dens_d+dens_dm+dens_de))
+legend('bulbe', 'disque mince', 'dsque épais', 'densité totale')
+set(gca, 'YScale', 'log')
 
 xlabel('distance au soleil (en pc))');
 ylabel('densité de masse en M_{sol}/pc^{3}');

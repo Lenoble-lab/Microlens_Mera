@@ -1,54 +1,57 @@
-function vt = vperp(x,glr,glt,glp,sigrl,sigtl,sigpl,vrotl,L,gsr,gst,gsp,sigrs,sigts,sigps,vrots)
-
-global cosb cosbl sinb L0 sinl vsp vsr vst vlr vlp vlt Ro elev
-
-
 %------------------
 % VITESSE DU SOLEIL
 %------------------
 
-vxsol=0; vzsol=0; vysol=-200e3;
+vxsol=0; 
+vysol=10;
+vzsol=0; 
 
-%------------------
-% VITESSE DU SOLEIL, Brunthaler et al. 2010
-%------------------
+th = 0.01;
+x = 0.9;
 
-vxsol = -11.1e3; 
-vzsol = 7.25e3; 
-vysol = vrotdm(Ro,elev,0) + 12.24e3;
+l = 0;
+b = 0;
 
+sinb = abs(sin(b));		cosb = cos(b);		cosl = cos(l);
+cosbl=cos(b)*cos(l);		sinl = sin(l);
 %-----------------------------------------------------------
 % CALCUL DES COORDONNEES PAR RAPPORT AU CENTRE DE LA GALAXIE
 %-----------------------------------------------------------
 
-[R, z, th] = toGC(x.*L);
-r  = sqrt(R.*R+z.*z);
+% [R, z, th] = toGC(x.*L);
+%     r  = sqrt(R.*R+z.*z);
 
 %-------------------------------------------------------------------------
 % Conversion des g en vitesse. g varie entre 0 et 1, et le v correspondant
 % a une distribution gaussienne de centre 0 et de dispertion sig 
 %-------------------------------------------------------------------------
 
-vlr = sigrl.*erfinv(2.*glr-1);
-vlt = sigtl.*erfinv(2.*glt-1);
-vlp = sigpl.*erfinv(2.*glp-1)+vrotl;
+% vlr = sigrl.*erfinv(2.*glr-1).*0;
+% vlt = sigtl.*erfinv(2.*glt-1).*0+vrotl;
+% vlz = sigzl.*erfinv(2.*glz-1).*0;
+
+vlr = 0;
+vlt = 10;
+vlz = 0;
 
 %-----------------------------------------------
 % calcul des angles pour conversion en cartesien
 %-----------------------------------------------
 
-sth = R./r;	cth = z./r;	sph = x.*L*cosb.*sinl./R;
-cph = -(Ro-x.*L.*cosbl)./R;
+%     sth = x.*L*cosb.*sinl./R;
+%     cth = -(Ro-x.*L.*cosbl)./R;
+
+cth = cos(th);
+sth = sin(th);
 
 %----------------------------------
 % calcul de la vitesse en cartesien
 %----------------------------------
 
-vlx = vlr.*sth.*cph + vlt.*cth.*cph - vlp.*sph;
-vly = vlr.*sth.*sph + vlt.*cth.*sph + vlp.*cph;
-vlz = vlr.*cth - vlt.*sth;
+vlx = vlr.*cth - vlt.*sth;
+vly = vlr.*sth + vlt.*cth;
 
-%----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
 % on tient compte maintenant de la vitesse du Soleil et de la source (eq 3.21)
 %-----------------------------------------------------------------------------
 
@@ -56,27 +59,37 @@ vlz = vlr.*cth - vlt.*sth;
 % Meme calcul mais pour la source cette fois-ci
 %----------------------------------------------
 
-[R, z, th] = toGC(L);	% utilisation des memes variables pour economiser
-r  = sqrt(R.*R+z.*z);	% la memoire
+% [R, z, th] = toGC(L);	% utilisation des memes variables pour economiser
+%     r  = sqrt(R.*R+z.*z);	% la memoire
 
-vsr = sigrs.*erfinv(2.*gsr-1);
-vst = sigts.*erfinv(2.*gst-1);
-vsp = sigps.*erfinv(2.*gsp-1)+vrots;
+% vsr = sigrs.*erfinv(2.*gsr-1).*0;
+% vst = sigts.*erfinv(2.*gst-1).*0+vrots;
+% vsz = sigzs.*erfinv(2.*gsz-1);
 
-sth = R./r;	cth = z./r;	sph = L*cosb.*sinl./R;
-cph = -(Ro-L.*cosbl)./R;
+vsr = 0;
+vst = 10;
+vsz = 0;
 
-vsx = vsr.*sth.*cph + vst.*cth.*cph - vsp.*sph;
-vsy = vsr.*sth.*sph + vst.*cth.*sph + vsp.*cph;
-vsz = vsr.*cth - vst.*sth;
+%     sth = x.*L*cosb.*sinl./R;
+%     cth = -(Ro-x.*L.*cosbl)./R;
+
+cth = cos(th);
+sth = sin(th);
+%----------------------------------
+% calcul de la vitesse en cartesien
+%----------------------------------
+
+vsx = vsr.*cth - vst.*sth;
+vsy = vsr.*sth + vst.*cth;
+
 
 %------------------------------
 % CALCUL DE LA VITESSE RELATIVE
 %------------------------------
 
-vlx = vlx - (1-x).*vxsol + x.*vsx;
-vly = vly - (1-x).*vysol + x.*vsy;
-vlz = vlz - (1-x).*vzsol + x.*vsz;
+vlx = vlx - (1-x).*vxsol - x.*vsx;
+vly = vly - (1-x).*vysol - x.*vsy;
+vlz = vlz - (1-x).*vzsol - x.*vsz;
 
 %----------------------------------------------
 % Vitesse projet�e le long de la ligne de vis�e
@@ -89,4 +102,4 @@ v  = vlx.*vlx + vly.*vly + vlz.*vlz;
 % Norme de la vitesse perpendiculairement � la ligne de vis�e
 %------------------------------------------------------------
 
-vt = sqrt(v-vr.*vr);
+vt = sqrt(v-vr.*vr)
