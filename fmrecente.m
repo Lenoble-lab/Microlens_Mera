@@ -7,8 +7,7 @@ function pm = fmrecente(m)
 pm = fmchab05(m);
 % pm = fm_kroupa_modif(m);
 % pm = fmchab_modi(m);
-% pm = PDMF_Maraston(pm,m);
-% pm = PDMF_gould(pm,m);
+
 
 % pm = zeros(size(m));
 % % [~,idx] = find(abs(m-1)<0.3);

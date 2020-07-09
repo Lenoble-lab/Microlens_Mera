@@ -22,6 +22,9 @@ frac_M_tot = [];
 frac_N_tot = [];
 v_tot = [];
 L_tot = [];
+eve_BH = [];
+star_pop = [];
+frac_eve_tot = [];
 %-----------------------------------
 % Param�tres de la fonction de masse
 %-----------------------------------
@@ -223,7 +226,6 @@ disp(['Gammax = ' num2str(Gammax*1e-12) '*1e12']);
 % ouverture des fichiers de donnees
 %----------------------------------
 
-fid = fopen(fichevents,'w');
 fid1 = fopen('evenements.txt','w');
 fids = fopen('strange.txt','w');
 
@@ -238,13 +240,6 @@ for compteur = 1:nbsimul,
 disp(['compteur = ' num2str(compteur)]);
 
   end
-
-
-%---------------------------------------------------
-% Initialisation aleatoire des generateurs aleatoire
-%---------------------------------------------------
-
-% randn('seed',sum(100000*clock)), rand('seed',sum(100000*clock))
 
 %----------------------------------
 %tirage de la distance de la source
@@ -328,15 +323,16 @@ m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 %-----------------
 %PDMF
 %------------------
+%star_pop : code [1,2,3,4,5] = [BD, MS, WD, NS, BH]
 
 % m_tot_imf = [m_tot_imf, m];
-[m, frac_N, frac_M] = PDMF_gould_1(m);
-% [m, frac_N, frac_M] = PDMF_Maraston_1(m);
-
+% [m, frac_N, frac_M] = PDMF_gould_1(m);
+[m, frac_N, frac_M, frac_eve, star_pop] = PDMF_Maraston_1(m);
+frac_N_tot = [frac_N_tot ; frac_N];
+frac_M_tot = [frac_M_tot ; frac_M];
+frac_eve_tot = [frac_eve_tot; frac_eve];
 % m = ones(size(x));
 m_tot_pdmf = [m_tot_pdmf, m];
-% frac_N_tot = [frac_N_tot ; frac_N];
-% frac_M_tot = [frac_M_tot ; frac_M];
 
 %----------------------------------------------
 %calcul des sigmas et v rotation de la lentille
@@ -467,13 +463,23 @@ end;
 
 ra = rand(size(x));
 g  = dgam(x,ds,v,m)./Gammax;
-i = find(g-ra>=0);
+i = find(g>=ra);
 
 j = find(g>1);
 
 dgamma = [dgamma,g];
 
 dgammaccepte=[dgammaccepte,g(i)];
+
+%---------------
+%sélection des eve de BH pour test
+%--------------------
+i_BH_eve = find(star_pop == 5);
+te_BH = (2/c*sqrt(GMsol*pc)/86400).*sqrt(ds(i_BH_eve).*m(i_BH_eve).*x(i_BH_eve).*(1-x(i_BH_eve)))./v(i_BH_eve);
+
+eve_BH = [eve_BH, [x(i_BH_eve);ds(i_BH_eve); v(i_BH_eve); m(i_BH_eve); te_BH; star_pop(i_BH_eve); dgam(x(i_BH_eve),ds(i_BH_eve),v(i_BH_eve),m(i_BH_eve))./Gammax]];
+
+
 
 %------------------------
 %selection des evenements
@@ -484,9 +490,8 @@ if (length(i)>=1)
   
   tecorrespondant=[tecorrespondant,te];
   
-  evnts = [x(i);ds(i);v(i);m(i);te];
-  fprintf(fid,'%12.8f  %12.8f  %12.8f  %12.8f  %12.8f\n',evnts);
-  fprintf(fid1,'%12.8f  %12.8f  %12.8f  %12.8f  %12.8f\n',evnts);
+  evnts = [x(i);ds(i);v(i);m(i);te;star_pop(i)];
+  fprintf(fid1,'%12.8f  %12.8f  %12.8f  %12.8f  %12.8f  %12.8f\n',evnts);
 end;
 
 
@@ -497,16 +502,8 @@ end;
 
 
 clear x glr glt glp sigrl sigtl sigpl vrotl ds gsr gst gsp sigrs sigts sigps vrots 
-clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strange
-
+clear v m ibul idel idml ihl ibus ides idms ihs ra R z th rhotot evnts te strange star_pop
 end
-
-
-fclose(fid1);
-fclose(fid);
-fclose(fids);
-
-
 %---------------------
 %% Analyse des résultats
 %---------------------

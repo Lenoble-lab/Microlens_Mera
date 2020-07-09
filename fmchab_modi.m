@@ -34,10 +34,10 @@ c1=0.093/log(10)*exp(-((log10(m1)-log10(0.2)).^2)./(2*sigma^2))/(exp(-((log10(m1
 
 
 %Comme Alibert dans sa thèse
-m1 = msup;
-sigma = 0.627;
-m0 = 0.1;
-c1 = 0.141;
+% m1 = msup;
+% sigma = 0.627;
+% m0 = 0.1;
+% c1 = 0.141;
 
 
 
