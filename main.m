@@ -233,7 +233,7 @@ dgamma=[];
 dgammaccepte=[];        % initialisation pour les traitement ulterieur des donnees
 tecorrespondant=[];
 
-for compteur = 1:nbsimul,
+for compteur = 1:nbsimul
 
   if ( rem(compteur,100) == 0 )  
     
@@ -331,6 +331,8 @@ m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 frac_N_tot = [frac_N_tot ; frac_N];
 frac_M_tot = [frac_M_tot ; frac_M];
 frac_eve_tot = [frac_eve_tot; frac_eve];
+
+% star_pop = x;
 % m = ones(size(x));
 m_tot_pdmf = [m_tot_pdmf, m];
 

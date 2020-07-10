@@ -1,6 +1,8 @@
 
 %Updating for a 10Gyr pop according to Maraston 1998
 %m : tirage aléatoire des masses selon l'imf considérée
+%On stocke trois liste pour avoir les fractions en nombre, en masse et avec
+%le facteur 1/sqrt(m) pour chaque type d'objet 
 function [m, frac_N, frac_M, frac_eve, star_pop]  = PDMF_Maraston_1(m)
 
 pm = zeros(size(m));

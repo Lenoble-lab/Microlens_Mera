@@ -13,7 +13,7 @@ vlimit = 1000e3;
 
 n = 20000;
 % n = 5000;
-nbsimul=1000; %a augmenter pour meilleure stat
+nbsimul=500; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -321,13 +321,13 @@ end
 %Graph normalisé
 figure(16)
 hold on;
-plot(centre, hist_local, 'black');
+plot(centre, hist_local/length(te), 'black');
 plot(centre, hist_model, 'red');
-plot(centre, hist_BD/length(find(star_pop == 1)));
-plot(centre, hist_MS/length(find(star_pop == 2)));
-plot(centre, hist_WD/length(find(star_pop == 3)));
-plot(centre, hist_NS/length(find(star_pop == 4)));
-plot(centre, hist_BH/length(find(star_pop == 5)));
+% plot(centre, hist_BD/length(find(star_pop == 1)));
+% plot(centre, hist_MS/length(find(star_pop == 2)));
+% plot(centre, hist_WD/length(find(star_pop == 3)));
+% plot(centre, hist_NS/length(find(star_pop == 4)));
+% plot(centre, hist_BH/length(find(star_pop == 5)));
 
 title('comparaison local et modèle')
 legend('local', 'model', 'BD', 'MS', 'WD', 'NS', 'BH')
@@ -383,13 +383,7 @@ set(gca, 'YScale', 'log')
 set(gca, 'XScale', 'log')
 
 
-
-
-%%
-% histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
-
-
-%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE IV
+%expérience
 figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
