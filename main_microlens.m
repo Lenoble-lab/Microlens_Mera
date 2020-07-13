@@ -67,7 +67,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 global minf msup
 
 minf=0.01;
-msup=100;
+msup=100;   
 
 %----------------------------------------
 % Param�tres de la fonction de luminosité pour le blending (Alibert et al.)
@@ -288,7 +288,7 @@ nbre_bin = bin_max;
 
 
 %Trace la distribde te  pour le modèle et la courbe stockée localement
-[hist_local, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
+[hist_local, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %Selon la pop d'étoiles
@@ -321,8 +321,8 @@ end
 %Graph normalisé
 figure(16)
 hold on;
-plot(centre, hist_local/length(te), 'black');
-plot(centre, hist_model, 'red');
+plot(centre/66, hist_local/max(hist_local), 'black');
+plot(centre/66, hist_model/max(hist_model), 'red');
 % plot(centre, hist_BD/length(find(star_pop == 1)));
 % plot(centre, hist_MS/length(find(star_pop == 2)));
 % plot(centre, hist_WD/length(find(star_pop == 3)));
@@ -333,8 +333,9 @@ title('comparaison local et modèle')
 legend('local', 'model', 'BD', 'MS', 'WD', 'NS', 'BH')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-set(gca, 'XScale', 'log')
+% set(gca, 'XScale', 'log')
 
+%%
 %graph en fonction de l'exposition
 exposure = 10;
 figure(17)
@@ -369,6 +370,13 @@ log_NS = histc(te(star_pop == 4),edges_log);
 log_BH = histc(te(star_pop == 5),edges_log);
 log_tot = histc(te,edges_log);
 
+% log_BD = histc(intersect(te(star_pop == 1), i_eff),edges_log);
+% log_MS = histc(intersect(te(star_pop == 2), i_eff),edges_log);
+% log_WD = histc(intersect(te(star_pop == 3), i_eff),edges_log);
+% log_NS = histc(intersect(te(star_pop == 4), i_eff),edges_log);
+% log_BH = histc(intersect(te(star_pop == 5), i_eff),edges_log);
+% log_tot = histc(te(i_eff),edges_log);
+
 plot(x, [0 log_BD(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_MS(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_WD(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
@@ -376,7 +384,8 @@ plot(x, [0 log_NS(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_BH(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_tot(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 
-legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot')
+
+legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot', 'expérience')
 xlabel('log(t_{e})')
 ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
 set(gca, 'YScale', 'log')
@@ -386,13 +395,34 @@ set(gca, 'XScale', 'log')
 %expérience
 figure(18)
 hold on;
-plot(centre, hist_obs, 'red');
-plot(centre, hist_obs_b, 'black');
-M = length(hist_exp_err);
-plot(edges(sort([1:M 1:M])), [0 , hist_exp_err(sort([1:M 1:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'expérience')
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
+% plot(centre, hist_obs, 'red');
+% plot(centre, hist_obs_b, 'black');
+log_BD_eff = histc(te(intersect(find(te(star_pop == 1)), i_eff)),edges_log);
+log_MS_eff = histc(te(intersect(find(te(star_pop == 2)), i_eff)),edges_log);
+log_WD_eff = histc(te(intersect(find(te(star_pop == 3)), i_eff)),edges_log);
+log_NS_eff = histc(te(intersect(find(te(star_pop == 4)), i_eff)),edges_log);
+log_BH_eff = histc(te(intersect(find(te(star_pop == 5)), i_eff)),edges_log);
+log_tot_eff = histc(te(i_eff),edges_log);
+log_exp_eff = histc(teff, edges_log);
+
+plot(x, [0 log_BD_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_MS_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_WD_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_NS_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_BH_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_tot_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0; log_exp_eff(sort([1:M-1 1:M-1])); 0]/length(teff))
+
+
+legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot', 'expérience')
+xlabel('log(t_{e})')
+ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+
+% legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'expérience')
+% xlabel('t_{e}')
+% ylabel('Nombre d''évènements par unité de t_{e}')
 
 
 

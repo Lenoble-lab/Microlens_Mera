@@ -210,8 +210,10 @@ ifds = real(ifds./ifds(end));	% on fait en sorte que la primitive varie de 0 a 1
 % calcul du maximum de Gamma par monte carlo
 %-------------------------------------------
 
-Gammax = -dgammax(fminsearch(@dgammax,[0.5, 15e3]));
+couple_max = fminsearch(@dgammax,[0.5, 15e3]);
+Gammax = -dgammax(couple_max);
 
+disp(['couple max : (x,L) = ' num2str(couple_max)])
 disp(['Gammax = ' num2str(Gammax*1e-12) '*1e12']);
 
 %%
@@ -324,15 +326,15 @@ m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 %PDMF
 %------------------
 %star_pop : code [1,2,3,4,5] = [BD, MS, WD, NS, BH]
+star_pop = zeros(size(x));
 
 % m_tot_imf = [m_tot_imf, m];
 % [m, frac_N, frac_M] = PDMF_gould_1(m);
-[m, frac_N, frac_M, frac_eve, star_pop] = PDMF_Maraston_1(m);
-frac_N_tot = [frac_N_tot ; frac_N];
-frac_M_tot = [frac_M_tot ; frac_M];
-frac_eve_tot = [frac_eve_tot; frac_eve];
+% [m, frac_N, frac_M, frac_eve, star_pop] = PDMF_Maraston_1(m);
+% frac_N_tot = [frac_N_tot ; frac_N];
+% frac_M_tot = [frac_M_tot ; frac_M];
+% frac_eve_tot = [frac_eve_tot; frac_eve];
 
-% star_pop = x;
 % m = ones(size(x));
 m_tot_pdmf = [m_tot_pdmf, m];
 

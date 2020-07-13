@@ -69,7 +69,7 @@ table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 % Choix du champ à analyser
 %------------
 
-% field = 'BLG535';
+field = 'BLG535';
 
 
 global vlimit
@@ -82,7 +82,7 @@ vlimit = 1000e3;
 
 n = 20000;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=300; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source

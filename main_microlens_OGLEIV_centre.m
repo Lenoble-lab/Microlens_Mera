@@ -114,7 +114,7 @@ vlimit = 1000e3;
 
 n = 20000;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=300; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -207,24 +207,22 @@ close all
 %--------------
 figure(40)
 hold on
-[Y, edges] = histcounts(m_tot_pdmf, 500, 'BinLimits',[0,5]);
+[Y, edges] = histcounts(m_tot_pdmf, 1000, 'BinLimits',[0,5]);
+[Y_bon, edges] = histcounts(m, 1000, 'BinLimits',[0,5]);
+
 M = length(Y);
-plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/M)
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf)/2.7./sqrt(edges(sort([1:M 1:M]))))
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf))
+plot(edges(sort([1:M 2:M+1])), Y_bon(sort([1:M 1:M]))/length(m))
+legend('PDMF avec facteu', 'PDMF brut','eve retenu brut')
 title("PDMF")
 set(gca, 'YScale', 'log')
-% axis([0 10 1e-2 1e3])
+set(gca, 'XScale', 'log')
 
 disp(['fraction de rémanents en nombre (WD, NS, BH) ', num2str(mean(frac_N_tot))])
 disp(['fraction de rémanents en masse (WD, NS, BH) ', num2str(mean(frac_M_tot))])
+disp(['fraction d evenements (BD, MS, WD, NS, BH) ', num2str(mean(frac_eve_tot))])
 
-figure(41)
-[Y_imf, edges] = histcounts(m_tot_imf);
-M = length(Y_imf);
-plot(edges(sort([1:M 2:M+1])), Y_imf(sort([1:M 1:M]))/M)
-title('IMF')
-set(gca, 'YScale', 'log')
-set(gca, 'XScale', 'log')
-axis([0 10 1 1e2])
 
 %---------------
 %calcul de gamma
