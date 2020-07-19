@@ -11,7 +11,7 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
+n = 400000;
 % n = 5000;
 nbsimul=100; %a augmenter pour meilleure stat
 
@@ -21,7 +21,7 @@ nbsimul=100; %a augmenter pour meilleure stat
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 20000.;
 dinf = 800.;
 %distance en parsec
 
@@ -83,8 +83,9 @@ Vsup = 16;
 %-------------------
 % Monte-Carlo
 %-------------------
+tic
 main
-
+toc
 %%
 %----------------------------------------
 % recuperation des evenements selectionnes

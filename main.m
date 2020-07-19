@@ -330,10 +330,10 @@ star_pop = zeros(size(x));
 
 % m_tot_imf = [m_tot_imf, m];
 % [m, frac_N, frac_M] = PDMF_gould_1(m);
-% [m, frac_N, frac_M, frac_eve, star_pop] = PDMF_Maraston_1(m);
-% frac_N_tot = [frac_N_tot ; frac_N];
-% frac_M_tot = [frac_M_tot ; frac_M];
-% frac_eve_tot = [frac_eve_tot; frac_eve];
+[m, frac_N, frac_M, frac_eve, star_pop] = PDMF_Maraston_1(m);
+frac_N_tot = [frac_N_tot ; frac_N];
+frac_M_tot = [frac_M_tot ; frac_M];
+frac_eve_tot = [frac_eve_tot; frac_eve];
 
 % m = ones(size(x));
 m_tot_pdmf = [m_tot_pdmf, m];
@@ -522,5 +522,6 @@ fprintf(fid,'%15.11f  \n',tau);
 fprintf(fid,'%15.11f  \n',Gammax);
 fprintf(fid,'%15.11f  \n',uT);
 fprintf(fid,'%15.11f  \n',AT);
+fprintf(fid, '%15.11f  \n',mean(m_tot_pdmf));
 
 fclose(fid);

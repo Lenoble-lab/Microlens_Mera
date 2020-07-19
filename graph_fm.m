@@ -6,14 +6,17 @@ minf=0.01;
 msup=100;
 
 integral(@rapport_masse, 0.01, 0.07)/integral(@rapport_masse, 0.01, 100)
-integral(@rapport_masse, 0.01, 0.07)/integral(@rapport_masse, 0.01, 100)
+integral(@rapport_masse, 5, 50)/integral(@rapport_masse, 0.01, 100)
+
+integral(@rapport_masse, 50, 100)
 
 m = (0:1e-5:1).*(msup-minf)+minf;
 fm05 = fmchab05(m);
 % fm_maraston = PDMF_Maraston(fm05,m);
 fm_maraston = fmrecente_maraston(m);
 fm_eff = rapport_masse(m)./integral(@rapport_masse, 0.01, 100);
-fm_gould = fmrecente_gould(m);
+% fm_gould = fmrecente_gould(m);
+fm_gould = fm_basu_rana(m);
 % fm_recente = fmrecente(m)/integral(@fmrecente, 0.01, 100);
 
 [~,idx] = min(abs(m-1.4));
@@ -26,7 +29,7 @@ set(gca, 'YScale', 'log')
 hold on;
 plot(log10(m),fm05);
 plot(log10(m),fm_maraston);
-% plot(log10(m),fm_gould);
+plot(log10(m),fm_gould);
 plot(log10(m),fm_eff);
 plot(log10(m(idx)),fm_maraston(idx), 'x', 'Color', [0.8500 0.3250 0.0980]);
 ylabel('\xi(log(m))');
@@ -79,7 +82,7 @@ function pm = rapport_masse(m)
 pm = fmchab05(m);
 % pm = fm_kroupa(m);
 % pm = fmchab_modi(m);
-pm = PDMF_Maraston(pm,m)./sqrt(m);
+pm = PDMF_Maraston(pm,m).*sqrt(m);
 % pm = PDMF_gould(pm,m).*m;
 end
 

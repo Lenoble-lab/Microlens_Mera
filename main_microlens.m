@@ -11,9 +11,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
+n = 10000;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=100; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -21,7 +21,7 @@ nbsimul=500; %a augmenter pour meilleure stat
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 20000.;
 dinf = 800.;
 %distance en parsec
 
@@ -109,6 +109,8 @@ star_pop = star_pop';
 disp(' ')
 close all
 
+mmean = mean(m_tot_pdmf);
+
 %------------------
 %Test pour la PDMF
 %--------------
@@ -119,13 +121,15 @@ hold on
 [Y_bon, edges] = histcounts(m, 1000, 'BinLimits',[0,5]);
 
 M = length(Y);
-plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf)/2.7./sqrt(edges(sort([1:M 1:M]))))
 plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf))
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf).*sqrt(edges(sort([1:M 1:M])))*2.2)
 plot(edges(sort([1:M 2:M+1])), Y_bon(sort([1:M 1:M]))/length(m))
-legend('PDMF avec facteu', 'PDMF brut','eve retenu brut')
-title("PDMF")
+legend('PDMF', 'Distribution théorique','Distribution obtenue par MC')
+xlabel('mass (M_sol)')
+ylabel('distribution de masse')
+% title("PDMF")
 set(gca, 'YScale', 'log')
-set(gca, 'XScale', 'log')
+% set(gca, 'XScale', 'log')
 
 
 % axis([0 10 1e-2 1e3])
@@ -181,7 +185,7 @@ gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
-gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
+gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6/mmean;
 gam=gam1*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
@@ -284,7 +288,7 @@ te_model = evenements_1(:,5);
 
 %Paramètre graph
 bin_max = 100;
-nbre_bin = bin_max;
+nbre_bin = bin_max/2;
 
 
 %Trace la distribde te  pour le modèle et la courbe stockée localement
@@ -321,8 +325,10 @@ end
 %Graph normalisé
 figure(16)
 hold on;
-plot(centre/66, hist_local/max(hist_local), 'black');
-plot(centre/66, hist_model/max(hist_model), 'red');
+plot(centre, hist_local, 'black');
+plot(centre, hist_model, 'red');
+plot(centre, hist_exp_err)
+plot(centre, hist_obs);
 % plot(centre, hist_BD/length(find(star_pop == 1)));
 % plot(centre, hist_MS/length(find(star_pop == 2)));
 % plot(centre, hist_WD/length(find(star_pop == 3)));
@@ -330,12 +336,12 @@ plot(centre/66, hist_model/max(hist_model), 'red');
 % plot(centre, hist_BH/length(find(star_pop == 5)));
 
 title('comparaison local et modèle')
-legend('local', 'model', 'BD', 'MS', 'WD', 'NS', 'BH')
+legend('local', 'model', 'expérience', 'te obs')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 % set(gca, 'XScale', 'log')
 
-%%
+
 %graph en fonction de l'exposition
 exposure = 10;
 figure(17)
@@ -388,6 +394,7 @@ plot(x, [0 log_tot(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot', 'expérience')
 xlabel('log(t_{e})')
 ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+% title('normalisé pour expo = 10 et gamobs')
 set(gca, 'YScale', 'log')
 set(gca, 'XScale', 'log')
 
