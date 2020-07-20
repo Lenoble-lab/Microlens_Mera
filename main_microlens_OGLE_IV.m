@@ -80,9 +80,8 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
-% n = 5000;
-nbsimul=300; %a augmenter pour meilleure stat
+n = 60e5;
+nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -90,7 +89,7 @@ nbsimul=300; %a augmenter pour meilleure stat
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 20000.;
 dinf = 800.;
 %distance en parsec
 
@@ -170,6 +169,7 @@ te=te';
 
 disp(' ')
 close all
+mmean = mean(m_tot_pdmf);
 
 %---------------
 %calcul de gamma
@@ -179,7 +179,7 @@ gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
-gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
+gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6/mmean;
 gam=gam1*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
@@ -217,29 +217,8 @@ script_blending
 temax = 100;
 nbre_bin = temax;
 
-% exp_ogle_2006
-% teff_ogle = teff;
-% [hist_ogle, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-% 
-% 
-% exp_macho_2005
-% [hist_macho, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-% sort(teff)
-% figure(1)
-% bar(edges(1:end-1),hist_macho)
-
-% exp_eros_2006
-% % teff_eros = teff;
-% [hist_eros, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,temax]);
-% 
-% figure(1)
-% bar(edges(1:end-1),[hist_ogle; hist_macho; hist_eros]')
-% legend('OGLE', 'MACHO', 'EROS')
-
 exp_ogle_IV_2019
-% exp_MOA_2016
-% exp_ogle_III_2015
-% exp_ogle_II_2006
+
 
 %---------------
 %calcul de gamma

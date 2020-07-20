@@ -11,9 +11,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 10000;
+n = 10*1e5;
 % n = 5000;
-nbsimul=100; %a augmenter pour meilleure stat
+nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -54,8 +54,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-% l = 4 *pi/180;    % direction d'observation en radian
-% b = -1 *pi/180;
+l = -2.2 *pi/180;    % direction d'observation en radian
+b = -2.8 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -83,8 +83,9 @@ Vsup = 16;
 %-------------------
 % Monte-Carlo
 %-------------------
+tic
 main
-
+toc
 
 %%
 %----------------------------------------
@@ -283,7 +284,7 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 
 %telechargement de la courbe du modèle
 
-load ../graph/07_07_evenements/evenements_1.txt
+load ../graph/modif_FM/evenements_1.txt
 te_model = evenements_1(:,5);
 
 %Paramètre graph
@@ -327,8 +328,8 @@ figure(16)
 hold on;
 plot(centre, hist_local, 'black');
 plot(centre, hist_model, 'red');
-plot(centre, hist_exp_err)
-plot(centre, hist_obs);
+% plot(centre, hist_exp_err)
+% plot(centre, hist_obs);
 % plot(centre, hist_BD/length(find(star_pop == 1)));
 % plot(centre, hist_MS/length(find(star_pop == 2)));
 % plot(centre, hist_WD/length(find(star_pop == 3)));

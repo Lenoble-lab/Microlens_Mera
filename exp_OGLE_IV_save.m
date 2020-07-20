@@ -2,10 +2,10 @@
 %A faire tourner dans la console après avoir fait tourner main_microlens pour enregistrer si nécéssaire
 
 % Liste des champs : 
-% field_li = ["BLG507", "BLG508", "BLG513", "BLG515", "BLG535", "BLG612"];
+% % field_li = ["BLG507", "BLG508", "BLG513", "BLG515", "BLG535", "BLG612"];
 %chemin d'enregistremen
-type = 'Gould';
-path_field = strcat('../graph/OGLEIV/', field, '/', type);
+type = 'model';
+path_field = strcat('../graph/OGLEIV/', field);
 
 %Création dossier
 mkdir(path_field);

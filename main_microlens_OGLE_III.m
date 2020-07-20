@@ -11,9 +11,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 400000;
+n = 60e5;
 % n = 5000;
-nbsimul=100; %a augmenter pour meilleure stat
+nbsimul=0; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -91,12 +91,19 @@ toc
 % recuperation des evenements selectionnes
 %----------------------------------------
 
-load evenements.txt
-x=evenements(:,1);
-ds=evenements(:,2);
-v=evenements(:,3);
-m=evenements(:,4);
-te=evenements(:,5);
+% load evenements.txt
+% x=evenements(:,1);
+% ds=evenements(:,2);
+% v=evenements(:,3);
+% m=evenements(:,4);
+% te=evenements(:,5);
+
+load ../graph/modif_FM/evenements_1.txt
+x=evenements_1(:,1);
+ds=evenements_1(:,2);
+v=evenements_1(:,3);
+m=evenements_1(:,4);
+te=evenements_1(:,5);
 
 x=x';
 ds=ds';

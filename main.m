@@ -328,8 +328,7 @@ m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 %star_pop : code [1,2,3,4,5] = [BD, MS, WD, NS, BH]
 star_pop = zeros(size(x));
 
-% m_tot_imf = [m_tot_imf, m];
-% [m, frac_N, frac_M] = PDMF_gould_1(m);
+% [m, frac_N, frac_M, frac_eve, star_pop] = PDMF_gould_1(m);
 [m, frac_N, frac_M, frac_eve, star_pop] = PDMF_Maraston_1(m);
 frac_N_tot = [frac_N_tot ; frac_N];
 frac_M_tot = [frac_M_tot ; frac_M];
