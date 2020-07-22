@@ -319,7 +319,7 @@ m(idel) = interp1(ifmmde,mmde(index),ra(idel));
 m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
 
 [ifmmh, index] = unique(ifmmh); 
-m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
+% m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 
 
 %-----------------
@@ -510,7 +510,7 @@ end
 %---------------------
 %% Analyse des résultats
 %---------------------
-
+mmean = mean(m_tot_pdmf);
 fid=fopen('simul_para.txt','w');
 
 fprintf(fid,'%15.11f  \n',tau);
@@ -521,6 +521,6 @@ fprintf(fid,'%15.11f  \n',tau);
 fprintf(fid,'%15.11f  \n',Gammax);
 fprintf(fid,'%15.11f  \n',uT);
 fprintf(fid,'%15.11f  \n',AT);
-fprintf(fid, '%15.11f  \n',mean(m_tot_pdmf));
+fprintf(fid, '%15.11f  \n',mmean);
 
 fclose(fid);

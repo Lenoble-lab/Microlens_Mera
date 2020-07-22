@@ -31,11 +31,11 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table7,'VariableTypes
 table7 = readtable('../OGLEIV/table7.dat',opts);
 
 
-fichier ='../graph/comp_modele_OGLEIV_Marason.txt';
+fichier ='../graph/modif_FM/comp_modele_OGLEIV.txt';
 
-fid = fopen(fichier, 'w');
+fid_model = fopen(fichier, 'w');
 
-fprintf(fid, ['Calcul pour chaque champ des données de mon modèle, comparée avec celle de OGLE IV \n' ...
+fprintf(fid_model, ['Calcul pour chaque champ des données de mon modèle, comparée avec celle de OGLE IV \n' ...
 'Les variables stockées sont, dans l ordre : \n ' ...
 'Champ; \n longitude; \n lattitude; \n N_stars; \n N_events; ' ...
 '\n gam_OGLE; \n tau_OGLE (10^-6); \n mean_te_ogle; \n ' ...
@@ -66,8 +66,8 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
-nbsimul=500; %a augmenter pour meilleure stat
+n = 10e5;
+nbsimul=10; %a augmenter pour meilleure stat
 nbMAX=500;
 
 %----------------------------------------------------------------------
@@ -96,11 +96,27 @@ Lkpc=Ro/1000;  % distance Sun-GC en kpc
 global Rcoro
 Rcoro = 3500;
 
-fprintf(fid, ' n = %10.0f, nbsimul = %10.0f, nbmax = %10.0f \n', [n, nbsimul, nbMAX]);
+fprintf(fid_model, ' n = %10.0f, nbsimul = %10.0f, nbmax = %10.0f \n', [n, nbsimul, nbMAX]);
 
-%---------------------------------------       
-% param�tres du calcul de microlentilles
-%---------------------------------------
+
+%-----------------------------------
+% Param�tres de la fonction de masse
+%-----------------------------------
+global minf msup
+
+minf=0.01;
+msup=100;  
+
+%----------------------------------------
+% Param�tres de la fonction de luminosité pour le blending (Alibert et al.)
+%----------------------------------------
+
+global Vinf Vsup 
+
+Vinf = 22; % magnitudes limites des étoiles observées.
+Vsup = 16;
+
+
 % for field = table7.field
 for id_field = 1:length(table7.field)
  
@@ -122,26 +138,31 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 %-------------------
 main
 
+load evenements.txt
+x=evenements(:,1);
+ds=evenements(:,2);
+v=evenements(:,3);
+m=evenements(:,4);
+te=evenements(:,5);
+star_pop = evenements(:,6);
 
-end
-
-
-
-%---------------------
-% Analyse des résultats
-%---------------------
-
-close all;
+x=x';
+ds=ds';
+v=v';
+m=m';
+te=te';
+star_pop = star_pop';
 
 %---------------
 %calcul de gamma
 %---------------
 
+
 gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 % disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
-gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
+gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6/mmean;
 gam=gam1*Gammax;
 % disp(['gamma (integre par MC) = ' num2str(gam)]);
 
@@ -239,8 +260,8 @@ evnts = [l*180/pi; b*180/pi; table7.N_stars(table7.field == field); table7.N_eve
 table7.gam(table7.field == field); table7.tau(table7.field == field); table7.t_E_mean(table7.field == field); ...
 Gammax; gam; tau*1e6; mean(te); gamobs; tauobs*1e6; mean(teobs); ...
 gamobsb; tauobsb*1e6; mean(teblend)];
-fprintf(fid, field);
-fprintf(fid,'  %12.8f  %12.8f  %12.8f  %12.8f %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f\n',evnts);
+fprintf(fid_model, field);
+fprintf(fid_model,'  %12.8f  %12.8f  %12.8f  %12.8f %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f %12.8f  %12.8f  %12.8f\n',evnts);
 end
 
 %--------------------------------------

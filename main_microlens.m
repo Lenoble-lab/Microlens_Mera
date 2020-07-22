@@ -11,7 +11,7 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 10*1e5;
+n = 40*1e5;
 % n = 5000;
 nbsimul=10; %a augmenter pour meilleure stat
 
@@ -54,8 +54,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-l = -2.2 *pi/180;    % direction d'observation en radian
-b = -2.8 *pi/180;
+% l = -2.2 *pi/180;    % direction d'observation en radian
+% b = -2.8 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -66,7 +66,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 %-----------------------------------
 global minf msup
 
-minf=0.01;
+minf=0.0001;
 msup=100;   
 
 %----------------------------------------
@@ -203,15 +203,18 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 %------------------------
 
 % Param�tre pour le blending 
-f = 0.05;   %fraction des évenements unblendé f = P(1)
-nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
+% f = 0.05;   %fraction des évenements unblendé f = P(1)
+% nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
 f = 0.5;
 nbar = 1.257;
+
 % f = 0.2;
 % nbar = 2.6;
+
 % f = 1;
 % nbra = 0;
+%%
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
 

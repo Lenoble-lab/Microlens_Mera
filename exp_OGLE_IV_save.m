@@ -17,10 +17,10 @@ mkdir(path_field);
 saveas(18, strcat(path_field, '/hist_', type, '_normalise_', field), 'epsc')
 
 %Enregistrement hist à l'échelle
-% saveas(17, strcat(path_field, '/hist_scale_', field), 'epsc')
+saveas(17, strcat(path_field, '/hist_scale_', field), 'epsc')
 % print(17, '-depsc', '-r600', strcat(path_field, '/hist_scale_', field))
 % saveas(17, strcat(path_field, '/hist_', field, '.png'))
-print(17, '-dpng','-r600', strcat(path_field, '/hist_', type, '_', field));
+% print(17, '-dpng','-r600', strcat(path_field, '/hist_', type, '_', field));
 
 %Enregistrement des données
 file = fopen(strcat(path_field, '/data_', type, '_', field),'w');

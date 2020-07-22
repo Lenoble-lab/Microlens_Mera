@@ -98,18 +98,26 @@ toc
 % m=evenements(:,4);
 % te=evenements(:,5);
 
-load ../graph/modif_FM/evenements_1.txt
-x=evenements_1(:,1);
-ds=evenements_1(:,2);
-v=evenements_1(:,3);
-m=evenements_1(:,4);
-te=evenements_1(:,5);
+load ../graph/modif_FM/evenements_9.txt
+% x=evenements_1(:,1);
+% ds=evenements_1(:,2);
+% v=evenements_1(:,3);
+% m=evenements_1(:,4);
+te=evenements_9(:,5);
 
-x=x';
-ds=ds';
-v=v';
-m=m';
 te=te';
+
+te_model = te;
+fid = fopen('../graph/modif_FM/simul_para_9.txt');
+tau = str2double(fgets(fid));
+n = str2double(fgets(fid));
+nbsimul = str2double(fgets(fid));
+tau_1 = str2double(fgets(fid));
+Gammax = str2double(fgets(fid));
+uT = str2double(fgets(fid));
+At = str2double(fgets(fid));
+mmean = str2double(fgets(fid));
+
 
 disp(' ')
 close all
@@ -191,11 +199,6 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 %------------------------
 
 
-%telechargement de la courbe du modèle
-
-load ../graph/07_07_evenements/evenements_1.txt
-te_model = evenements_1(:,5);
-
 %Paramètre graph
 bin_max = 100;
 nbre_bin = bin_max/2;
@@ -249,3 +252,33 @@ legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all star
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
+
+%Graph log
+te_min = 0.1; te_max = 700; M = 50;
+edges_log=te_min*(te_max/te_min).^([0:M]/M);
+x=edges_log(sort([1:M 1:M])); 
+
+hist_exp_log = histc(teff,edges_log);
+hist_exp_log_fs = histc(teff(i_fs),edges_log);
+hist_exp_log_BW = histc(teff(i_BW),edges_log);
+hist_obs_log = histc(te,edges_log);
+hist_obs_b_log = histc(teblend,edges_log);
+
+if ishandle(2)
+    close(2)
+end
+figure(2)
+hold on
+plot(x, [0 hist_obs_log(sort([1:M-1 1:M-1])) 0]/length(te))
+plot(x, [0 hist_obs_b_log(sort([1:M-1 1:M-1])) 0]/length(teblend))
+plot(x, [0; hist_exp_log(sort([1:M-1 1:M-1])); 0]/length(teff))
+% plot(x, [0; hist_exp_log_BW(sort([1:M-1 1:M-1])); 0]/length(teff(i_BW)))
+plot(x, [0; hist_exp_log_fs(sort([1:M-1 1:M-1])); 0]/length(teff(i_fs)))
+
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III(non blendé, f_{s}>0.2)')
+legend('Location', 'best')
+xlabel('log(t_{e})')
+ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+% title('normalisé pour expo = 10 et gamobs')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')

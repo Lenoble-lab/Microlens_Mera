@@ -70,7 +70,7 @@ table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 %------------
 
 field = 'BLG535';
-
+disp(field)
 
 global vlimit
 
@@ -80,7 +80,7 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 60e5;
+n = 30e5;
 nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
@@ -249,6 +249,11 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 % 
 % disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 
+%prise en compte de l'efficacité pour l'histogramme corrigé
+N_events = table7.N_events(table7.field == field);
+gam_ogle = table7.gam(find(table7.field == field));
+mean_eff = N_events/(gam_ogle*exposure);
+
 %------------------------
 % affichage des resultats
 %------------------------
@@ -298,8 +303,8 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 %graph en fonction de l'exposition
 figure(17)
 hold on;
-plot(centre, hist_obs.*gamobs*exposure, 'red');
-plot(centre, hist_obs_b*gamobsb*exposure, 'black');
+plot(centre, hist_obs.*gamobs*exposure*mean_eff, 'red');
+plot(centre, hist_obs_b*gamobsb*exposure*mean_eff, 'black');
 histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')

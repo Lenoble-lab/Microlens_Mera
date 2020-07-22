@@ -43,13 +43,12 @@ VarNames_comp = {'field', 'glon', 'glat', 'N_stars', 'N_events', 'gam_OGLE', 'ta
     'gamma_eff_blend', 'tau_eff_blend', 'mean_te_eff_blend'};
 
 
-VarTypes_comp = {'string', 'double', 'double', 'doublesaveas', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
+VarTypes_comp = {'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'}; 
 
 opts = delimitedTextImportOptions('VariableNames',VarNames_comp,'VariableTypes',VarTypes_comp,...
                                 'Delimiter',delimiter, 'DataLines', 22, ...
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-
-
+comp_modele = readtable('../graph/modif_FM/comp_modele_OGLEIV.txt',opts);
 
 %----------------
 %Tracé profondeur optique en fonction de la lattitude galactique au centre

@@ -51,11 +51,12 @@ fact(il)=1; % donne parfois des nombres complexes si trop proche de l'amplificat
 Bmin = (At-1)./(ampli(Umin)-1);
 
 i0 = find(B>Bmin);
-
 %Récupération des résultats
 teblend(out) = te(out);
 teblend(i0)=te(i0).*fact(i0); % on a appliqué le blending à te et on a conservé l'ordre de te (important pour le blending après efficacité)
 
+%On enlève les 0
+teblend = teblend(teblend ~=0);
 %Pour calculer gmean
 fact(out) = ones(size(out));
 
