@@ -69,9 +69,10 @@ table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 % Choix du champ à analyser
 %------------
 
-field = 'BLG535';
-disp(field)
+% field = 'BLG535';
+field_list = table7.field(find(table7.N_events>5));
 
+for field = field_list
 global vlimit
 
 vlimit = 1000e3;
@@ -148,28 +149,41 @@ Vsup = 16;
 %-------------------
 main
 
-
-%%
 %----------------------------------------
 % recuperation des evenements selectionnes
 %----------------------------------------
+path_field = strcat('../graph/OGLEIV/', field);
 
-load evenements.txt
-x=evenements(:,1);
-ds=evenements(:,2);
-v=evenements(:,3);
-m=evenements(:,4);
-te=evenements(:,5);
+movefile("evenements.txt", strcat(path_field, "/evenements.txt"))
+movefile ("simul_para.txt", strcat(path_field, "/simul_para.txt"))
+end
 
-x=x';
-ds=ds';
-v=v';
-m=m';
+
+%%
+%analyse des résultat
+te_tot = [];
+te_obs_tot =[];
+te_obs_b_tot = [];
+gam_obs_tot = [];
+tau_obs_tot = [];
+% field_list = ["BLG505"];
+for field = field_list
+   
+path_field = strcat('../graph/OGLEIV/', field);
+load(strcat(path_field, '/evenements.txt'))
+
+te = evenements_1(:,5);
 te=te';
 
-disp(' ')
-close all
-mmean = mean(m_tot_pdmf);
+fid = fopen(strcat(path_field,'/simul_para.txt'));
+tau = str2double(fgets(fid));
+n = str2double(fgets(fid));
+nbsimul = str2double(fgets(fid));
+tau_1 = str2double(fgets(fid));
+Gammax = str2double(fgets(fid));
+uT = str2double(fgets(fid));
+At = str2double(fgets(fid));
+mmean = str2double(fgets(fid));
 
 %---------------
 %calcul de gamma
@@ -248,11 +262,28 @@ tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
 disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 % 
 % disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
+te_tot = [te_tot te];
+te_obs_tot =[te_obs_tot teobs];
+te_obs_b_tot = [te_obs_b_tot teobsblend];
+gam_obs_tot = [gam_obs_tot, gamobs];
+tau_obs_tot = [tau_obs_tot, tauobs];
+end
+
+%------------------------
+% affichage des resultats
+%------------------------
+
+te = te_tot;
+teobs = te_obs_tot;
+teobsblend = te_obs_b_tot;
+
+id_field = find(ismember(extractBetween(table3.field, 1, 6), field_list) & table3.Is_med<=21);
+teff = table3.tE_best(id_field);
 
 %prise en compte de l'efficacité pour l'histogramme corrigé
-N_events = table7.N_events(table7.field == field);
-gam_ogle = table7.gam(find(table7.field == field));
-mean_eff = N_events/(gam_ogle*exposure);
+% N_events = table7.N_events(table7.field == field);
+% gam_ogle = table7.gam(find(table7.field == field));
+% mean_eff = N_events/(gam_ogle*exposure);
 
 %------------------------
 % affichage des resultats
