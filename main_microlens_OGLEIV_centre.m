@@ -291,9 +291,12 @@ eff_blend = zeros(1,length(teblend));
 eff_unblend(i1_unblend) = interp1(te_inter,eff_2017,te(i1_unblend));
 eff_blend(i1_blend) = interp1(te_inter,eff_2017,teblend(i1_blend));
 
+%choix de l'éfficacité
+eff = eff_2017;
 
 %---------------
 %efficacité du dossier /eff
+%Efficacité 2019
 %------------------------
 VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
 VarType_eff_IV = {'double', 'double', 'double'};
@@ -305,7 +308,7 @@ opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableT
 eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
 
 
-% eff_2019 = eff_field_2019.efficiency;
+eff_2019 = eff_field_2019.efficiency;
 
 
 te_inter_min = 10.^(eff_field_2019.log_tE_min);
@@ -314,25 +317,23 @@ te_inter_max = 10.^(eff_field_2019.log_tE_max);
 teffmaxm=max(te_inter_max);
 teffminm=min(te_inter_min);
 
-% eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-% eff_blend = zeros(1,length(teblend));
-% 
-% for i = 1:length(te_inter_min)
-%     i1_unblend = find(te>=te_inter_min(i) & te<=te_inter_max(i));
-%     i1_blend = find(teblend>=te_inter_min(i) & teblend<=te_inter_max(i));
-%     
-%     eff_unblend(i1_unblend) = ones(size(i1_unblend)) .* eff_field_2019.efficiency(i);
-%     eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field_2019.efficiency(i);
-%     
-% end
+eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+eff_blend = zeros(1,length(teblend));
 
+for i = 1:length(te_inter_min)
+    i1_unblend = find(te>=te_inter_min(i) & te<=te_inter_max(i));
+    i1_blend = find(teblend>=te_inter_min(i) & teblend<=te_inter_max(i));
+    
+    eff_unblend(i1_unblend) = ones(size(i1_unblend)) .* eff_field_2019.efficiency(i);
+    eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field_2019.efficiency(i);
+    
+end
+%choix de l'éfficacité
+eff = eff_2019;
 
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
-
-%choix de l'éfficacité
-eff = eff_2017;
 
 %tirage au sort pour l'efficacité
 
