@@ -11,13 +11,13 @@ integral(@rapport_masse, 5, 50)/integral(@rapport_masse, 0.01, 100)
 integral(@rapport_masse, 50, 100)
 
 m = (0:1e-5:1).*(msup-minf)+minf;
-fm05 = fmchab05(m);
+fm05 = fmchab05(m)/integral(@fmchab05, 0.01, 100);
 fm_maraston = PDMF_Maraston_1(m);
 % fm_eff = rapport_masse(m)./integral(@rapport_masse, 0.01, 100);
 fm_gould = PDMF_gould_1(m);
 % fm_gould = fm_basu_rana(m);
 % fm_recente = fmrecente(m)/integral(@fmrecente, 0.01, 100);
-
+fm_kroupa = fm_kroupa_modif(m)/integral(@fm_kroupa_modif, 0.01, 100);
 [~,idx] = min(abs(m-1.4));
 
 if ishandle(1)
@@ -27,8 +27,9 @@ figure(1);
 set(gca, 'YScale', 'log')
 hold on;
 plot(log10(m),fm05);
-plot(log10(m),fm_maraston);
-plot(log10(m),fm_gould);
+% plot(log10(m),fm_maraston);
+% plot(log10(m),fm_gould);
+plot(log10(m),fm_kroupa);
 plot(log10(m(idx)),fm_maraston(idx), 'x', 'Color', [0.8500 0.3250 0.0980]);
 ylabel('\xi(log(m))');
 xlabel('log_{10} (M_{sol})');

@@ -98,17 +98,17 @@ toc
 % m=evenements(:,4);
 % te=evenements(:,5);
 
-load ../graph/modif_FM/evenements_9.txt
+load ../graph/modif_FM/evenements_1.txt
 % x=evenements_1(:,1);
 % ds=evenements_1(:,2);
 % v=evenements_1(:,3);
 % m=evenements_1(:,4);
-te=evenements_9(:,5);
+te=evenements_1(:,5);
 
 te=te';
 
 te_model = te;
-fid = fopen('../graph/modif_FM/simul_para_9.txt');
+fid = fopen('../graph/modif_FM/simul_para_1.txt');
 tau = str2double(fgets(fid));
 n = str2double(fgets(fid));
 nbsimul = str2double(fgets(fid));
@@ -269,11 +269,15 @@ if ishandle(2)
 end
 figure(2)
 hold on
-plot(x, [0 hist_obs_log(sort([1:M-1 1:M-1])) 0]/length(te))
-plot(x, [0 hist_obs_b_log(sort([1:M-1 1:M-1])) 0]/length(teblend))
+% plot(x, [0 hist_obs_log(sort([1:M-1 1:M-1])) 0]/length(te))
+plot((edges_log + [edges_log(2:end) te_max+100])./2, hist_obs_log./length(te))
+plot((edges_log + [edges_log(2:end) te_max+100])./2, hist_obs_b_log./length(te))
+% plot(edges_log, hist_exp_log_fs./length(teff(i_fs)))
+% plot(x, [0 hist_obs_b_log(sort([1:M-1 1:M-1])) 0]/length(teblend))
 plot(x, [0; hist_exp_log(sort([1:M-1 1:M-1])); 0]/length(teff))
 % plot(x, [0; hist_exp_log_BW(sort([1:M-1 1:M-1])); 0]/length(teff(i_BW)))
-plot(x, [0; hist_exp_log_fs(sort([1:M-1 1:M-1])); 0]/length(teff(i_fs)))
+plot(x, [0; hist_exp_log_fs(sort([1:M-1 1:M-1])); 0]/length(teff(i_fs)), 'b')
+errorbar((edges_log + [edges_log(2:end) te_max+100])./2, hist_exp_log_fs./length(teff(i_fs)), mean(teff(i_fs))./sqrt(hist_exp_log_fs)./length(teff(i_fs)), 'b.')
 
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III(non blendé, f_{s}>0.2)')
 legend('Location', 'best')

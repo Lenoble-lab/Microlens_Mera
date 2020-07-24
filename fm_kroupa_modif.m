@@ -36,6 +36,14 @@ alpha_MS = -1.1;
 alpha = -2.3;
 m3 = 0.5;
 
+%--------------
+%Valeurs de Mroz 2017
+%----------------
+alpha_bd = -0.8;
+alpha_MS = -1.3;
+alpha = -2;
+m3 = 0.5;
+
 
 
 i1 = find(m>=m1 & m<m2 & m>=minf);
