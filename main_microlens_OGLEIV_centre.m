@@ -197,12 +197,12 @@ tau_obs_tot = [];
 for field = field_list
    
 path_field = strcat('../graph/OGLEIV/', field);
-load(strcat(path_field, '/evenements_1.txt'))
+load(strcat(path_field, '/evenements.txt'))
 
-te = evenements_1(:,5);
+te = evenements(:,5);
 te=te';
 
-fid = fopen(strcat(path_field,'/simul_para_1.txt'));
+fid = fopen(strcat(path_field,'/simul_para.txt'));
 tau = str2double(fgets(fid));
 n = str2double(fgets(fid));
 nbsimul = str2double(fgets(fid));
@@ -453,7 +453,7 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 %Graph log
 te_min = 0.1; te_max = 500; M = 26;
 edges_log=te_min*(te_max/te_min).^([0:M]/M);
-x=edges_log(sort([1:M 1:M])); 
+x=edges_log(sort([1:M+1 1:M+1])); 
 
 %calcul centre pour errorbar
 centre = zeros(size(edges_log)-[0,1]);
@@ -461,21 +461,19 @@ for j =1:length(centre);
 centre(j)=(edges_log(j)+edges_log(j+1))/2;
 end
 
-hist_exp_log = histc(teff,edges_log);
-hist_obs_log = histc(te,edges_log);
-hist_obs_b_log = histc(teblend,edges_log);
+hist_exp_log = histcounts(teff,edges_log);
+hist_obs_log = histcounts(teobs,edges_log);
+hist_obs_b_log = histcounts(teobsblend,edges_log);
 
 if ishandle(2)
     close(2)
 end
 figure(2)
 hold on
-% plot(x, [0 hist_obs_log(sort([1:M-1 1:M-1])) 0]./length(te))
-% plot(x, [0 hist_obs_b_log(sort([1:M-1 1:M-1])) 0]./length(teblend))
-plot((edges_log + [edges_log(2:end) te_max+100])./2, hist_obs_log./length(te))
-plot((edges_log + [edges_log(2:end) te_max+100])./2, hist_obs_b_log./length(teblend))
-plot(x, [0; hist_exp_log(sort([1:M-1 1:M-1])); 0]./length(teff), 'b')
-errorbar((edges_log + [edges_log(2:end) te_max+100])./2, hist_exp_log./length(teff), 1./sqrt(hist_exp_log)./length(teff), 'b.')
+plot(centre, hist_obs_log./length(teobs))
+plot(centre, hist_obs_b_log./length(teobsblend))
+plot(x, [0 hist_exp_log(sort([1:M 1:M])) 0]./length(teff), 'b')
+errorbar(centre, hist_exp_log./length(teff), 1./sqrt(hist_exp_log)./length(teff), 'b.')
 
 % errorbar((edges_log + [edges_log(2:end) te_max+100])./2, hist_exp_log./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), '.')
 set(gca, 'YScale', 'log')
