@@ -298,38 +298,38 @@ eff = eff_2017;
 %efficacité du dossier /eff
 %Efficacité 2019
 %------------------------
-VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
-VarType_eff_IV = {'double', 'double', 'double'};
-
-opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
-                            'Delimiter',delimiter, 'DataLines', 5, ...
-                   'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-               
-eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
-
-
-eff_2019 = eff_field_2019.efficiency;
-
-
-te_inter_min = 10.^(eff_field_2019.log_tE_min);
-te_inter_max = 10.^(eff_field_2019.log_tE_max);
-
-teffmaxm=max(te_inter_max);
-teffminm=min(te_inter_min);
-
-eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
-eff_blend = zeros(1,length(teblend));
-
-for i = 1:length(te_inter_min)
-    i1_unblend = find(te>=te_inter_min(i) & te<=te_inter_max(i));
-    i1_blend = find(teblend>=te_inter_min(i) & teblend<=te_inter_max(i));
-    
-    eff_unblend(i1_unblend) = ones(size(i1_unblend)) .* eff_field_2019.efficiency(i);
-    eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field_2019.efficiency(i);
-    
-end
-%choix de l'éfficacité
-eff = eff_2019;
+% VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
+% VarType_eff_IV = {'double', 'double', 'double'};
+% 
+% opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
+%                             'Delimiter',delimiter, 'DataLines', 5, ...
+%                    'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+%                
+% eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
+% 
+% 
+% eff_2019 = eff_field_2019.efficiency;
+% 
+% 
+% te_inter_min = 10.^(eff_field_2019.log_tE_min);
+% te_inter_max = 10.^(eff_field_2019.log_tE_max);
+% 
+% teffmaxm=max(te_inter_max);
+% teffminm=min(te_inter_min);
+% 
+% eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
+% eff_blend = zeros(1,length(teblend));
+% 
+% for i = 1:length(te_inter_min)
+%     i1_unblend = find(te>=te_inter_min(i) & te<=te_inter_max(i));
+%     i1_blend = find(teblend>=te_inter_min(i) & teblend<=te_inter_max(i));
+%     
+%     eff_unblend(i1_unblend) = ones(size(i1_unblend)) .* eff_field_2019.efficiency(i);
+%     eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field_2019.efficiency(i);
+%     
+% end
+% %choix de l'éfficacité
+% eff = eff_2019;
 
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
@@ -450,9 +450,9 @@ plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_normalise(sort([1:M 2:M-1]))])
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-
+%%
 %Graph log
-te_min = 0.1; te_max = 500; M = 26;
+te_min = min(teff); te_max = max(teff); M = 26;
 edges_log=te_min*(te_max/te_min).^([0:M]/M);
 x=edges_log(sort([1:M+1 1:M+1])); 
 

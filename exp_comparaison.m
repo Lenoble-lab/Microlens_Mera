@@ -62,6 +62,18 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table4_MOA,'VariableT
                    
 table4_MOA = readtable('../MOA_II/Table4.dat',opts);
 
+%-----------------------------------------------
+%Raw te
+%Champs centraux OGLE IV
+%-----------------------------------------------
+
+VarNames_table_event = {'Name', 't_0', 't_E', 'u_0'};
+VarTypes_table_event = {'string', 'double', 'double', 'double'}; 
+
+opts = delimitedTextImportOptions('VariableNames',VarNames_table_event,'VariableTypes',VarTypes_table_event,...
+                                'Delimiter',delimiter, 'DataLines', 8, ...
+                       'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+table_event = readtable('../OGLEIV/OGLE-IV-events-FFP.txt',opts);
 
 %--------------------------
 %Efficacité
@@ -138,8 +150,8 @@ legend([field_2017, field_2019])
 %%
 %Histogramme complet des évènements
 nbre_bin = 30;
-figure(1)
-semilogxhist(table3_IV.tE_best, nbre_bin)
+figure(10)
+semilogxhist([table3_IV.tE_best; table_event.t_E], nbre_bin)
 
 hold on
 semilogxhist(table2_III.te, nbre_bin)
@@ -150,6 +162,35 @@ xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 
+%Graph log
+te_min = 0.1; te_max = 600; M = 30;
+edges_log=te_min*(te_max/te_min).^([0:M]/M);
+x=edges_log(sort([1:M+1 1:M+1])); 
+
+%calcul centre pour errorbar
+centre = zeros(size(edges_log)-[0,1]);
+for j =1:length(centre);
+centre(j)=(edges_log(j)+edges_log(j+1))/2;
+end
+
+hist_IV = histcounts([table3_IV.tE_best; table_event.t_E] ,edges_log);
+hist_III = histcounts(table2_III.te,edges_log);
+hist_MOA = histcounts(table4_MOA.tE,edges_log);
+
+if ishandle(12)
+    close(12)
+end
+figure(12)
+hold on
+plot(x, [0 hist_IV(sort([1:M 1:M])) 0])
+plot(x, [0 hist_III(sort([1:M 1:M])) 0])
+plot(x, [0 hist_MOA(sort([1:M 1:M])) 0])
+
+legend('OGLE IV', 'OGLE III', 'MOA')
+xlabel('t_{e}')
+ylabel('Nombre d''évènements par unité de t_{e}')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
 %Comparaison efficacité
 figure(2)
 %OGLE III

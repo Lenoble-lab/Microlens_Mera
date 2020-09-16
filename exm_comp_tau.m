@@ -55,11 +55,12 @@ comp_modele = readtable('../graph/modif_FM/comp_modele_OGLEIV.txt',opts);
 %---------------------
 
 glong = 0;
-bin_long = 3;
+bin_long = 2;
 bin_lat = 0.1;
 
 %MOA II
-glat = (0:bin_lat:1) .*-6 -1;
+glat = (0:bin_lat:1) .*-12 +6;
+% glat = (0:bin_lat:1) .*-6 -1;
 
 tau_mean_MOA = zeros(size(glat)-1);
 lat_mean_MOA = zeros(size(glat)-1);
@@ -109,8 +110,8 @@ lat_mean_IV(i) = mean(table7.glat(i0));
 e_tau_mean_IV(i) = mean(table7.tau_err(i0));
 gam_mean_IV(i) = mean(table7.gam(i0));
 e_gam_mean_IV(i) = mean(table7.gam_err(i0));
-te_mean_IV(i) = mean(table7.t_E_mean(i0));
-e_te_mean_IV(i) = mean(table7.t_E_mean_err(i0));
+te_mean_IV(i) = sum(table7.t_E_mean(i0).*table7.N_events(i0))/sum(table7.N_events(i0));
+e_te_mean_IV(i) = sum(table7.t_E_mean_err(i0).*table7.N_events(i0))/sum(table7.N_events(i0));
 
 tau_brut(i) = mean(comp_modele.tau_brut(i0));
 tau_eff(i) = mean(comp_modele.tau_eff(i0));
@@ -128,14 +129,15 @@ end
 
 figure(1)
 hold on
-errorbar(lat_mean_MOA, tau_mean_MOA, e_tau_mean_MOA, E_tau_mean_MOA, 'o')
 errorbar(lat_mean_IV, tau_mean_IV, e_tau_mean_IV, 'o')
+errorbar(lat_mean_MOA, tau_mean_MOA, e_tau_mean_MOA, E_tau_mean_MOA, 'o', 'Color', 'black')
 plot(lat_mean_IV, tau_brut)
 plot(lat_mean_IV, tau_eff)
 plot(lat_mean_IV, tau_eff_blend)
 
-legend('MOA II', 'OGLE IV', 'Modèle brut', 'Modèle avec efficacité expérimentale (OGLE IV)', 'Modèle avec efficacité expérimentale et blending (OGLE IV)')
-xlabel('b (deg)')
+legend('OGLE IV','MOA II')
+% legend('MOA II', 'OGLE IV', 'Modèle brut', 'Modèle avec efficacité expérimentale (OGLE IV)', 'Modèle avec efficacité expérimentale et blending (OGLE IV)')
+xlabel('lattitude (deg)')
 ylabel('\tau \times 10^{-6}')
 
 figure(2)
@@ -145,8 +147,8 @@ plot(lat_mean_IV, gam_brut)
 plot(lat_mean_IV, gam_eff)
 plot(lat_mean_IV, gam_eff_blend)
 
-legend('OGLE IV', 'Modèle brut', 'Modèle avec efficacité expérimentale (OGLE IV)', 'Modèle avec efficacité expérimentale et blending (OGLE IV)')
-xlabel('b (deg)')
+% legend('OGLE IV', 'Modèle brut', 'Modèle avec efficacité expérimentale (OGLE IV)', 'Modèle avec efficacité expérimentale et blending (OGLE IV)')
+xlabel('lattitude (deg)')
 ylabel('\Gamma')
 
 figure(3)
@@ -155,7 +157,8 @@ errorbar(lat_mean_IV, te_mean_IV, e_te_mean_IV, 'o')
 plot(lat_mean_IV, te_brut)
 plot(lat_mean_IV, te_eff)
 plot(lat_mean_IV, te_eff_blend)
-
+% axis([-6 6 22 36])
 legend('OGLE IV', 'Modèle brut', 'Modèle avec efficacité expérimentale (OGLE IV)', 'Modèle avec efficacité expérimentale et blending (OGLE IV)')
-xlabel('b (deg)')
+legend('Location', 'best')
+xlabel('lattitude (deg)')
 ylabel('<t_{e}>')

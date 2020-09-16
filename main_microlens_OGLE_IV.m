@@ -71,8 +71,11 @@ table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 
 % field = 'BLG535';
 field_list = table7.field(find(table7.N_events>5));
+% field_list = "BLG515";
+for i_field = 50:length(field_list)
 
-for field = field_list
+field = field_list(i_field);
+disp(field)
 global vlimit
 
 vlimit = 1000e3;
@@ -81,7 +84,7 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 30e5;
+n = 40e5;
 nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
@@ -153,7 +156,7 @@ main
 % recuperation des evenements selectionnes
 %----------------------------------------
 path_field = strcat('../graph/OGLEIV/', field);
-
+mkdir(path_field)
 movefile("evenements.txt", strcat(path_field, "/evenements.txt"))
 movefile ("simul_para.txt", strcat(path_field, "/simul_para.txt"))
 end
@@ -167,12 +170,14 @@ te_obs_b_tot = [];
 gam_obs_tot = [];
 tau_obs_tot = [];
 % field_list = ["BLG505"];
-for field = field_list
-   
+
+for i_field = 1:length(field_list)
+field = field_list(i_field);
+
 path_field = strcat('../graph/OGLEIV/', field);
 load(strcat(path_field, '/evenements.txt'))
 
-te = evenements_1(:,5);
+te = evenements(:,5);
 te=te';
 
 fid = fopen(strcat(path_field,'/simul_para.txt'));
@@ -215,10 +220,6 @@ nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles d
 
 f = 0.5;
 nbar = 1.257;
-% f = 0.2;
-% nbar = 2.6;
-% f = 1;
-% nbra = 0;
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
 
@@ -289,12 +290,6 @@ teff = table3.tE_best(id_field);
 % affichage des resultats
 %------------------------
 
-
-%telechargement de la courbe du modèle
-
-load ../graph/evenements_1.txt
-te_model = evenements_1(:,5);
-
 %Paramètre graph
 bin_max = 100;
 nbre_bin = bin_max/2;
@@ -302,7 +297,6 @@ nbre_bin = bin_max/2;
 
 %Trace la distribde te  pour le modèle et la courbe stockée localement
 [hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-[hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %tracé distribution avec blending uniquement la courbe stockée localement
 [histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
@@ -322,24 +316,15 @@ for j =1:length(centre);
 centre(j)=(edges(j)+edges(j+1))/2;
 end
 
-%Graph normalisé
-figure(16)
-hold on;
-plot(centre, hist, 'black');
-plot(centre, hist_model, 'red');
-title('comparaison local et modèle')
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
-
-%graph en fonction de l'exposition
-figure(17)
-hold on;
-plot(centre, hist_obs.*gamobs*exposure*mean_eff, 'red');
-plot(centre, hist_obs_b*gamobsb*exposure*mean_eff, 'black');
-histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
+% %graph en fonction de l'exposition
+% figure(17)
+% hold on;
+% plot(centre, hist_obs.*gamobs*exposure*mean_eff, 'red');
+% plot(centre, hist_obs_b*gamobsb*exposure*mean_eff, 'black');
+% histogram(teff, nbre_bin, 'BinLimits',[0,bin_max])
+% legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+% xlabel('t_{e}')
+% ylabel('Nombre d''évènements par unité de t_{e}')
 
 %Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE IV
 figure(18)
@@ -348,29 +333,39 @@ plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
 M = length(hist_exp_err);
 plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-
-
 %%
-%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
-% figure(18)
-% hold on;
-% plot(centre, hist_obs, 'red');
-% plot(centre, hist_obs_b, 'black');
-% M = length(hist_exp_err);
-% plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-% M = length(hist_exp_BW);
-% plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
-% legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)')
-% xlabel('t_{e}')
-% ylabel('Nombre d''évènements par unité de t_{e}')
+%Graph log
+te_min = min(teff); te_max = max(teff); M = 26;
+edges_log=te_min*(te_max/te_min).^([0:M]/M);
+x=edges_log(sort([1:M+1 1:M+1])); 
 
-%graph noramlisé avec blending
-% figure(1);
-% hold on;
-% plot(centre, hist, 'red')
-% plot(centre, histb, 'black')
-% title('Blending black et sans blending rouge)');
-% hold off;
+%calcul centre pour errorbar
+centre = zeros(size(edges_log)-[0,1]);
+for j =1:length(centre);
+centre(j)=(edges_log(j)+edges_log(j+1))/2;
+end
+
+hist_exp_log = histcounts(teff,edges_log);
+hist_obs_log = histcounts(teobs,edges_log);
+hist_obs_b_log = histcounts(teobsblend,edges_log);
+
+if ishandle(2)
+    close(2)
+end
+figure(2)
+hold on
+% plot(centre, hist_obs_log./length(teobs))
+% plot(centre, hist_obs_b_log./length(teobsblend))
+% plot(x, [0 hist_exp_log(sort([1:M 1:M])) 0]./length(teff), 'b')
+errorbar(centre, hist_exp_log, 1./sqrt(hist_exp_log), 'b.')
+
+% errorbar((edges_log + [edges_log(2:end) te_max+100])./2, hist_exp_log./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), '.')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
+legend('Location', 'best')
+xlabel('log(t_{e})')
+ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')

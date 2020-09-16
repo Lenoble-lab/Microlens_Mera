@@ -319,7 +319,7 @@ m(idel) = interp1(ifmmde,mmde(index),ra(idel));
 m(ibul) = interp1(ifmmbu,mmbu(index),ra(ibul));
 
 [ifmmh, index] = unique(ifmmh); 
-% m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
+m(ihl) = interp1(ifmmh,mmh(index),ra(ihl));
 
 
 %-----------------

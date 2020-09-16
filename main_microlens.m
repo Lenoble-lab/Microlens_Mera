@@ -11,7 +11,7 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 40*1e5;
+n = 60*1e5;
 % n = 5000;
 nbsimul=10; %a augmenter pour meilleure stat
 
