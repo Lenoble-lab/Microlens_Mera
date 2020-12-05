@@ -66,7 +66,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 %-----------------------------------
 global minf msup
 
-minf=0.0001;
+minf=0.01;
 msup=100;   
 
 %----------------------------------------

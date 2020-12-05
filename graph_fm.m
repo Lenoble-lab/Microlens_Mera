@@ -1,5 +1,3 @@
-
-
 global minf msup
 
 minf=0.01;
@@ -11,13 +9,20 @@ integral(@rapport_masse, 5, 50)/integral(@rapport_masse, 0.01, 100)
 integral(@rapport_masse, 50, 100)
 
 m = (0:1e-5:1).*(msup-minf)+minf;
-fm05 = fmchab05(m)/integral(@fmchab05, 0.01, 100);
-fm_maraston = PDMF_Maraston_1(m);
+fm05 = fmchab05(m)./integral(@fmchab05, minf, msup);
+fm03 = fmchab03(m)./integral(@fmchab03, minf, msup);
+%fm_maraston = PDMF_Maraston_1(m);
 % fm_eff = rapport_masse(m)./integral(@rapport_masse, 0.01, 100);
-fm_gould = PDMF_gould_1(m);
+%fm_gould = PDMF_gould_1(m);
 % fm_gould = fm_basu_rana(m);
 % fm_recente = fmrecente(m)/integral(@fmrecente, 0.01, 100);
-fm_kroupa = fm_kroupa_modif(m)/integral(@fm_kroupa_modif, 0.01, 100);
+fm_krou = fm_kroupa(m)./integral(@fm_kroupa, minf, msup);
+fm_awi_disk = fm_awiphan_disk(m)./integral(@fm_awiphan_disk, minf, msup);
+fm_awi_bulge = fm_awiphan_bulge(m)./integral(@fm_awiphan_bulge, minf, msup);
+fm = fmchab(m)./integral(@fmchab, minf, msup);
+
+% fm_awi = fm_awiphan(m)./sum(fm_awiphan(m))/((msup-minf)/length(m));
+
 [~,idx] = min(abs(m-1.4));
 
 if ishandle(1)
@@ -26,15 +31,17 @@ end
 figure(1);
 set(gca, 'YScale', 'log')
 hold on;
-plot(log10(m),fm05);
-% plot(log10(m),fm_maraston);
+plot(log10(m),fm);
+% plot(log10(m),fm03);
+% plot(log10(m),fm_krou);
+% plot(log10(m),fm_awi_bulge);
+% plot(log10(m),fm_awi_disk);
 % plot(log10(m),fm_gould);
-plot(log10(m),fm_kroupa);
-plot(log10(m(idx)),fm_maraston(idx), 'x', 'Color', [0.8500 0.3250 0.0980]);
-ylabel('\xi(log(m))');
+% plot(log10(m(idx)),fm_maraston(idx), 'x', 'Color', [0.8500 0.3250 0.0980]);
+ylabel('\xi(log(m))')
 xlabel('log_{10} (M_{sol})');
-legend('fm 05', 'fm Maraston', 'fm eff')
-axis([-2 2 1e-6 10]);
+legend('Chabrier 2005', 'chabrier 2003', 'Kroupa 2001', 'Awiphan, bulge', 'Awiphan, disk')
+% axis([-2 2 1e-6 10]);
 
 
 

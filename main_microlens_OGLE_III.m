@@ -13,7 +13,7 @@ vlimit = 1000e3;
 
 n = 60e5;
 % n = 5000;
-nbsimul=0; %a augmenter pour meilleure stat
+nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -58,7 +58,7 @@ b = -4 *pi/180;
 % b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
-AT = 3/sqrt(5);    % Seuil de d�tection en amplification
+AT = 3/sqrt(5);    % Seuil de d�tectiocreen en amplification
 
 
 %-----------------------------------
@@ -91,23 +91,26 @@ toc
 % recuperation des evenements selectionnes
 %----------------------------------------
 
-% load evenements.txt
-% x=evenements(:,1);
-% ds=evenements(:,2);
-% v=evenements(:,3);
-% m=evenements(:,4);
-% te=evenements(:,5);
+load evenements.txt
+x=evenements(:,1);
+ds=evenements(:,2);
+v=evenements(:,3);
+m=evenements(:,4);
+te=evenements(:,5);
+
+te=te';
+x = x';
+ds = ds';
 
 load ../graph/modif_FM/evenements_1.txt
 % x=evenements_1(:,1);
 % ds=evenements_1(:,2);
 % v=evenements_1(:,3);
 % m=evenements_1(:,4);
-te=evenements_1(:,5);
+te_model=evenements_1(:,5);
 
-te=te';
 
-te_model = te;
+te_model = te_model';
 fid = fopen('../graph/modif_FM/simul_para_1.txt');
 tau = str2double(fgets(fid));
 n = str2double(fgets(fid));
@@ -255,7 +258,7 @@ ylabel('Nombre d''évènements par unité de t_{e}')
 
 %%
 %Graph log
-te_min = min(teobs); te_max = max(teobs); M = 50;
+te_min = min(teobs); te_max = max(teobs); M = 30;
 edges_log=te_min*(te_max/te_min).^([0:M]/M);
 x=edges_log(sort([1:M+1 1:M+1])); 
 
