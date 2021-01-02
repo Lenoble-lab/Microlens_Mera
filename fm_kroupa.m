@@ -7,7 +7,7 @@ global minf msup
 
 m1 = 0.01;
 m2 = 0.08;
-m3 = 1;
+m3 = 0.5;
 
 
 
@@ -24,9 +24,9 @@ alpha = -2.3;
 %-----------------------
 %Valeurs de Calchi-Novatti
 %-------------------------
-alpha_bd = -1.6;
-alpha_MS = -1.7;
-alpha = -2;
+% alpha_bd = -1.6;
+% alpha_MS = -1.7;
+% alpha = -2;
 
 % alpha_bd = 1;
 % alpha_MS = -0.15;

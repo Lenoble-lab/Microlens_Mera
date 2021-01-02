@@ -11,9 +11,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
+n = 60*1e5;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -21,7 +21,7 @@ nbsimul=500; %a augmenter pour meilleure stat
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 20000.;
 dinf = 800.;
 %distance en parsec
 
@@ -54,8 +54,8 @@ b = -4 *pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
-% l = 4 *pi/180;    % direction d'observation en radian
-% b = -1 *pi/180;
+% l = -2.2 *pi/180;    % direction d'observation en radian
+% b = -2.8 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
 AT = 3/sqrt(5);    % Seuil de d�tection en amplification
@@ -67,7 +67,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 global minf msup
 
 minf=0.01;
-msup=100;
+msup=100;   
 
 %----------------------------------------
 % Param�tres de la fonction de luminosité pour le blending (Alibert et al.)
@@ -83,8 +83,9 @@ Vsup = 16;
 %-------------------
 % Monte-Carlo
 %-------------------
+tic
 main
-
+toc
 
 %%
 %----------------------------------------
@@ -109,6 +110,8 @@ star_pop = star_pop';
 disp(' ')
 close all
 
+mmean = mean(m_tot_pdmf);
+
 %------------------
 %Test pour la PDMF
 %--------------
@@ -119,13 +122,15 @@ hold on
 [Y_bon, edges] = histcounts(m, 1000, 'BinLimits',[0,5]);
 
 M = length(Y);
-plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf)/2.7./sqrt(edges(sort([1:M 1:M]))))
 plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf))
+plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/length(m_tot_pdmf).*sqrt(edges(sort([1:M 1:M])))*2.2)
 plot(edges(sort([1:M 2:M+1])), Y_bon(sort([1:M 1:M]))/length(m))
-legend('PDMF avec facteu', 'PDMF brut','eve retenu brut')
-title("PDMF")
+legend('PDMF', 'Distribution théorique','Distribution obtenue par MC')
+xlabel('mass (M_sol)')
+ylabel('distribution de masse')
+% title("PDMF")
 set(gca, 'YScale', 'log')
-set(gca, 'XScale', 'log')
+% set(gca, 'XScale', 'log')
 
 
 % axis([0 10 1e-2 1e3])
@@ -181,7 +186,7 @@ gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
-gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
+gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6/mmean;
 gam=gam1*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
@@ -198,15 +203,18 @@ disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 %------------------------
 
 % Param�tre pour le blending 
-f = 0.05;   %fraction des évenements unblendé f = P(1)
-nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
+% f = 0.05;   %fraction des évenements unblendé f = P(1)
+% nbar = 4.51; % P(n) = fonction(nbar) = f avec P(n) la proba d'avoir n étoiles dans DeltaS
 
 f = 0.5;
 nbar = 1.257;
+
 % f = 0.2;
 % nbar = 2.6;
+
 % f = 1;
 % nbra = 0;
+%%
 %retourn teblend (histogramme corrigé) et taurblend (profondeur optique corrigée)
 script_blending 
 
@@ -279,16 +287,16 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 
 %telechargement de la courbe du modèle
 
-load ../graph/07_07_evenements/evenements_1.txt
+load ../graph/modif_FM/evenements_1.txt
 te_model = evenements_1(:,5);
 
 %Paramètre graph
 bin_max = 100;
-nbre_bin = bin_max;
+nbre_bin = bin_max/2;
 
 
 %Trace la distribde te  pour le modèle et la courbe stockée localement
-[hist_local, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max]);
+[hist_local, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %Selon la pop d'étoiles
@@ -321,8 +329,10 @@ end
 %Graph normalisé
 figure(16)
 hold on;
-plot(centre, hist_local/length(te), 'black');
+plot(centre, hist_local, 'black');
 plot(centre, hist_model, 'red');
+% plot(centre, hist_exp_err)
+% plot(centre, hist_obs);
 % plot(centre, hist_BD/length(find(star_pop == 1)));
 % plot(centre, hist_MS/length(find(star_pop == 2)));
 % plot(centre, hist_WD/length(find(star_pop == 3)));
@@ -330,10 +340,11 @@ plot(centre, hist_model, 'red');
 % plot(centre, hist_BH/length(find(star_pop == 5)));
 
 title('comparaison local et modèle')
-legend('local', 'model', 'BD', 'MS', 'WD', 'NS', 'BH')
+legend('local', 'model', 'expérience', 'te obs')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-set(gca, 'XScale', 'log')
+% set(gca, 'XScale', 'log')
+
 
 %graph en fonction de l'exposition
 exposure = 10;
@@ -369,6 +380,13 @@ log_NS = histc(te(star_pop == 4),edges_log);
 log_BH = histc(te(star_pop == 5),edges_log);
 log_tot = histc(te,edges_log);
 
+% log_BD = histc(intersect(te(star_pop == 1), i_eff),edges_log);
+% log_MS = histc(intersect(te(star_pop == 2), i_eff),edges_log);
+% log_WD = histc(intersect(te(star_pop == 3), i_eff),edges_log);
+% log_NS = histc(intersect(te(star_pop == 4), i_eff),edges_log);
+% log_BH = histc(intersect(te(star_pop == 5), i_eff),edges_log);
+% log_tot = histc(te(i_eff),edges_log);
+
 plot(x, [0 log_BD(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_MS(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_WD(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
@@ -376,9 +394,11 @@ plot(x, [0 log_NS(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_BH(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 plot(x, [0 log_tot(sort([1:M-1 1:M-1])) 0]/length(te)*gamobs*exposure)
 
-legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot')
+
+legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot', 'expérience')
 xlabel('log(t_{e})')
 ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+% title('normalisé pour expo = 10 et gamobs')
 set(gca, 'YScale', 'log')
 set(gca, 'XScale', 'log')
 
@@ -386,13 +406,34 @@ set(gca, 'XScale', 'log')
 %expérience
 figure(18)
 hold on;
-plot(centre, hist_obs, 'red');
-plot(centre, hist_obs_b, 'black');
-M = length(hist_exp_err);
-plot(edges(sort([1:M 1:M])), [0 , hist_exp_err(sort([1:M 1:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'expérience')
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
+% plot(centre, hist_obs, 'red');
+% plot(centre, hist_obs_b, 'black');
+log_BD_eff = histc(te(intersect(find(te(star_pop == 1)), i_eff)),edges_log);
+log_MS_eff = histc(te(intersect(find(te(star_pop == 2)), i_eff)),edges_log);
+log_WD_eff = histc(te(intersect(find(te(star_pop == 3)), i_eff)),edges_log);
+log_NS_eff = histc(te(intersect(find(te(star_pop == 4)), i_eff)),edges_log);
+log_BH_eff = histc(te(intersect(find(te(star_pop == 5)), i_eff)),edges_log);
+log_tot_eff = histc(te(i_eff),edges_log);
+log_exp_eff = histc(teff, edges_log);
+
+plot(x, [0 log_BD_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_MS_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_WD_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_NS_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_BH_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0 log_tot_eff(sort([1:M-1 1:M-1])) 0]/length(te(i_eff)))
+plot(x, [0; log_exp_eff(sort([1:M-1 1:M-1])); 0]/length(teff))
+
+
+legend('BD', 'MS', 'WD', 'NS', 'BH', 'tot', 'expérience')
+xlabel('log(t_{e})')
+ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+
+% legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'expérience')
+% xlabel('t_{e}')
+% ylabel('Nombre d''évènements par unité de t_{e}')
 
 
 

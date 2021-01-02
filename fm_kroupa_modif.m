@@ -5,14 +5,20 @@ pm = zeros(size(m));
 
 global minf msup
 
-m1 = 0.01;
+m1 = 0.001;
 m2 = 0.08;
 m3 = 1;
 
 
 
-c = 1/0.1405;
+c = 1;
 
+%--------------------
+%Awiphan 2016, Thin disk
+%------------------
+alpha_bd = -0.5;
+alpha_MS = -1.6;
+alpha = -3;
 
 %--------------------
 %Kroupa 2001
@@ -24,17 +30,25 @@ alpha = -2.3;
 %-----------------------
 %Valeurs de Calchi-Novatti
 %-------------------------
-alpha_bd = -1.6;
-alpha_MS = -1.7;
-alpha = -2;
+% alpha_bd = -1.6;
+% alpha_MS = -1.7;
+% alpha = -2;
 
 %--------------
 %Valeurs de Wegg 2017
 %----------------
-alpha_bd = 0;
-alpha_MS = -1.1;
-alpha = -2.3;
-m3 = 0.5;
+% alpha_bd = 0;
+% alpha_MS = -1.1;
+% alpha = -2.3;
+% m3 = 0.5;
+
+%--------------
+%Valeurs de Mroz 2017
+%----------------
+% alpha_bd = -0.8;
+% alpha_MS = -1.3;
+% alpha = -2;
+% m3 = 0.5;
 
 
 

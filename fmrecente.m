@@ -4,10 +4,11 @@
 function pm = fmrecente(m)
 
 % pm = fmchab03(m);
-pm = fmchab05(m);
+% pm = fmchab05(m);
 % pm = fm_kroupa_modif(m);
 % pm = fmchab_modi(m);
-
+% pm = fm_basu_rana(m);
+pm = fm_kroupa(m);
 
 % pm = zeros(size(m));
 % % [~,idx] = find(abs(m-1)<0.3);

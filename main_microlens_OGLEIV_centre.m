@@ -9,7 +9,7 @@ clearvars -except field field_li
 % S. Kozlowski, J. Skowron, R. Poleski, K. Ulaczyk, M. Gromadzki,
 % K. Rybicki, P. Iwanek, and M. Wrona
 %---------------------------------------------------------------------------------------------------------------
-
+field_list = ["BLG500", "BLG501", "BLG504", "BLG505", "BLG506", "BLG511", "BLG512", "BLG534", "BLG611"];
 %-----------------------------------------------
 %Table 6. Basic information about analyzed fields
 %------------------------------------------------
@@ -90,19 +90,14 @@ opts = delimitedTextImportOptions('VariableNames',VarNames_table_event,'Variable
                        'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
 table_event = readtable('../OGLEIV/OGLE-IV-events-FFP.txt',opts);
 
-
 %-------------
 % Choix du champ à analyser
 %------------
 
-field = "BLG505";
+% field = "BLG505";
 
-%-------------
-%donnée expérimentales
-%----------------
+for field = field_list
 
-i_field = find(extractBetween(table_event.Name, 1,6) == field);
-teff = table_event.t_E(i_field);
 
 global vlimit
 
@@ -112,9 +107,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
+n = 40e5;
 % n = 5000;
-nbsimul=500; %a augmenter pour meilleure stat
+nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -122,7 +117,7 @@ nbsimul=500; %a augmenter pour meilleure stat
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 20000.;
 dinf = 800.;
 %distance en parsec
 
@@ -148,8 +143,8 @@ Rcoro = 3500;
 %---------------------------------------
 global l b
 
-% definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
-% A priori c'est cette definition qui est juste.
+% on suit la direction du champ considéré
+
 l = table6.glon(table6.field == field) *pi/180;    % direction d'observation en radian
 b = table6.glat(table6.field == field) *pi/180;
 
@@ -162,7 +157,7 @@ AT = 3/sqrt(5);    % Seuil de d�tection en amplification
 %-----------------------------------
 global minf msup
 
-minf=0.01;
+minf=0.1;
 msup=100;
 
 %----------------------------------------
@@ -185,46 +180,38 @@ main
 %----------------------------------------
 % recuperation des evenements selectionnes
 %----------------------------------------
+path_field = strcat('../graph/OGLEIV/', field);
 
-load evenements.txt
-x=evenements(:,1);
-ds=evenements(:,2);
-v=evenements(:,3);
-m=evenements(:,4);
-te=evenements(:,5);
+movefile("evenements.txt", strcat(path_field, "/evenements_1.txt"))
+movefile ("simul_para.txt", strcat(path_field, "/simul_para_1.txt"))
+end
 
-x=x';
-ds=ds';
-v=v';
-m=m';
+%%
+%analyse des résultat
+te_tot = [];
+te_obs_tot =[];
+te_obs_b_tot = [];
+gam_obs_tot = [];
+tau_obs_tot = [];
+% field_list = ["BLG505"];
+for field = field_list
+   
+path_field = strcat('../graph/OGLEIV/', field);
+load(strcat(path_field, '/evenements.txt'))
+
+te = evenements(:,5);
 te=te';
 
-disp(' ')
-close all
+fid = fopen(strcat(path_field,'/simul_para.txt'));
+tau = str2double(fgets(fid));
+n = str2double(fgets(fid));
+nbsimul = str2double(fgets(fid));
+tau_1 = str2double(fgets(fid));
+Gammax = str2double(fgets(fid));
+uT = str2double(fgets(fid));
+At = str2double(fgets(fid));
+mmean = str2double(fgets(fid));
 
-%------------------
-%Test pour la PDMF
-%--------------
-figure(40)
-hold on
-[Y, edges] = histcounts(m_tot_pdmf, 500, 'BinLimits',[0,5]);
-M = length(Y);
-plot(edges(sort([1:M 2:M+1])), Y(sort([1:M 1:M]))/M)
-title("PDMF")
-set(gca, 'YScale', 'log')
-% axis([0 10 1e-2 1e3])
-
-disp(['fraction de rémanents en nombre (WD, NS, BH) ', num2str(mean(frac_N_tot))])
-disp(['fraction de rémanents en masse (WD, NS, BH) ', num2str(mean(frac_M_tot))])
-
-figure(41)
-[Y_imf, edges] = histcounts(m_tot_imf);
-M = length(Y_imf);
-plot(edges(sort([1:M 2:M+1])), Y_imf(sort([1:M 1:M]))/M)
-title('IMF')
-set(gca, 'YScale', 'log')
-set(gca, 'XScale', 'log')
-axis([0 10 1 1e2])
 
 %---------------
 %calcul de gamma
@@ -234,7 +221,7 @@ gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
 disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
-gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6;
+gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6/mmean;
 gam=gam1*Gammax;
 disp(['gamma (integre par MC) = ' num2str(gam)]);
 
@@ -268,11 +255,7 @@ script_blending
 %donne teff : tet des observations et eff : efficacité
 %------------
 
-
-temax = 100;
-nbre_bin = temax;
-
-%----------------
+%---------------
 % Données de l'expérience OGLE
 %----------------------
 
@@ -291,15 +274,10 @@ disp(['tau observé ogle = ' num2str(table7.tau(find(extractBetween(table7.field
 %Calcul de l'efficacité à partir des données de OGLE IV pour l'article de
 %2017 (nature)
 %-----------------
-figure(1)
 eff_2017 = eval(['eff_field.',convertStringsToChars(field)]);
 
 te_inter = 10.^eff_field.log_tE;
 
-te_inter_plot = 10.^[-1; eff_field.log_tE + 0.07];
-M = length(eff_2017);
-loglog([te_inter_plot(sort([1:M 1:M]));10^(2.5)], [eff_2017(sort([1:M 1:M 1]))])
-hold on
 
 teffmaxm=max(te_inter);
 teffminm=min(te_inter);
@@ -313,37 +291,32 @@ eff_blend = zeros(1,length(teblend));
 eff_unblend(i1_unblend) = interp1(te_inter,eff_2017,te(i1_unblend));
 eff_blend(i1_blend) = interp1(te_inter,eff_2017,teblend(i1_blend));
 
+%choix de l'éfficacité
+eff = eff_2017;
 
 %---------------
 %efficacité du dossier /eff
+%Efficacité 2019
 %------------------------
-VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
-VarType_eff_IV = {'double', 'double', 'double'};
-
-opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
-                            'Delimiter',delimiter, 'DataLines', 5, ...
-                   'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
-               
-eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
-
-
+% VarNames_eff_IV = {'log_tE_min', 'log_tE_max', 'efficiency'};
+% VarType_eff_IV = {'double', 'double', 'double'};
+% 
+% opts_eff = delimitedTextImportOptions('VariableNames',VarNames_eff_IV,'VariableTypes',VarType_eff_IV,...
+%                             'Delimiter',delimiter, 'DataLines', 5, ...
+%                    'WhiteSpace', ' ', 'ConsecutiveDelimitersRule', 'join');
+%                
+% eff_field_2019 = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
+% 
+% 
 % eff_2019 = eff_field_2019.efficiency;
-
-%Graph
-M = length(eff_field_2019.log_tE_min);
-te_graph = [eff_field_2019.log_tE_min(1) ; eff_field_2019.log_tE_min ; eff_field_2019.log_tE_max; eff_field_2019.log_tE_max(M)];
-eff_graph = [0 ; eff_field_2019.efficiency(sort([1:M 1:M])) ; 0];
-loglog(10.^sort(te_graph), eff_graph*0.4)
-legend('2017', '2019 (x0.4)')
-title(strcat('efficiency according to the 2 data of the field : ', field));
-
-
-te_inter_min = 10.^(eff_field_2019.log_tE_min);
-te_inter_max = 10.^(eff_field_2019.log_tE_max);
-
-teffmaxm=max(te_inter_max);
-teffminm=min(te_inter_min);
-
+% 
+% 
+% te_inter_min = 10.^(eff_field_2019.log_tE_min);
+% te_inter_max = 10.^(eff_field_2019.log_tE_max);
+% 
+% teffmaxm=max(te_inter_max);
+% teffminm=min(te_inter_min);
+% 
 % eff_unblend = zeros(1,length(te));	% applique une efficacite nulle aux durees superieures et inferieures
 % eff_blend = zeros(1,length(teblend));
 % 
@@ -355,14 +328,12 @@ teffminm=min(te_inter_min);
 %     eff_blend(i1_blend) = ones(size(i1_blend)) .* eff_field_2019.efficiency(i);
 %     
 % end
-
+% %choix de l'éfficacité
+% eff = eff_2019;
 
 %--------------------------------------------------------------------------------------------------------------------------
 % compare le nombre aleatoire precedent a l'efficacite que l'on vient de calculer afin de decider si l'evt est garde ou non
 %--------------------------------------------------------------------------------------------------------------------------
-
-%choix de l'éfficacité
-eff = eff_2017;
 
 %tirage au sort pour l'efficacité
 
@@ -396,7 +367,7 @@ tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
 disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 % 
 % tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
-% tauobsblend=real(tauobsblend);
+% tauobsblend=real(tauobsblend)
 % % disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
 % 
 gamobsb = gam/length(te)*length(teobsblend);
@@ -407,15 +378,25 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 % 
 % disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 
+te_tot = [te_tot te];
+te_obs_tot =[te_obs_tot teobs];
+te_obs_b_tot = [te_obs_b_tot teobsblend];
+gam_obs_tot = [gam_obs_tot, gamobs];
+tau_obs_tot = [tau_obs_tot, tauobs];
+end
 %------------------------
 % affichage des resultats
 %------------------------
 
+te = te_tot;
+teobs = te_obs_tot;
+teobsblend = te_obs_b_tot;
 
-%telechargement de la courbe du modèle
+%Choix expérience
+teff = table_event.t_E;
+% i_field = find(extractBetween(table_event.Name, 1,6) == field);
+% teff = table_event.t_E(i_field);
 
-load ../graph/evenements_1.txt
-te_model = evenements_1(:,5);
 
 %Paramètre graph
 bin_max = 100;
@@ -423,7 +404,6 @@ nbre_bin = bin_max/2;
 
 %Trace la distrib de te  pour le modèle et la courbe stockée localement
 [hist, edges] = histcounts(te, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
-[hist_model, edges] = histcounts(te_model, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 
 %tracé distribution avec blending uniquement la courbe stockée localement
 [histb, edges] = histcounts(teblend, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
@@ -438,27 +418,22 @@ for j =1:length(centre);
 centre(j)=(edges(j)+edges(j+1))/2;
 end
 
+%prise en compte de l'efficacité pour l'histogramme corrigé
+N_events = table7.N_events(table7.field == field);
+gam_ogle = table7.gam(find(table7.field == field));
+mean_eff = N_events/(gam_ogle*exposure);
+
 %expérience
 [hist_exp_normalise, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max], 'Normalization', 'probability');
 [hist_exp, edges] = histcounts(teff, nbre_bin, 'BinLimits',[0,bin_max]);
-
-
-%Graph normalisé
-figure(16)
-hold on;
-plot(centre, hist, 'black');
-plot(centre, hist_model, 'red');
-legend('local', 'model')
-title('comparaison local et modèle')
-xlabel('t_{e}')
-ylabel('Nombre d''évènements par unité de t_{e}')
-
+close all
 %graph en fonction de l'exposition
 figure(17)
 hold on;
-plot(centre, hist_obs.*gamobs*exposure, 'red');
-plot(centre, hist_obs_b*gamobsb*exposure, 'black');
-plot(centre, hist_exp)
+plot(centre, hist_obs.*mean(gam_obs_tot)*exposure*mean_eff, 'red');
+plot(centre, hist_obs_b*gamobsb*exposure*mean_eff, 'black');
+M = length(hist_exp);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp(sort([1:M 2:M-1]))])
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
@@ -468,30 +443,43 @@ figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
 plot(centre, hist_obs_b, 'black');
-plot(centre, hist_exp_normalise)
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+M = length(hist_exp_normalise);
+plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_normalise(sort([1:M 2:M-1]))])
+% errorbar(centre, hist_exp_normalise, 1./sqrt(hist_exp_normalise)./length(teff), 'b.')
+
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-
-
 %%
-%Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
-% figure(18)
-% hold on;
-% plot(centre, hist_obs, 'red');
-% plot(centre, hist_obs_b, 'black');
-% M = length(hist_exp_err);
-% plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
-% M = length(hist_exp_BW);
-% plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_BW(sort([1:M 2:M-1]))], 'g')
-% legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III (fenêtre de Baade)')
-% xlabel('t_{e}')
-% ylabel('Nombre d''évènements par unité de t_{e}')
+%Graph log
+te_min = min(teff); te_max = max(teff); M = 26;
+edges_log=te_min*(te_max/te_min).^([0:M]/M);
+x=edges_log(sort([1:M+1 1:M+1])); 
 
-%graph noramlisé avec blending
-% figure(1);
-% hold on;
-% plot(centre, hist, 'red')
-% plot(centre, histb, 'black')
-% title('Blending black et sans blending rouge)');
-% hold off;
+%calcul centre pour errorbar
+centre = zeros(size(edges_log)-[0,1]);
+for j =1:length(centre);
+centre(j)=(edges_log(j)+edges_log(j+1))/2;
+end
+
+hist_exp_log = histcounts(teff,edges_log);
+hist_obs_log = histcounts(teobs,edges_log);
+hist_obs_b_log = histcounts(teobsblend,edges_log);
+
+if ishandle(2)
+    close(2)
+end
+figure(2)
+hold on
+plot(centre, hist_obs_log./length(teobs))
+plot(centre, hist_obs_b_log./length(teobsblend))
+plot(x, [0 hist_exp_log(sort([1:M 1:M])) 0]./length(teff), 'b')
+errorbar(centre, hist_exp_log./length(teff), 1./sqrt(hist_exp_log)./length(teff), 'b.')
+
+% errorbar((edges_log + [edges_log(2:end) te_max+100])./2, hist_exp_log./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), '.')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
+legend('Location', 'best')
+xlabel('log(t_{e})')
+ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')

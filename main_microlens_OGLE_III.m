@@ -11,9 +11,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 20000;
+n = 60e5;
 % n = 5000;
-nbsimul=100; %a augmenter pour meilleure stat
+nbsimul=10; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -21,7 +21,7 @@ nbsimul=100; %a augmenter pour meilleure stat
 
 global dsup dinf 
 
-dsup = 15000.;
+dsup = 20000.;
 dinf = 800.;
 %distance en parsec
 
@@ -58,7 +58,7 @@ b = -4 *pi/180;
 % b = -1 *pi/180;
 
 uT = 1;		   % Seuil de d�tection en param�tre d'impact
-AT = 3/sqrt(5);    % Seuil de d�tection en amplification
+AT = 3/sqrt(5);    % Seuil de d�tectiocreen en amplification
 
 
 %-----------------------------------
@@ -83,8 +83,9 @@ Vsup = 16;
 %-------------------
 % Monte-Carlo
 %-------------------
+tic
 main
-
+toc
 %%
 %----------------------------------------
 % recuperation des evenements selectionnes
@@ -97,11 +98,29 @@ v=evenements(:,3);
 m=evenements(:,4);
 te=evenements(:,5);
 
-x=x';
-ds=ds';
-v=v';
-m=m';
 te=te';
+x = x';
+ds = ds';
+
+load ../graph/modif_FM/evenements_1.txt
+% x=evenements_1(:,1);
+% ds=evenements_1(:,2);
+% v=evenements_1(:,3);
+% m=evenements_1(:,4);
+te_model=evenements_1(:,5);
+
+
+te_model = te_model';
+fid = fopen('../graph/modif_FM/simul_para_1.txt');
+tau = str2double(fgets(fid));
+n = str2double(fgets(fid));
+nbsimul = str2double(fgets(fid));
+tau_1 = str2double(fgets(fid));
+Gammax = str2double(fgets(fid));
+uT = str2double(fgets(fid));
+At = str2double(fgets(fid));
+mmean = str2double(fgets(fid));
+
 
 disp(' ')
 close all
@@ -183,11 +202,6 @@ disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 %------------------------
 
 
-%telechargement de la courbe du modèle
-
-load ../graph/07_07_evenements/evenements_1.txt
-te_model = evenements_1(:,5);
-
 %Paramètre graph
 bin_max = 100;
 nbre_bin = bin_max/2;
@@ -226,6 +240,7 @@ xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
 
+
 %Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE III
 figure(18)
 hold on;
@@ -241,3 +256,39 @@ legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all star
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
+%%
+%Graph log
+te_min = min(teobs); te_max = max(teobs); M = 30;
+edges_log=te_min*(te_max/te_min).^([0:M]/M);
+x=edges_log(sort([1:M+1 1:M+1])); 
+
+hist_exp_log = histcounts(teff,edges_log);
+hist_exp_log_fs = histcounts(teff(i_fs),edges_log);
+hist_exp_log_BW = histcounts(teff(i_BW),edges_log);
+hist_obs_log = histcounts(teobs,edges_log);
+hist_obs_b_log = histcounts(teobsblend,edges_log);
+
+centre = zeros(size(edges_log)-[0,1]);
+for j =1:length(centre);
+centre(j)=(edges_log(j)+edges_log(j+1))/2;
+end
+
+if ishandle(2)
+    close(2)
+end
+figure(2)
+hold on
+plot(centre, hist_obs_log./length(teobs))
+plot(centre, hist_obs_b_log./length(teobsblend))
+plot(x, [0 hist_exp_log(sort([1:M 1:M])) 0]./length(teff))
+% plot(x, [0; hist_exp_log_BW(sort([1:M-1 1:M-1])); 0]/length(teff(i_BW)))
+plot(x, [0 hist_exp_log_fs(sort([1:M 1:M])) 0]/length(teff(i_fs)), 'b')
+errorbar(centre, hist_exp_log_fs./length(teff(i_fs)), 1./sqrt(hist_exp_log_fs)./length(teff(i_fs)), 'b.')
+
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE III (all stars)', 'OGLE III(non blendé, f_{s}>0.2)')
+legend('Location', 'best')
+xlabel('log(t_{e})')
+ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+% title('normalisé pour expo = 10 et gamobs')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')

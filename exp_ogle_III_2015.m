@@ -145,8 +145,8 @@ ra_blend = rand(1,length(teblend))*max(eff_field.efficiency);
 
 % On choisit l'efficacité ici en prenant les bons indices i
 
-i = find(ra_unblend-eff_unblend<=0); 
-teobs = te(i);
+i_eff = find(ra_unblend-eff_unblend<=0); 
+teobs = te(i_eff);
 
 ib = find(ra_blend-eff_blend<=0); 
 teobsblend = teblend(ib); % On récupère les éléments qui sont soumis au blending avec le calcul d'avant

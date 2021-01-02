@@ -6,10 +6,10 @@
 function res = dgammmax(data)
 x = data(1); L = data(2);
 
-global dsup vlimit minf
+global dsup vlimit minf msup
 
 if L<dsup
-res = -rholens(x.*L).*sqrt(x.*(1-x)).*L.^1.5.*vlimit/sqrt(minf);	% Calcul du dgamma (cf eq 3.25 p. 57 de ma these)
+res = -rholens(x.*L).*sqrt(x.*(1-x)).*L.^1.5.*vlimit*sqrt(msup);	% Calcul du dgamma (cf eq 3.25 p. 57 de ma these)
 else
     res = 0;
 end

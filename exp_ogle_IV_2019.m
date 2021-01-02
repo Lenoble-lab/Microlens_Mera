@@ -157,18 +157,6 @@ eff_field = readtable(strcat("../OGLEIV/eff/", field, ".eff"),opts_eff);
 
 eff = eff_field.efficiency;
 
-figure(1)
-loglog(table3.tE_best(id_field), table3.weight(id_field).^-1, 'o')
-hold on
-
-M = length(eff_field.log_tE_min);
-te_graph = [eff_field.log_tE_min(1) ; eff_field.log_tE_min ; eff_field.log_tE_max; eff_field.log_tE_max(M)];
-eff_graph = [0 ; eff_field.efficiency(sort([1:M 1:M])) ; 0];
-loglog(10.^sort(te_graph), eff_graph)
-legend({'table 3', strcat('data from ', field, '.eff')}, 'Location','southeast')
-xlabel('t_{e}')
-ylabel('efficacité')
-
 %-----------------------------------------------------------------------------------------------
 % Interpolation lineaire de l'efficacite pour determiner la probabilite qu'un evt a d'etre garde
 %-----------------------------------------------------------------------------------------------
