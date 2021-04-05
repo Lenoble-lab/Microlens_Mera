@@ -19,7 +19,9 @@ fm03 = fmchab03(m)./integral(@fmchab03, minf, msup);
 fm_krou = fm_kroupa(m)./integral(@fm_kroupa, minf, msup);
 fm_awi_disk = fm_awiphan_disk(m)./integral(@fm_awiphan_disk, minf, msup);
 fm_awi_bulge = fm_awiphan_bulge(m)./integral(@fm_awiphan_bulge, minf, msup);
-fm = fmchab(m)./integral(@fmchab, minf, msup);
+fm_cas_1 = fmchab_2014_cas_1(m)./integral(@fmchab_2014_cas_1, minf, msup);
+fm_cas_2 = fmchab_2014_cas_2(m)./integral(@fmchab_2014_cas_2, minf, msup);
+fm_MW = fmchab_2014_MW(m)./integral(@fmchab_2014_MW, minf, msup);
 
 % fm_awi = fm_awiphan(m)./sum(fm_awiphan(m))/((msup-minf)/length(m));
 
@@ -31,8 +33,11 @@ end
 figure(1);
 set(gca, 'YScale', 'log')
 hold on;
-plot(log10(m),fm);
-% plot(log10(m),fm03);
+plot(log10(m),fm_cas_1);
+plot(log10(m),fm_cas_2);
+plot(log10(m),fm_MW);
+plot(log10(m),fm03);
+plot(log10(m),fm05);
 % plot(log10(m),fm_krou);
 % plot(log10(m),fm_awi_bulge);
 % plot(log10(m),fm_awi_disk);
@@ -40,7 +45,8 @@ plot(log10(m),fm);
 % plot(log10(m(idx)),fm_maraston(idx), 'x', 'Color', [0.8500 0.3250 0.0980]);
 ylabel('\xi(log(m))')
 xlabel('log_{10} (M_{sol})');
-legend('Chabrier 2005', 'chabrier 2003', 'Kroupa 2001', 'Awiphan, bulge', 'Awiphan, disk')
+% legend('Chabrier 2005', 'chabrier 2003', 'Kroupa 2001', 'Awiphan, bulge', 'Awiphan, disk')
+legend('cas 1', 'cas 2', 'cas MW', 'chabrier 2003', 'Chabrier 2005')
 % axis([-2 2 1e-6 10]);
 
 
@@ -83,6 +89,82 @@ legend('Chabrier 2005', 'chabrier 2003', 'Kroupa 2001', 'Awiphan, bulge', 'Awiph
 % xlabel('log_{10} (M_{sol})');
 %axis([0,100,0,0.05]);
 
+
+function pm = fmchab_2014_MW(m)
+pm = zeros(size(m));
+
+global minf msup
+
+% Cas MW
+x = 1.35;
+m0 = 2.0;
+n_c = 11;
+sigma = 0.589;
+m_c = 0.18;
+A_h = 0.649;
+
+i1 = find(m>=minf & m<=m0);
+i2 = find(m>m0 & m<=msup);
+A_l = A_h*n_c^(x/2);
+
+if(length(i1)>=1)
+  pm(i1) =A_l*m0^(-x) * exp(-((log10(m(i1))-log10(m_c)).^2)./(2*sigma^2)).*m(i1).^(-1);
+end  
+
+if(length(i2)>=1)
+  pm(i2) =A_h*((m(i2)).^(-x))./m(i2);
+end
+end
+function pm = fmchab_2014_cas_2(m)
+pm = zeros(size(m));
+
+global minf msup
+
+%cas 2
+x = 1.6;
+m0 = 0.35;
+n_c = 11;
+sigma = 0.531;
+m_c = 0.032;
+A_h = 0.390;
+
+i1 = find(m>=minf & m<=m0);
+i2 = find(m>m0 & m<=msup);
+A_l = A_h*n_c^(x/2);
+
+if(length(i1)>=1)
+  pm(i1) =A_l*m0^(-x) * exp(-((log10(m(i1))-log10(m_c)).^2)./(2*sigma^2)).*m(i1).^(-1);
+end  
+
+if(length(i2)>=1)
+  pm(i2) =A_h*((m(i2)).^(-x))./m(i2);
+end
+end
+function pm = fmchab_2014_cas_1(m)
+pm = zeros(size(m));
+
+global minf msup
+
+%Cas 1
+x = 1.35;
+m0 = 0.35;
+n_c = 14;
+sigma = 0.607;
+m_c = 0.025;
+A_h = 0.417;
+
+i1 = find(m>=minf & m<=m0);
+i2 = find(m>m0 & m<=msup);
+A_l = A_h*n_c^(x/2);
+
+if(length(i1)>=1)
+  pm(i1) =A_l*m0^(-x) * exp(-((log10(m(i1))-log10(m_c)).^2)./(2*sigma^2)).*m(i1).^(-1);
+end  
+
+if(length(i2)>=1)
+  pm(i2) =A_h*((m(i2)).^(-x))./m(i2);
+end
+end
 function pm = rapport_masse(m)
 
 pm = fmchab05(m);

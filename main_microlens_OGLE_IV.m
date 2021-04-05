@@ -72,9 +72,13 @@ table3 = readtable('../OGLEIV/table3_corrected.dat',opts);
 % field = 'BLG535';
 field_list = table7.field(find(table7.N_events>5));
 % field_list = "BLG515";
-for i_field = 50:length(field_list)
+for i_field = 55:56
+%     :length(field_list)
 
 field = field_list(i_field);
+field = "BLG525";
+disp(field)
+% field = field_list(i_field);
 disp(field)
 global vlimit
 
@@ -84,8 +88,8 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 40e5;
-nbsimul=10; %a augmenter pour meilleure stat
+n = 40e6;
+nbsimul=1; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -155,10 +159,9 @@ main
 %----------------------------------------
 % recuperation des evenements selectionnes
 %----------------------------------------
-path_field = strcat('../graph/OGLEIV/', field);
-mkdir(path_field)
-movefile("evenements.txt", strcat(path_field, "/evenements.txt"))
-movefile ("simul_para.txt", strcat(path_field, "/simul_para.txt"))
+path_field = strcat('../graph/modif_FM/OGLEIV/', field);
+movefile("evenements.txt", strcat(path_field, "/evenements_1.txt"))
+movefile ("simul_para.txt", strcat(path_field, "/simul_para_1.txt"))
 end
 
 
@@ -173,14 +176,14 @@ tau_obs_tot = [];
 
 for i_field = 1:length(field_list)
 field = field_list(i_field);
+disp(field)
 
-path_field = strcat('../graph/OGLEIV/', field);
-load(strcat(path_field, '/evenements.txt'))
-
+path_field = strcat('../graph/modif_FM/OGLEIV/', field);
+evenements = load(strcat(path_field, '/evenements_2.txt'));
 te = evenements(:,5);
 te=te';
 
-fid = fopen(strcat(path_field,'/simul_para.txt'));
+fid = fopen(strcat(path_field,'/simul_para_2.txt'));
 tau = str2double(fgets(fid));
 n = str2double(fgets(fid));
 nbsimul = str2double(fgets(fid));
@@ -195,20 +198,20 @@ mmean = str2double(fgets(fid));
 %---------------
 
 gamma=tau/uT*2/pi/mean(te)*1e6*365.25;
-disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
+% disp(['gamma (calcule par le te moyen) =    ' num2str(gamma)]);
 
 
 gam1=4*sqrt(GMsol)/c*uT/sqrt(pc*pc*pc)*length(te)/(n*nbsimul)*86400*365.25*1e6/mmean;
 gam=gam1*Gammax;
-disp(['gamma (integre par MC) = ' num2str(gam)]);
+% disp(['gamma (integre par MC) = ' num2str(gam)]);
 
 
 ttobs=tau/(gam/1e6/365.25);
-disp(['<tobs> (en jours) = ' num2str(ttobs)]);
+% disp(['<tobs> (en jours) = ' num2str(ttobs)]);
 
 taur=gam*pi/2*uT*mean(te)/365.25/1e6;
 taur=real(taur);
-disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
+% disp(['tau (avec gamma integré par MC) = ' num2str(taur)]);
 
 %------------------------
 % Application du blending
@@ -239,7 +242,7 @@ exp_ogle_IV_2019
 %calcul de gamma
 %---------------
 
-disp('Grandeurs avec intervention de l''efficacite experimentale :')
+% disp('Grandeurs avec intervention de l''efficacite experimentale :')
 
 %------------------------------------------------------------------------------------------------
 % on ne peut pas calculer le gamma par la formule avec le tobs, car le tau ne prend pas en compte
@@ -247,20 +250,20 @@ disp('Grandeurs avec intervention de l''efficacite experimentale :')
 %------------------------------------------------------------------------------------------------
 
 gamobs = gam/length(te)*length(teobs);
-disp(['gamma (integre par MC) = ' num2str(gamobs)]);
+% disp(['gamma (integre par MC) = ' num2str(gamobs)]);
 % 
 tauobs=gamobs*pi/2*uT*mean(teobs)/365.25/1e6;
-disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
+% disp(['tau obs (calcule par le te moyen) = ' num2str(tauobs)]);
 % 
 % tauobsblend=tauobs * gmean * (nbar/(1-exp(-nbar)));
 % tauobsblend=real(tauobsblend);
 % % disp(['tau observé avec blending (Alibert 2005)  = ' num2str(tauobsblend)]);
 % 
 gamobsb = gam/length(te)*length(teobsblend);
-disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
+% disp(['gamma avec blending (integre par MC) = ' num2str(gamobsb)]);
 % 
 tauobsb=gamobsb*pi/2*uT*mean(teobsblend)/365.25/1e6;
-disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
+% disp(['tau obs avec blending (calcule par le te moyen) = ' num2str(tauobsb)]);
 % 
 % disp(['rapport tau_blend/tau_obs_théorique = ' num2str(tauobsb/tauobs)]);
 te_tot = [te_tot te];
@@ -327,6 +330,9 @@ end
 % ylabel('Nombre d''évènements par unité de t_{e}')
 
 %Graph normalisé expérience et exp simulée avec l'efficacité pour OGLE IV
+if ishandle(18)
+    close(18)
+end
 figure(18)
 hold on;
 plot(centre, hist_obs, 'red');
@@ -336,9 +342,11 @@ plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_err(sort([1:M 2:M-1]))])
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-%%
+
 %Graph log
-te_min = min(teff); te_max = max(teff); M = 26;
+te_min = min(teff);
+% te_min = 10^0.2;
+te_max = max(teff); M = 26;
 edges_log=te_min*(te_max/te_min).^([0:M]/M);
 x=edges_log(sort([1:M+1 1:M+1])); 
 
@@ -357,10 +365,10 @@ if ishandle(2)
 end
 figure(2)
 hold on
-% plot(centre, hist_obs_log./length(teobs))
-% plot(centre, hist_obs_b_log./length(teobsblend))
-% plot(x, [0 hist_exp_log(sort([1:M 1:M])) 0]./length(teff), 'b')
-errorbar(centre, hist_exp_log, 1./sqrt(hist_exp_log), 'b.')
+plot(centre, hist_obs_log./length(teobs))
+plot(centre, hist_obs_b_log./length(teobsblend))
+plot(x, [0 hist_exp_log(sort([1:M 1:M])) 0]./length(teff), 'b')
+errorbar(centre, hist_exp_log./length(teff), 1./sqrt(hist_exp_log)./length(teff), 'b.')
 
 % errorbar((edges_log + [edges_log(2:end) te_max+100])./2, hist_exp_log./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), mean(teff)./sqrt(hist_exp_log)./length(teff), '.')
 set(gca, 'YScale', 'log')
