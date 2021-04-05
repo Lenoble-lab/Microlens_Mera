@@ -107,9 +107,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 40e5;
+n = 4e7;
 % n = 5000;
-nbsimul=10; %a augmenter pour meilleure stat
+nbsimul=1; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -180,29 +180,37 @@ main
 %----------------------------------------
 % recuperation des evenements selectionnes
 %----------------------------------------
-path_field = strcat('../graph/OGLEIV/', field);
+path_field = strcat('../graph/OGLEIV_centre/', field);
 
-movefile("evenements.txt", strcat(path_field, "/evenements_1.txt"))
-movefile ("simul_para.txt", strcat(path_field, "/simul_para_1.txt"))
+movefile("evenements.txt", strcat(path_field, "/evenements_3.txt"))
+movefile ("simul_para.txt", strcat(path_field, "/simul_para_3.txt"))
 end
 
 %%
+%Si on veut enelever BLG 611 qui est un peu en dehirs du centre galactique
+field_list = ["BLG500", "BLG501", "BLG504", "BLG505", "BLG506", "BLG511", "BLG512", "BLG534"];
+
+
 %analyse des résultat
 te_tot = [];
 te_obs_tot =[];
 te_obs_b_tot = [];
 gam_obs_tot = [];
 tau_obs_tot = [];
+tau_ogle = [];
+gam_ogle_list = [];
+gam_err = [];
+tau_err = [];
 % field_list = ["BLG505"];
 for field = field_list
    
-path_field = strcat('../graph/OGLEIV/', field);
-load(strcat(path_field, '/evenements.txt'))
+path_field = strcat('../graph/OGLEIV_centre/', field);
+evenements = load(strcat(path_field, '/evenements_1.txt'));
 
 te = evenements(:,5);
 te=te';
 
-fid = fopen(strcat(path_field,'/simul_para.txt'));
+fid = fopen(strcat(path_field,'/simul_para_1.txt'));
 tau = str2double(fgets(fid));
 n = str2double(fgets(fid));
 nbsimul = str2double(fgets(fid));
@@ -269,7 +277,10 @@ disp(['exposure ogle = ', num2str(exposure)])
 disp(['gamma observé ogle = ' num2str(table7.gam(find(extractBetween(table7.field, 1, 6) == field)))])
 disp(['tau observé ogle = ' num2str(table7.tau(find(extractBetween(table7.field, 1, 6) == field)))])
 
-
+tau_ogle = [tau_ogle, table7.tau(find(extractBetween(table7.field, 1, 6) == field))];
+gam_ogle_list = [gam_ogle_list, table7.gam(find(extractBetween(table7.field, 1, 6) == field))];
+tau_err = [tau_err, table7.tau_err(find(extractBetween(table7.field, 1, 6) == field))];
+gam_err = [gam_err, table7.gam_err(find(extractBetween(table7.field, 1, 6) == field))];
 %-------------
 %Calcul de l'efficacité à partir des données de OGLE IV pour l'article de
 %2017 (nature)
@@ -430,11 +441,11 @@ close all
 %graph en fonction de l'exposition
 figure(17)
 hold on;
-plot(centre, hist_obs.*mean(gam_obs_tot)*exposure*mean_eff, 'red');
-plot(centre, hist_obs_b*gamobsb*exposure*mean_eff, 'black');
+plot(centre, hist_obs.*mean(gam_obs_tot)*exposure/mean_eff, 'red');
+plot(centre, hist_obs_b*gamobsb*exposure/mean_eff, 'black');
 M = length(hist_exp);
 plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp(sort([1:M 2:M-1]))])
-legend('hist modèle', 'hist modèle avec blending (f=0.5)', strcat('OGLE IV,  ', field))
+legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
 
@@ -450,9 +461,11 @@ plot(edges(sort([1:M 1:M])), [0 , 0, hist_exp_normalise(sort([1:M 2:M-1]))])
 legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 xlabel('t_{e}')
 ylabel('Nombre d''évènements par unité de t_{e}')
-%%
+
 %Graph log
-te_min = min(teff); te_max = max(teff); M = 26;
+te_min = min(teff); 
+% te_min = 0.1;
+te_max = max(teff); M = 26;
 edges_log=te_min*(te_max/te_min).^([0:M]/M);
 x=edges_log(sort([1:M+1 1:M+1])); 
 
@@ -483,3 +496,33 @@ legend('hist modèle', 'hist modèle avec blending (f=0.5)', 'OGLE IV')
 legend('Location', 'best')
 xlabel('log(t_{e})')
 ylabel('Nombre d''évènements par unité de t_{e} (échelle log)')
+
+%Comparaison de gamma et tau entre expérience et observation d'ogle
+%%
+if ishandle(4)
+    close(4)
+end
+figure(4)
+hold on
+plot(tau_ogle, 'bo')
+plot(tau_obs_tot.*1e6, 'ro')
+errorbar(tau_ogle, tau_err, 'bo')
+xticklabels(field_list)
+xtickangle(45)
+legend('ogle', 'calcul')
+xlabel('field')
+ylabel('tau')
+
+if ishandle(5)
+    close(5)
+end
+figure(5)
+hold on
+plot(gam_ogle_list, 'bo')
+plot(gam_obs_tot,'ro')
+errorbar(gam_ogle_list, gam_err, 'bo')
+xticklabels(field_list)
+xtickangle(45)
+legend('ogle','calcul')
+xlabel('field')
+ylabel('gamma')

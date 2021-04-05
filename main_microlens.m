@@ -11,9 +11,9 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 60*1e5;
+n = 30*1e5;
 % n = 5000;
-nbsimul=10; %a augmenter pour meilleure stat
+nbsimul=1; %a augmenter pour meilleure stat
 
 %----------------------------------------------------------------------
 % Param�tres de la fonction de distribution de la distance de la source
@@ -49,8 +49,8 @@ global l b
 
 % definition de la fenetre de Baade dans la majeure partie des articles :  l = 1 et b = -4
 % A priori c'est cette definition qui est juste.
-l = 1 *pi/180;    % direction d'observation en radian
-b = -4 *pi/180;
+l = 0.1 *pi/180;    % direction d'observation en radian
+b = 0*pi/180;
 
 
 % definition de la fenetre de Baade dans les theses de Mera et Alibert : l = 4 et b = -1
