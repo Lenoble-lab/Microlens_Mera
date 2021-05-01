@@ -107,7 +107,7 @@ vlimit = 1000e3;
 % Nombre de simulations
 %----------------------
 
-n = 4e7;
+n = 6e7;
 % n = 5000;
 nbsimul=1; %a augmenter pour meilleure stat
 
@@ -180,7 +180,7 @@ main
 %----------------------------------------
 % recuperation des evenements selectionnes
 %----------------------------------------
-path_field = strcat('../graph/OGLEIV_centre/', field);
+path_field = strcat('../graph/modif_FM/OGLEIV_centre/', field);
 
 movefile("evenements.txt", strcat(path_field, "/evenements_3.txt"))
 movefile ("simul_para.txt", strcat(path_field, "/simul_para_3.txt"))
@@ -204,13 +204,13 @@ tau_err = [];
 % field_list = ["BLG505"];
 for field = field_list
    
-path_field = strcat('../graph/OGLEIV_centre/', field);
-evenements = load(strcat(path_field, '/evenements_1.txt'));
+path_field = strcat('../graph/modif_FM/OGLEIV_centre/', field);
+evenements = load(strcat(path_field, '/evenements_3.txt'));
 
 te = evenements(:,5);
 te=te';
 
-fid = fopen(strcat(path_field,'/simul_para_1.txt'));
+fid = fopen(strcat(path_field,'/simul_para_3.txt'));
 tau = str2double(fgets(fid));
 n = str2double(fgets(fid));
 nbsimul = str2double(fgets(fid));
